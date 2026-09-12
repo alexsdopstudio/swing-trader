@@ -24,6 +24,7 @@ Last updated: 2026-09-12
 - experiment index and durable reviewed experiment memory
 - CI with pytest and Ruff
 - repo-native AI memory and context builder
+- automated cross-session/cross-agent PR handoff generation and resume protocol
 - gated branch/design/PR/review/merge development lifecycle
 - Simplify and Compound stages for AI-assisted development
 - reusable solution-memory taxonomy for engineering and trading research

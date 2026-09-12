@@ -5,7 +5,7 @@ This document defines the required lifecycle for repository changes performed by
 The default lifecycle is:
 
 ```text
-Intake
+Session bootstrap / intake
   -> Dedicated branch
   -> Design
   -> Draft PR
@@ -17,7 +17,24 @@ Intake
   -> Merge
 ```
 
-The process is designed to keep implementation traceable, reviewable, and progressively more useful to future work.
+The process is designed to keep implementation traceable, reviewable, resumable across sessions, and progressively more useful to future work.
+
+## 0. Session bootstrap and resume
+
+Before creating a new branch, AI agents must reconstruct current repository state autonomously.
+
+When GitHub access is available:
+
+1. read `AGENTS.md` from `main`;
+2. list open pull requests;
+3. inspect each relevant PR's latest comment containing `<!-- agent-handoff -->`;
+4. inspect the matching PR body, head branch, active plan, final diff, check state, reviews, and unresolved threads;
+5. continue existing in-flight work when it matches the requested objective;
+6. only create new work when no matching branch/PR exists.
+
+The user is not a context-transfer mechanism. Do not ask the user to paste old chats, summarize previous implementation work, run bootstrap commands, or identify the correct branch when repository/GitHub state can answer those questions.
+
+If the automated handoff is missing or stale, reconstruct state directly from the PR and repository, then continue. `docs/workflow/agent-session-handoff.md` defines the complete fallback and source-of-truth hierarchy.
 
 ## 1. Intake
 
@@ -30,9 +47,11 @@ Before editing production code, define:
 - relevant architecture, ADRs, strategy rules, prior solutions, and experiments;
 - material risks, especially look-ahead bias, execution assumptions, position/risk logic, data quality, reproducibility, and overfitting.
 
+If a matching in-flight PR already exists, intake updates that task rather than creating a duplicate.
+
 ## 2. Dedicated branch
 
-Create one dedicated branch from the latest `main` before creating version-controlled design or implementation changes.
+Create one dedicated branch from the latest `main` before creating version-controlled design or implementation changes, unless the logical change already has an existing branch/PR that should be resumed.
 
 The branch is the working container for the entire logical change: design, implementation, simplification, tests, compound knowledge, review fixes, and final documentation.
 
@@ -71,7 +90,7 @@ Material changes to trading behavior, risk policy, execution semantics, live-tra
 
 ## 4. Draft PR
 
-Open a Draft PR once the design is sufficiently clear. The Draft PR is the shared audit trail for the entire feature: design, implementation, simplification, tests, compound knowledge, review feedback, and final decision.
+Open a Draft PR once the design is sufficiently clear. The Draft PR is the shared audit trail for the entire feature: design, implementation, simplification, tests, compound knowledge, review feedback, handoff state, and final decision.
 
 The Draft PR must reference the active plan and summarize:
 
@@ -81,6 +100,8 @@ The Draft PR must reference the active plan and summarize:
 - validation strategy.
 
 Do not open a second implementation PR for the same logical feature.
+
+For same-repository PRs, `.github/workflows/agent-handoff.yml` maintains a derived cross-session handoff comment/artifact. This convenience layer summarizes state but does not replace the PR body, diff, checks, reviews, or project memory as sources of truth.
 
 ## 5. Implementation
 
@@ -124,7 +145,8 @@ Before the PR is ready for Compound and final review:
 - run relevant integration or backtest validation;
 - inspect execution assumptions and data alignment;
 - verify no unintended risk-policy changes;
-- verify documentation and project memory reflect the state that will exist after merge.
+- verify documentation and project memory reflect the state that will exist after merge;
+- verify automated handoff generation succeeds for non-trivial same-repository PRs when the workflow is applicable.
 
 ## 8. Compound
 
@@ -152,7 +174,7 @@ The active plan should also be finalized for the post-merge state before final r
 
 Every PR requires a formal review pass before merge, including PRs authored by an AI agent.
 
-The reviewer must inspect the final diff rather than relying only on the PR description.
+The reviewer must inspect the final diff rather than relying only on the PR description or generated handoff.
 
 Review should cover:
 
@@ -189,6 +211,7 @@ Review should cover:
 - Are branch, commits, and PR title compliant?
 - Is all repository content in English?
 - Are docs, ADRs, plans, solution memory, and current-state memory updated?
+- Is the task recoverable from repository/PR state without one chat session?
 - Are all CI checks green?
 - Are there unresolved review threads?
 
@@ -232,17 +255,18 @@ Emergency fixes still require a branch and PR. The design may be concise, but th
 
 For AI-driven development, the default behavior is autonomous execution of this lifecycle:
 
-1. understand the task and repository context;
-2. create the dedicated branch from the latest `main`;
-3. write/update the design plan;
-4. open the Draft PR;
-5. implement;
-6. simplify;
-7. validate;
-8. compound reusable learning;
-9. finalize memory and the active plan;
-10. perform a final diff-based PR review;
-11. fix findings and repeat the relevant stages if necessary;
-12. merge only after a `PASS` review and green CI.
+1. inspect open work and reconstruct session state from repository/GitHub metadata;
+2. understand the task and repository context;
+3. continue a matching in-flight PR or create a dedicated branch from the latest `main`;
+4. write/update the design plan;
+5. open the Draft PR when new work is required;
+6. implement;
+7. simplify;
+8. validate;
+9. compound reusable learning;
+10. finalize memory and the active plan;
+11. perform a final diff-based PR review;
+12. fix findings and repeat the relevant stages if necessary;
+13. merge only after a `PASS` review and green CI.
 
-Ask for user input only when a material product, trading-risk, architecture, or scope decision cannot be safely inferred from existing project decisions.
+Ask for user input only when a material product, trading-risk, architecture, or scope decision cannot be safely inferred from existing project decisions. Do not delegate routine context discovery, branch selection, handoff generation, CI inspection, review, or merge operations to the user when tools are available.

@@ -36,7 +36,7 @@ This README is the lightweight solution-memory index consumed by the AI context 
 
 ### Engineering
 
-_No reusable engineering solution notes recorded yet._
+- [`separate-durable-memory-from-inflight-state.md`](engineering/separate-durable-memory-from-inflight-state.md) — keep durable project knowledge versioned while deriving fast-changing branch/PR/check/review state into replaceable cross-agent handoffs.
 
 ### Trading research
 

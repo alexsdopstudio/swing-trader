@@ -7,6 +7,7 @@ MEMORY_FILES = (
     "AGENTS.md",
     "ARCHITECTURE.md",
     ".ai/current-state.md",
+    ".ai/handoff.md",
     "docs/product/strategy-v1.md",
     "docs/domain/risk-model.md",
     "docs/roadmap.md",
@@ -65,7 +66,7 @@ def build_context(root: Path) -> str:
         (
             "",
             "## Instruction",
-            "Treat repository files as the source of truth. Inspect implementation, tests, decisions, and the solution-memory index before editing. Update durable memory when decisions or reusable learnings change.",
+            "Treat repository files as the source of truth. Inspect implementation, tests, decisions, the latest generated handoff when present, and the solution-memory index before editing. Update durable memory when decisions or reusable learnings change.",
             "",
         )
     )

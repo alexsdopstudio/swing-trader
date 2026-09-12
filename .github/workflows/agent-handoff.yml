@@ -1,0 +1,113 @@
+name: Agent handoff
+
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, edited, synchronize, reopened, ready_for_review, converted_to_draft]
+
+permissions:
+  contents: read
+  checks: read
+  issues: write
+  pull-requests: write
+
+jobs:
+  handoff:
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout PR head
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Build metadata snapshot
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const pr = context.payload.pull_request;
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const checksResponse = await github.rest.checks.listForRef({
+              owner,
+              repo,
+              ref: pr.head.sha,
+              per_page: 100,
+            });
+            const checks = checksResponse.data.check_runs.map((run) => ({
+              name: run.name,
+              status: run.status,
+              conclusion: run.conclusion,
+              url: run.html_url,
+            }));
+            const metadata = {
+              pr: {
+                repository: `${owner}/${repo}`,
+                number: pr.number,
+                title: pr.title,
+                url: pr.html_url,
+                base: pr.base.ref,
+                head: pr.head.ref,
+                head_sha: pr.head.sha,
+                draft: pr.draft,
+                body: pr.body || '',
+              },
+              checks,
+            };
+            fs.writeFileSync('.handoff-metadata.json', JSON.stringify(metadata, null, 2));
+
+      - name: Generate handoff
+        run: |
+          python scripts/build_handoff.py \
+            --metadata-file .handoff-metadata.json \
+            --output-dir .artifacts/agent-handoff
+
+      - name: Upload handoff artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: agent-handoff-pr-${{ github.event.pull_request.number }}
+          path: .artifacts/agent-handoff
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Upsert handoff comment
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const marker = '<!-- agent-handoff -->';
+            const body = fs.readFileSync('.artifacts/agent-handoff/handoff.md', 'utf8');
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const issue_number = context.issue.number;
+            const comments = await github.paginate(github.rest.issues.listComments, {
+              owner,
+              repo,
+              issue_number,
+              per_page: 100,
+            });
+            const existing = comments.find((comment) => (comment.body || '').includes(marker));
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner,
+                repo,
+                comment_id: existing.id,
+                body,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner,
+                repo,
+                issue_number,
+                body,
+              });
+            }
