@@ -2,14 +2,13 @@
 
 ## Now
 
-- Add simple passive/reference baselines so opportunity cost and risk-adjusted value are visible beside the swing strategy.
 - Keep v1 frozen for `PROSPECTIVE-v1-holdout`, which begins 2026-09-14.
+- Run parameter-neighborhood robustness sweeps without changing the frozen v1 specification or selecting a new v1 parameter set from retrospective results.
 - Build forward paper/holdout recording without allowing interim v1 tuning.
 - Preserve provenance for every prospective observation and provider revision.
 
 ## Next
 
-- Parameter-neighborhood robustness sweeps without changing the frozen v1 specification.
 - Broader-universe testing to reduce survivor and selection bias.
 - Persistent experiment registry/index automation.
 - Daily scan persistence.
@@ -33,6 +32,7 @@ Interim monitoring is allowed. Interim performance must not be used to tune v1.
 - EXP-0001 cost-aware exploratory baseline.
 - EXP-0002 execution-cost sensitivity using one shared market-data snapshot.
 - EXP-0003 retrospective temporal-stability diagnostic using six independent calendar folds.
+- EXP-0004 cost-aware passive/reference comparison using per-symbol and initial equal-weight buy-and-hold baselines on one shared snapshot.
 - Preregistered `PROSPECTIVE-v1-holdout` protocol separating future unseen evidence from retrospective diagnostics.
 
 ## Later
