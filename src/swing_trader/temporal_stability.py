@@ -304,6 +304,7 @@ def run_temporal_stability(
 
     producer_sha = commit_sha or _git_sha()
     fold_results: list[dict[str, Any]] = []
+    runtime: dict[str, Any] | None = None
     for fold in folds:
         fold_config = copy.deepcopy(base_config)
         fold_experiment = fold_config["experiment"]
@@ -324,6 +325,8 @@ def run_temporal_stability(
             downloader=snapshot,
             commit_sha=producer_sha,
         )
+        if runtime is None:
+            runtime = dict(result["runtime"])
         summary = _fold_summary(fold["name"], result)
         summary["evaluation_start"] = fold["evaluation_start"]
         summary["evaluation_end_exclusive"] = fold["evaluation_end"]
@@ -375,9 +378,7 @@ def run_temporal_stability(
                 "historical_data_already_observed": True,
                 "true_out_of_sample_claim": False,
             },
-            "runtime": {
-                "source_runtime": "recorded in per-fold results",
-            },
+            "runtime": runtime,
             "data_snapshot": {
                 "provider_download_count": snapshot.download_count,
                 "source": snapshot.source_records(),
