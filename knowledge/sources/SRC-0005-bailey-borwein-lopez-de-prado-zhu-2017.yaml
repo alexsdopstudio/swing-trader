@@ -1,0 +1,29 @@
+schema_version: 1
+id: SRC-0005
+title: The probability of backtest overfitting
+authors:
+  - David H. Bailey
+  - Jonathan M. Borwein
+  - Marcos López de Prado
+  - Qiji Jim Zhu
+year: 2017
+source_type: peer_reviewed_primary
+publisher: Risk Journals
+publication: The Journal of Computational Finance
+doi: 10.21314/jcf.2016.322
+url: https://doi.org/10.21314/jcf.2016.322
+accessed_on: 2026-09-13
+topics:
+  - backtesting
+  - overfitting
+  - model-selection
+  - cross-validation
+redistribution:
+  full_text_committed: false
+project_relevance: >-
+  Provides a framework for reasoning about the probability that a selected investment backtest is
+  overfit after comparing alternatives, reinforcing the project's policy of not promoting the best
+  retrospective parameter set and of reserving future data for preregistered evaluation.
+limitations:
+  - The proposed probability-of-backtest-overfitting framework is a diagnostic methodology, not proof that a strategy is robust when its estimate is favorable.
+  - Swing Trader currently emphasizes preregistration, neighborhood tests, and prospective replay rather than implementing the paper's full CSCV procedure.
