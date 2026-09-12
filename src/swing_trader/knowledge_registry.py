@@ -457,7 +457,9 @@ def build_registry(root: str | Path = ".") -> dict[str, Any]:
 
 def registry_bytes(root: str | Path = ".") -> bytes:
     payload = build_registry(root)
-    return (json.dumps(payload, indent=2, sort_keys=True, allow_nan=False) + "\n").encode("utf-8")
+    return (
+        json.dumps(payload, indent=2, sort_keys=True, allow_nan=False, ensure_ascii=False) + "\n"
+    ).encode("utf-8")
 
 
 def write_registry(root: str | Path = ".") -> Path:
