@@ -1,0 +1,208 @@
+{
+  "experiment": {
+    "id": "EXP-0002",
+    "name": "execution-cost-sensitivity",
+    "research_stage": "sensitivity",
+    "producer_code_sha": "36475d98ce36e4b1fef533a540be0d9b03c5bcd6",
+    "workflow_run_id": 34708027981,
+    "artifact_id": 10302117801,
+    "artifact_sha256": "3041370a940bf44c6448c02b9a99acb1594d5f514c8101422bbcac898a1e67b7",
+    "base_experiment_config": "experiments/EXP-0001-baseline/config.yaml",
+    "base_experiment_config_sha256": "088c84162ab3b684e87cd67b9ac6af57cae9f80f98f3f4fbfc159a240f2d2f52",
+    "base_execution_cost_config": "config/execution-costs.yaml",
+    "base_execution_cost_config_sha256": "aa9874e2dca440e224d0b8c60304563634981bd5c7e66bf9e15efa6ef10a4fac",
+    "sensitivity_config_sha256": "cefe66f16237f70c17b914d571d013a398edbe7cfcb79d95f2a263414da2a03a"
+  },
+  "runtime": {
+    "python": "3.12.14",
+    "numpy": "2.5.3",
+    "pandas": "3.0.5",
+    "PyYAML": "6.0.3",
+    "yfinance": "1.7.0"
+  },
+  "data_consistency": {
+    "identical_source_digests_across_scenarios": true,
+    "shared_provider_download_count": 5,
+    "source_digests_match_EXP-0001_reference": false,
+    "changed_source_symbols_vs_EXP-0001": [
+      "META",
+      "NVDA",
+      "QQQ"
+    ],
+    "unchanged_source_symbols_vs_EXP-0001": [
+      "BTC-USD",
+      "SOL-USD"
+    ],
+    "source": {
+      "BTC-USD": {
+        "first_observation": "2020-01-01",
+        "last_observation": "2026-08-31",
+        "rows": 2435,
+        "sha256": "3d1f12602576f0f20a843463695bfca10707d844985cf2dcd4c6ce7c957edc36"
+      },
+      "META": {
+        "first_observation": "2020-01-02",
+        "last_observation": "2026-08-31",
+        "rows": 1674,
+        "sha256": "b666a186d9a1d5d3eb7a1c7bbab28489646dec7afd6d404fb339e488c9e860ac"
+      },
+      "NVDA": {
+        "first_observation": "2020-01-02",
+        "last_observation": "2026-08-31",
+        "rows": 1674,
+        "sha256": "d0ca48a91e14e795b8892ecf1bd5eb1409f41d83fd08c9ee273ef9c145b6c166"
+      },
+      "QQQ": {
+        "first_observation": "2020-01-02",
+        "last_observation": "2026-08-31",
+        "rows": 1674,
+        "sha256": "156664fe415d75f31208016107711291079b5f806e9751945e2a43964f61c514"
+      },
+      "SOL-USD": {
+        "first_observation": "2020-04-10",
+        "last_observation": "2026-08-31",
+        "rows": 2335,
+        "sha256": "f733e8c72ad3952f7d756a75bc2af6e01a9dcb61b13ee2ae5238b14ab65bfb48"
+      }
+    },
+    "EXP-0001_baseline_metric_deltas": {
+      "end_equity": 0.00026671467367123114,
+      "cagr": 7.176671701358828e-09,
+      "max_drawdown": -2.0399561928563514e-08,
+      "profit_factor": 7.658679610500485e-07,
+      "expectancy_r": 1.0868165545296904e-07,
+      "trade_count": 0.0
+    }
+  },
+  "scenarios": {
+    "low": {
+      "multiplier": 0.5,
+      "equity_costs_bps": {
+        "commission": 0.5,
+        "full_spread": 2.5,
+        "slippage_per_side": 2.5
+      },
+      "crypto_costs_bps": {
+        "commission": 5.0,
+        "full_spread": 5.0,
+        "slippage_per_side": 5.0
+      },
+      "trade_count": 65,
+      "end_equity": 7025.913696654971,
+      "total_return": 0.40518273933099436,
+      "cagr": 0.061921849887323965,
+      "max_drawdown": -0.042715568729102205,
+      "profit_factor": 3.264881423733816,
+      "expectancy_r": 1.0771410306809839,
+      "win_rate": 0.46153846153846156,
+      "average_winner_r": 3.2532093086886738,
+      "average_loser_r": -0.7880603504684638,
+      "average_holding_days": 23.215384615384615,
+      "average_exposure": 0.06117608899445895,
+      "top5_profit_share": 0.47655282719977055,
+      "total_execution_cost": 43.99344272539295,
+      "total_fees": 12.464451730219393,
+      "end_equity_delta_vs_baseline": 67.39584050006033,
+      "expectancy_r_delta_vs_baseline": 0.030529123089600096
+    },
+    "baseline": {
+      "multiplier": 1.0,
+      "equity_costs_bps": {
+        "commission": 1.0,
+        "full_spread": 5.0,
+        "slippage_per_side": 5.0
+      },
+      "crypto_costs_bps": {
+        "commission": 10.0,
+        "full_spread": 10.0,
+        "slippage_per_side": 10.0
+      },
+      "trade_count": 65,
+      "end_equity": 6958.517856154911,
+      "total_return": 0.3917035712309822,
+      "cagr": 0.06011557325937056,
+      "max_drawdown": -0.04249153174345921,
+      "profit_factor": 3.1834277677568297,
+      "expectancy_r": 1.0466119075913838,
+      "win_rate": 0.46153846153846156,
+      "average_winner_r": 3.194943005315071,
+      "average_loser_r": -0.7948147476003486,
+      "average_holding_days": 23.16923076923077,
+      "average_exposure": 0.06037194172028428,
+      "top5_profit_share": 0.4798423378622357,
+      "total_execution_cost": 86.11164649785181,
+      "total_fees": 24.322729587884997
+    },
+    "high": {
+      "multiplier": 2.0,
+      "equity_costs_bps": {
+        "commission": 2.0,
+        "full_spread": 10.0,
+        "slippage_per_side": 10.0
+      },
+      "crypto_costs_bps": {
+        "commission": 20.0,
+        "full_spread": 20.0,
+        "slippage_per_side": 20.0
+      },
+      "trade_count": 65,
+      "end_equity": 6830.9222568996975,
+      "total_return": 0.3661844513799395,
+      "cagr": 0.056656061836033667,
+      "max_drawdown": -0.042054092077339345,
+      "profit_factor": 3.030914237437928,
+      "expectancy_r": 0.9880431197537942,
+      "win_rate": 0.46153846153846156,
+      "average_winner_r": 3.083158990985978,
+      "average_loser_r": -0.8077704841595068,
+      "average_holding_days": 23.092307692307692,
+      "average_exposure": 0.0588547029427863,
+      "top5_profit_share": 0.4863330263421689,
+      "total_execution_cost": 165.23668114548812,
+      "total_fees": 46.40127381813674,
+      "end_equity_delta_vs_baseline": -127.59559925521353,
+      "expectancy_r_delta_vs_baseline": -0.058568787837589564
+    },
+    "stress": {
+      "multiplier": 4.0,
+      "equity_costs_bps": {
+        "commission": 4.0,
+        "full_spread": 20.0,
+        "slippage_per_side": 20.0
+      },
+      "crypto_costs_bps": {
+        "commission": 40.0,
+        "full_spread": 40.0,
+        "slippage_per_side": 40.0
+      },
+      "trade_count": 66,
+      "end_equity": 6509.318959811348,
+      "total_return": 0.30186379196226953,
+      "cagr": 0.04769424489808771,
+      "max_drawdown": -0.04439861871862649,
+      "profit_factor": 2.620440046760488,
+      "expectancy_r": 0.822050123238992,
+      "win_rate": 0.45454545454545453,
+      "average_winner_r": 2.810895153329429,
+      "average_loser_r": -0.835320735169706,
+      "average_holding_days": 22.484848484848484,
+      "average_exposure": 0.055348740969951245,
+      "top5_profit_share": 0.49285851631695826,
+      "total_execution_cost": 307.9973323413206,
+      "total_fees": 84.91028649997733,
+      "end_equity_delta_vs_baseline": -449.1988963435633,
+      "expectancy_r_delta_vs_baseline": -0.22456178435239182
+    }
+  },
+  "robustness": {
+    "primary_scenario": "high",
+    "primary_expectancy_positive": true,
+    "stress_scenario": "stress",
+    "stress_expectancy_positive": true,
+    "profit_factor_nonincreasing_with_costs": true,
+    "cagr_nonincreasing_with_costs": true,
+    "end_equity_nonincreasing_with_costs": true,
+    "execution_cost_nondecreasing_with_multiplier": true
+  },
+  "decision": "COST ROBUSTNESS SUPPORTED IN-SAMPLE — CONTINUE RESEARCH — DO NOT DEPLOY"
+}
