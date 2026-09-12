@@ -15,7 +15,7 @@ This applies to:
 - configuration comments and descriptive values
 - test names and test descriptions
 - experiment notes and research conclusions
-- ADRs, plans, and AI memory files
+- ADRs, plans, solution notes, and AI memory files
 - branch names
 - commit messages
 - pull request titles and descriptions
@@ -34,14 +34,16 @@ Intake
   -> Design
   -> Draft PR
   -> Implementation
+  -> Simplify
   -> Validation
+  -> Compound
   -> Formal PR review
   -> Squash merge
 ```
 
 Create the dedicated branch before committing the design plan so design and implementation remain in one auditable history. For non-trivial changes, create a design plan under `docs/plans/active/` using `.ai/design-template.md` before implementing production code. Open the PR as Draft once the design is clear enough to review, then implement the feature on the same branch and PR.
 
-A PR is not complete when the code is written. It is complete only after validation, a formal diff-based `PASS` review, green required CI checks, updated project memory, and merge into `main`.
+A PR is not complete when the code works. It is complete only after simplification, validation, compound knowledge capture, a formal diff-based `PASS` review, green required CI checks, updated project memory, and merge into `main`.
 
 ## Branches
 
@@ -118,16 +120,51 @@ A PR should:
 2. Link or name the active design plan when required.
 3. Explain the motivation and proposed design before implementation details.
 4. State trading/research assumptions affected by the change.
-5. List tests and validation performed.
-6. Call out look-ahead, execution, risk, data-quality, overfitting, or reproducibility implications when applicable.
-7. Update durable project memory (`AGENTS.md`, ADRs, plans, current state, strategy docs) when future agent behavior should change.
-8. Keep all repository-facing text introduced by the PR in English.
-9. Pass a formal diff-based review.
-10. Pass all required CI checks before merge.
+5. Record the Simplify outcome.
+6. List tests and validation performed.
+7. Record the Compound outcome: reusable learning captured or `No reusable learning`.
+8. Call out look-ahead, execution, risk, data-quality, overfitting, or reproducibility implications when applicable.
+9. Update durable project memory (`AGENTS.md`, ADRs, plans, current state, strategy docs, solution notes) when future agent behavior should change.
+10. Keep all repository-facing text introduced by the PR in English.
+11. Pass a formal diff-based review.
+12. Pass all required CI checks before merge.
+
+## Simplify
+
+After implementation and before final validation, perform a dedicated simplification pass.
+
+Review the implementation for:
+
+- dead code;
+- unnecessary abstractions;
+- avoidable indirection;
+- duplicated logic;
+- overly broad interfaces;
+- complexity not justified by requirements or evidence.
+
+Record what was simplified in the PR. If no simplification is warranted, record `No simplification needed` and briefly explain why.
+
+Simplify is not permission to change scope or remove necessary safeguards. Trading invariants, deterministic risk controls, and reproducibility requirements take priority over cosmetic code reduction.
+
+## Compound
+
+Before final review, ask:
+
+> What did this change teach us that a future agent should not have to rediscover?
+
+Record one of the following in the PR:
+
+1. `No reusable learning`.
+2. A durable update to an existing source of truth such as an ADR, architecture/domain doc, plan, experiment record, or current-state memory.
+3. A reusable solution note under `docs/solutions/` using `.ai/solution-template.md`.
+
+Use solution notes for recurring problem/solution knowledge. Use ADRs for durable project decisions. Use `experiments/` for experiment-specific evidence and failed hypotheses.
+
+Compound occurs before final formal review so every knowledge artifact created by the step is part of the reviewed diff.
 
 ## Formal review
 
-Before merge, perform a review of the actual diff. Do not review only the PR description.
+Before merge, perform a review of the actual final diff. Do not review only the PR description.
 
 The review must cover:
 
@@ -136,6 +173,8 @@ The review must cover:
 - look-ahead, survivorship, data leakage, and execution timing;
 - deterministic risk controls and trading assumptions;
 - architecture, complexity, maintainability, and duplication;
+- whether the Simplify pass was sufficient;
+- whether the Compound outcome captured reusable knowledge appropriately;
 - English-only repository content;
 - required documentation/memory updates;
 - green CI and unresolved review threads.
@@ -148,7 +187,7 @@ CHANGES REQUESTED
 BLOCKED
 ```
 
-If the reviewer finds issues, fix them on the same branch and repeat the review. Merge only after `PASS`.
+If the reviewer finds issues, fix them on the same branch and repeat the relevant Simplify, Validation, Compound, and Review stages. Merge only after `PASS`.
 
 When the PR author and reviewer share the same GitHub identity, record the formal review as a review comment because GitHub does not provide an independent self-approval signal.
 
@@ -159,6 +198,7 @@ The agent or engineer responsible for the PR owns finishing the lifecycle rather
 Merge only when:
 
 - the design and acceptance criteria are satisfied;
+- the Simplify and Compound stages are complete;
 - formal review outcome is `PASS`;
 - required CI is green;
 - no unresolved review threads or known blockers remain;
@@ -174,10 +214,13 @@ AI coding agents follow the same process as humans and should execute it autonom
 2. Create the dedicated branch from the latest `main`.
 3. Write/update the design plan.
 4. Open a Draft PR.
-5. Implement and validate on that branch.
-6. Update durable memory.
-7. Mark the PR ready and perform a formal diff-based review.
-8. Fix findings and re-review if necessary.
-9. Merge after `PASS` and green CI.
+5. Implement on that branch.
+6. Simplify the implementation.
+7. Validate tests, lint, integration/backtest behavior, and research invariants.
+8. Perform the Compound check and update durable knowledge when appropriate.
+9. Finalize project memory and the active plan.
+10. Mark the PR ready and perform a formal diff-based review.
+11. Fix findings and repeat the relevant stages if necessary.
+12. Merge after `PASS` and green CI.
 
 Agents must not bypass review or leave a completed PR unmerged merely because they have write access. Ask for user input only when a material product, trading-risk, architecture, or scope decision cannot be safely inferred from existing project decisions.
