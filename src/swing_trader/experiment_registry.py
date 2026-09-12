@@ -40,6 +40,15 @@ def _mapping(payload: dict[str, Any], key: str, *, path: Path) -> dict[str, Any]
     return value
 
 
+def _optional_mapping(payload: dict[str, Any], key: str, *, path: Path) -> dict[str, Any]:
+    value = payload.get(key)
+    if value is None:
+        return {}
+    if not isinstance(value, dict):
+        raise ValueError(f"{path}: expected '{key}' mapping when present")
+    return value
+
+
 def _nonempty_string(mapping: dict[str, Any], key: str, *, label: str) -> str:
     value = mapping.get(key)
     if not isinstance(value, str) or not value.strip():
@@ -83,9 +92,32 @@ def _readme_has_directory(readme: str, directory_name: str) -> bool:
     return directory_name in readme
 
 
-def _producer_code_sha(result_experiment: dict[str, Any], *, label: str) -> str:
-    producer = result_experiment.get("producer_code_sha")
-    legacy = result_experiment.get("code_commit_sha")
+def _merged_provenance(
+    result_experiment: dict[str, Any],
+    provenance: dict[str, Any],
+    *,
+    label: str,
+) -> dict[str, Any]:
+    merged = dict(provenance)
+    for key in (
+        "producer_code_sha",
+        "code_commit_sha",
+        "workflow_run_id",
+        "artifact_id",
+        "artifact_sha256",
+    ):
+        if key not in result_experiment:
+            continue
+        value = result_experiment[key]
+        if key in merged and merged[key] != value:
+            raise ValueError(f"{label}: conflicting provenance value for '{key}'")
+        merged[key] = value
+    return merged
+
+
+def _producer_code_sha(provenance: dict[str, Any], *, label: str) -> str:
+    producer = provenance.get("producer_code_sha")
+    legacy = provenance.get("code_commit_sha")
     if producer is not None and legacy is not None and producer != legacy:
         raise ValueError(f"{label}: conflicting producer_code_sha and code_commit_sha")
     value = producer if producer is not None else legacy
@@ -104,6 +136,12 @@ def _historical_entry(directory: Path, readme: str, root: Path) -> dict[str, Any
     results = _load_json(files["results.json"])
     config_experiment = _mapping(config, "experiment", path=files["config.yaml"])
     result_experiment = _mapping(results, "experiment", path=files["results.json"])
+    result_provenance = _optional_mapping(results, "provenance", path=files["results.json"])
+    provenance = _merged_provenance(
+        result_experiment,
+        result_provenance,
+        label=str(files["results.json"]),
+    )
 
     config_id = _nonempty_string(config_experiment, "id", label=str(files["config.yaml"]))
     result_id = _nonempty_string(result_experiment, "id", label=str(files["results.json"]))
@@ -140,15 +178,15 @@ def _historical_entry(directory: Path, readme: str, root: Path) -> dict[str, Any
         "results_sha256": _sha256(files["results.json"]),
         "notes_sha256": _sha256(files["notes.md"]),
         "producer_code_sha": _producer_code_sha(
-            result_experiment, label=str(files["results.json"])
+            provenance, label=str(files["results.json"])
         ),
         "workflow_run_id": _optional_int(
-            result_experiment, "workflow_run_id", label=str(files["results.json"])
+            provenance, "workflow_run_id", label=str(files["results.json"])
         ),
         "artifact_id": _optional_int(
-            result_experiment, "artifact_id", label=str(files["results.json"])
+            provenance, "artifact_id", label=str(files["results.json"])
         ),
-        "artifact_sha256": _optional_string(result_experiment, "artifact_sha256"),
+        "artifact_sha256": _optional_string(provenance, "artifact_sha256"),
         "decision": None if decision is None else decision.strip(),
     }
 
