@@ -16,7 +16,8 @@ def _asset(
     scores: list[int],
     index: pd.DatetimeIndex | None = None,
 ) -> PortfolioAsset:
-    index = index or pd.date_range("2026-01-01", periods=len(opens), freq="D")
+    if index is None:
+        index = pd.date_range("2026-01-01", periods=len(opens), freq="D")
     data = pd.DataFrame(
         {
             "Open": opens,
