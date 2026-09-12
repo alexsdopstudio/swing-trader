@@ -135,6 +135,27 @@ def test_registry_normalizes_producer_sha_and_existing_provenance(tmp_path: Path
     assert entry["decision"] == "CONTINUE RESEARCH"
 
 
+def test_registry_normalizes_top_level_provenance_block(tmp_path: Path) -> None:
+    historical = _write_historical(tmp_path, producer_field="producer_code_sha")
+    results_path = historical / "results.json"
+    results = json.loads(results_path.read_text(encoding="utf-8"))
+    producer = results["experiment"].pop("producer_code_sha")
+    results["provenance"] = {
+        "producer_code_sha": producer,
+        "workflow_run_id": 123,
+        "artifact_id": 456,
+        "artifact_sha256": "c" * 64,
+    }
+    results_path.write_text(json.dumps(results, indent=2) + "\n", encoding="utf-8")
+    _write_index(tmp_path, historical.name)
+
+    entry = build_registry(tmp_path)["historical_experiments"][0]
+    assert entry["producer_code_sha"] == "a" * 40
+    assert entry["workflow_run_id"] == 123
+    assert entry["artifact_id"] == 456
+    assert entry["artifact_sha256"] == "c" * 64
+
+
 def test_registry_rejects_directory_config_result_id_mismatch(tmp_path: Path) -> None:
     historical = _write_historical(tmp_path, result_id="EXP-9999")
     _write_index(tmp_path, historical.name)
@@ -174,3 +195,9 @@ def test_registry_rejects_missing_readme_coverage(tmp_path: Path) -> None:
 
     with pytest.raises(ValueError, match="README.md does not link EXP-0001-alpha"):
         build_registry(tmp_path)
+
+
+def test_committed_repository_registry_is_current() -> None:
+    root = Path(__file__).resolve().parents[1]
+    path = check_registry(root)
+    assert path == root / "experiments" / "registry.json"
