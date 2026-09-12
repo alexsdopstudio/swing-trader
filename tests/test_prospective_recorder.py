@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 from datetime import UTC, datetime
 from pathlib import Path
 
@@ -29,6 +30,10 @@ def _source_frame() -> pd.DataFrame:
         },
         index=index,
     )
+
+
+def _downloader(symbol: str, start: str, end: str | None) -> pd.DataFrame:
+    return _source_frame()
 
 
 def test_registered_protocol_matches_lock() -> None:
@@ -116,20 +121,35 @@ def test_capture_uses_current_utc_date_as_exclusive_cutoff_and_downloads_once_pe
     assert result.archive_path.name.endswith(f"-{result.archive_sha256}.zip")
 
 
-def test_same_input_clock_and_code_produce_identical_archive_bytes(tmp_path: Path) -> None:
-    def downloader(symbol: str, start: str, end: str | None) -> pd.DataFrame:
-        return _source_frame()
+def test_archive_verifier_requires_registered_protocol_lock(tmp_path: Path) -> None:
+    result = capture_snapshot(
+        tmp_path / "snapshot",
+        downloader=_downloader,
+        recorded_at=datetime(2026, 9, 15, 2, 17, tzinfo=UTC),
+        commit_sha="test-sha",
+    )
+    assert result is not None
 
+    lock = json.loads(DEFAULT_LOCK_PATH.read_text(encoding="utf-8"))
+    lock["protocol_sha256"] = "0" * 64
+    wrong_lock = tmp_path / "wrong-lock.json"
+    wrong_lock.write_text(json.dumps(lock), encoding="utf-8")
+
+    with pytest.raises(RuntimeError, match="registered protocol lock"):
+        verify_snapshot_archive(result.archive_path, lock_path=wrong_lock)
+
+
+def test_same_input_clock_and_code_produce_identical_archive_bytes(tmp_path: Path) -> None:
     recorded_at = datetime(2026, 9, 15, 2, 17, tzinfo=UTC)
     first = capture_snapshot(
         tmp_path / "first",
-        downloader=downloader,
+        downloader=_downloader,
         recorded_at=recorded_at,
         commit_sha="test-sha",
     )
     second = capture_snapshot(
         tmp_path / "second",
-        downloader=downloader,
+        downloader=_downloader,
         recorded_at=recorded_at,
         commit_sha="test-sha",
     )
@@ -162,5 +182,7 @@ def test_recorder_workflow_is_append_only_and_has_no_backfill_input() -> None:
     assert "--clobber" not in workflow
     assert "gh release upload" in workflow
     assert "prospective-v1-holdout-data-" in workflow
+    assert "assets=\"$(gh release view" in workflow
+    assert "< <(gh release view" not in workflow
     assert "02:17" not in workflow  # cron is UTC fields, not prose that could drift.
     assert "17 2 * * *" in workflow
