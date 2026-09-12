@@ -173,6 +173,36 @@ def _read_sources(path: Path, manifest: dict[str, Any]) -> dict[str, pd.DataFram
     return frames
 
 
+def _validate_market_date_coverage(
+    frames: dict[str, pd.DataFrame],
+    market_date: pd.Timestamp,
+) -> None:
+    missing_crypto = [
+        symbol for symbol in ("BTC-USD", "SOL-USD") if market_date not in frames[symbol].index
+    ]
+    if missing_crypto:
+        raise RuntimeError(
+            f"prospective archive is missing newly observable crypto bar for {market_date.date()}: "
+            + ", ".join(missing_crypto)
+        )
+
+    qqq_has_bar = market_date in frames["QQQ"].index
+    equity_presence = {
+        symbol: market_date in frames[symbol].index for symbol in ("META", "NVDA")
+    }
+    if qqq_has_bar:
+        missing_equities = [symbol for symbol, present in equity_presence.items() if not present]
+        if missing_equities:
+            raise RuntimeError(
+                f"prospective archive has benchmark session but missing equity bar for "
+                f"{market_date.date()}: {', '.join(missing_equities)}"
+            )
+    elif any(equity_presence.values()):
+        raise RuntimeError(
+            f"prospective archive has equity bar without QQQ benchmark for {market_date.date()}"
+        )
+
+
 def _replay_bars(
     frames: dict[str, pd.DataFrame],
     market_date: pd.Timestamp,
@@ -247,6 +277,7 @@ def evaluate_holdout_archives(
 
             market_date = pd.Timestamp(expected - timedelta(days=1))
             frames = _read_sources(path, manifest)
+            _validate_market_date_coverage(frames, market_date)
             bars = _replay_bars(frames, market_date)
             session.process_date(market_date, bars)
             result = session.result()
