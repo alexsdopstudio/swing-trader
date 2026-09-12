@@ -1,0 +1,171 @@
+{
+  "experiment": {
+    "id": "EXP-0005",
+    "name": "parameter-neighborhood",
+    "research_stage": "retrospective-parameter-neighborhood",
+    "producer_code_sha": "7db5ac84b03c01af6dbbdc1c72922fe6bc25fb3b",
+    "workflow_run_id": 34712328760,
+    "artifact_id": 10303114360,
+    "artifact_sha256": "27c1d576a1d0417f2019f3ab6f2091e1e43a1944f45a07aede91fbefd37f1c28",
+    "historical_data_already_observed": true,
+    "true_out_of_sample_claim": false,
+    "historical_winner_selected": false,
+    "base_experiment_config": "experiments/EXP-0001-baseline/config.yaml",
+    "reference_results": "experiments/EXP-0001-baseline/results.json"
+  },
+  "runtime": {
+    "python": "3.12.14",
+    "numpy": "2.5.3",
+    "pandas": "3.0.5",
+    "PyYAML": "6.0.3",
+    "yfinance": "1.7.0"
+  },
+  "center": {
+    "min_score": 70,
+    "stop_atr": 2.0,
+    "trail_atr": 2.5
+  },
+  "parameters": {
+    "min_score": [65, 70, 75],
+    "stop_atr": [1.5, 2.0, 2.5],
+    "trail_atr": [2.0, 2.5, 3.0]
+  },
+  "preregistered_criteria": {
+    "minimum_joint_positive_scenarios": 18,
+    "minimum_joint_positive_axial_neighbors": 5,
+    "minimum_median_expectancy_r": 0.5,
+    "missing_expectancy_r_for_median": 0.0,
+    "center_reference_tolerances": {
+      "total_return": 0.01,
+      "cagr": 0.0025,
+      "max_drawdown": 0.005,
+      "expectancy_r": 0.1,
+      "trade_count": 2
+    }
+  },
+  "data_consistency": {
+    "shared_provider_download_count": 5,
+    "identical_source_digests_across_scenarios": true,
+    "source_digests_match_EXP_0001_reference": false,
+    "changed_source_symbols_vs_EXP_0001": ["META", "NVDA", "QQQ"],
+    "source": {
+      "BTC-USD": {
+        "first_observation": "2020-01-01",
+        "last_observation": "2026-08-31",
+        "rows": 2435,
+        "sha256": "3d1f12602576f0f20a843463695bfca10707d844985cf2dcd4c6ce7c957edc36"
+      },
+      "META": {
+        "first_observation": "2020-01-02",
+        "last_observation": "2026-08-31",
+        "rows": 1674,
+        "sha256": "ea95ff89dbd7c005ba5adfc8be62254abd8cedb79edf67fa35ee5a3d3cd9204f"
+      },
+      "NVDA": {
+        "first_observation": "2020-01-02",
+        "last_observation": "2026-08-31",
+        "rows": 1674,
+        "sha256": "56a9033d42135e34f7874d8d54a2e5de193faaf304883b4b0b6dc5d529d617a0"
+      },
+      "QQQ": {
+        "first_observation": "2020-01-02",
+        "last_observation": "2026-08-31",
+        "rows": 1674,
+        "sha256": "74527ddbc6ae51b0a01db5332e94021f780678c44a3f52fb11038c4ef5cc0073"
+      },
+      "SOL-USD": {
+        "first_observation": "2020-04-10",
+        "last_observation": "2026-08-31",
+        "rows": 2335,
+        "sha256": "f733e8c72ad3952f7d756a75bc2af6e01a9dcb61b13ee2ae5238b14ab65bfb48"
+      }
+    }
+  },
+  "robustness": {
+    "scenario_count": 27,
+    "joint_positive_count": 27,
+    "axial_neighbor_count": 6,
+    "axial_joint_positive_count": 6,
+    "median_expectancy_r": 0.9213783421659719,
+    "all_preregistered_criteria_passed": true,
+    "criteria": {
+      "joint_positive_scenarios": {
+        "required": 18,
+        "observed": 27,
+        "passed": true
+      },
+      "joint_positive_axial_neighbors": {
+        "required": 5,
+        "observed": 6,
+        "passed": true
+      },
+      "median_expectancy_r": {
+        "required": 0.5,
+        "observed": 0.9213783421659719,
+        "missing_value": 0.0,
+        "passed": true
+      },
+      "center_reproduction": {
+        "passed": true,
+        "center_joint_positive": true,
+        "reference_within_tolerance": true,
+        "checks": {
+          "total_return": {
+            "center": 0.3917035863038456,
+            "reference": 0.39170351788804747,
+            "delta": 6.841579813787746e-08,
+            "tolerance": 0.01,
+            "within_tolerance": true
+          },
+          "cagr": {
+            "center": 0.06011557528724909,
+            "reference": 0.06011556608269886,
+            "delta": 9.204550233121722e-09,
+            "tolerance": 0.0025,
+            "within_tolerance": true
+          },
+          "max_drawdown": {
+            "center": -0.04249150574485239,
+            "reference": -0.04249151134389728,
+            "delta": 5.599044894388783e-09,
+            "tolerance": 0.005,
+            "within_tolerance": true
+          },
+          "expectancy_r": {
+            "center": 1.0466119416423523,
+            "reference": 1.0466117989097283,
+            "delta": 1.427326239422655e-07,
+            "tolerance": 0.1,
+            "within_tolerance": true
+          },
+          "trade_count": {
+            "center": 65,
+            "reference": 65,
+            "delta": 0.0,
+            "tolerance": 2,
+            "within_tolerance": true
+          }
+        }
+      }
+    }
+  },
+  "distribution": {
+    "total_return_min": 0.19691078652352356,
+    "total_return_max": 0.6398504174847397,
+    "cagr_min": 0.03225564299022121,
+    "cagr_max": 0.09128631058615944,
+    "max_drawdown_worst": -0.07358172147381092,
+    "max_drawdown_best": -0.03295977470314648,
+    "profit_factor_min": 2.17721767472526,
+    "profit_factor_max": 3.955106301661547,
+    "expectancy_r_min": 0.4323095562714186,
+    "expectancy_r_median": 0.9213783421659719,
+    "expectancy_r_max": 1.7347108757977934,
+    "trade_count_min": 54,
+    "trade_count_max": 88,
+    "average_exposure_min": 0.03764872589358439,
+    "average_exposure_max": 0.08697450511697787
+  },
+  "decision": "LOCAL PARAMETER ROBUSTNESS SUPPORTED RETROSPECTIVELY — KEEP V1 FROZEN — CONTINUE RESEARCH — DO NOT DEPLOY",
+  "scenario_table": "experiments/EXP-0005-parameter-neighborhood/scenario-comparison.csv"
+}
