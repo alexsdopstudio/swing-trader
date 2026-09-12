@@ -1,0 +1,184 @@
+{
+  "experiment": {
+    "id": "EXP-0003",
+    "name": "temporal-stability",
+    "research_stage": "retrospective-temporal-diagnostic",
+    "producer_code_sha": "40fdfe6b665c16d1d3d5e861ca5c4c752b8fe67b",
+    "workflow_run_id": 34708885986,
+    "artifact_id": 10302716912,
+    "artifact_sha256": "99cf0e0d70eb4d23591e1206af055270eab6b483d6fc8fd1517b6e7298c0ee7f",
+    "historical_data_already_observed": true,
+    "true_out_of_sample_claim": false,
+    "base_experiment_config": "experiments/EXP-0001-baseline/config.yaml",
+    "snapshot_start": "2020-01-01",
+    "snapshot_end_exclusive": "2026-09-01"
+  },
+  "runtime": {
+    "PyYAML": "6.0.3",
+    "numpy": "2.5.3",
+    "pandas": "3.0.5",
+    "python": "3.12.14",
+    "yfinance": "1.7.0"
+  },
+  "data_snapshot": {
+    "provider_download_count": 5,
+    "source": {
+      "BTC-USD": {
+        "first_observation": "2020-01-01",
+        "last_observation": "2026-08-31",
+        "rows": 2435,
+        "sha256": "3d1f12602576f0f20a843463695bfca10707d844985cf2dcd4c6ce7c957edc36"
+      },
+      "META": {
+        "first_observation": "2020-01-02",
+        "last_observation": "2026-08-31",
+        "rows": 1674,
+        "sha256": "bce1e50728247b91f1b16065c598fb50c9d496d1971c5df3c29b7d70bc0642a0"
+      },
+      "NVDA": {
+        "first_observation": "2020-01-02",
+        "last_observation": "2026-08-31",
+        "rows": 1674,
+        "sha256": "006f37138a247a967dc00c751d2e3766a2acd448829dc526b522954494046cef"
+      },
+      "QQQ": {
+        "first_observation": "2020-01-02",
+        "last_observation": "2026-08-31",
+        "rows": 1674,
+        "sha256": "fe75c31093a330d423a569765774f9b430a4e22a598ec7002a99675bced8df08"
+      },
+      "SOL-USD": {
+        "first_observation": "2020-04-10",
+        "last_observation": "2026-08-31",
+        "rows": 2335,
+        "sha256": "f733e8c72ad3952f7d756a75bc2af6e01a9dcb61b13ee2ae5238b14ab65bfb48"
+      }
+    }
+  },
+  "folds": [
+    {
+      "name": "2021",
+      "evaluation_start": "2021-01-01",
+      "evaluation_end_exclusive": "2022-01-01",
+      "trade_count": 21,
+      "end_equity": 5651.918510218791,
+      "total_return": 0.1303837020437581,
+      "max_drawdown": -0.0424915398453275,
+      "profit_factor": 4.332365931587806,
+      "expectancy_r": 1.1912311519487564,
+      "win_rate": 0.5714285714285714,
+      "average_exposure": 0.0927902149816286,
+      "top5_profit_share": 0.854126309418233,
+      "total_execution_cost": 20.854084614494436
+    },
+    {
+      "name": "2022",
+      "evaluation_start": "2022-01-01",
+      "evaluation_end_exclusive": "2023-01-01",
+      "trade_count": 0,
+      "end_equity": 5000.0,
+      "total_return": 0.0,
+      "max_drawdown": 0.0,
+      "profit_factor": null,
+      "expectancy_r": null,
+      "win_rate": null,
+      "average_exposure": 0.0,
+      "top5_profit_share": null,
+      "total_execution_cost": 0.0
+    },
+    {
+      "name": "2023",
+      "evaluation_start": "2023-01-01",
+      "evaluation_end_exclusive": "2024-01-01",
+      "trade_count": 11,
+      "end_equity": 5709.670288414749,
+      "total_return": 0.1419340576829497,
+      "max_drawdown": -0.0241804879150824,
+      "profit_factor": 7.76977165073003,
+      "expectancy_r": 2.4955252282613234,
+      "win_rate": 0.6363636363636364,
+      "average_exposure": 0.0989261459683796,
+      "top5_profit_share": 0.9485668100335144,
+      "total_execution_cost": 13.24892311049962
+    },
+    {
+      "name": "2024",
+      "evaluation_start": "2024-01-01",
+      "evaluation_end_exclusive": "2025-01-01",
+      "trade_count": 19,
+      "end_equity": 5521.99650937957,
+      "total_return": 0.1043993018759139,
+      "max_drawdown": -0.0227099310340846,
+      "profit_factor": 3.404010261959048,
+      "expectancy_r": 1.069777475935856,
+      "win_rate": 0.4210526315789473,
+      "average_exposure": 0.0991716497010608,
+      "top5_profit_share": 0.86376024630137,
+      "total_execution_cost": 22.244283113438104
+    },
+    {
+      "name": "2025",
+      "evaluation_start": "2025-01-01",
+      "evaluation_end_exclusive": "2026-01-01",
+      "trade_count": 11,
+      "end_equity": 4933.098266088538,
+      "total_return": -0.0133803467822922,
+      "max_drawdown": -0.0270910330994929,
+      "profit_factor": 0.582692687117278,
+      "expectancy_r": -0.2409058456810017,
+      "win_rate": 0.2727272727272727,
+      "average_exposure": 0.0480650477116403,
+      "top5_profit_share": 1.0,
+      "total_execution_cost": 13.054250209746993
+    },
+    {
+      "name": "2026-ytd",
+      "evaluation_start": "2026-01-01",
+      "evaluation_end_exclusive": "2026-09-01",
+      "trade_count": 3,
+      "end_equity": 4947.364487313347,
+      "total_return": -0.0105271025373305,
+      "max_drawdown": -0.0147741146645516,
+      "profit_factor": 0.0,
+      "expectancy_r": -0.7042278253547204,
+      "win_rate": 0.0,
+      "average_exposure": 0.0044957839035162,
+      "top5_profit_share": null,
+      "total_execution_cost": 2.1029313850994256
+    }
+  ],
+  "diagnostics": {
+    "fold_count": 6,
+    "median_expectancy_r": 1.069777475935856,
+    "median_profit_factor": 3.404010261959048,
+    "minimum_expectancy_r": -0.7042278253547204,
+    "positive_expectancy_folds": 3,
+    "positive_expectancy_fraction": 0.5,
+    "positive_return_folds": 3,
+    "positive_return_fraction": 0.5,
+    "profit_factor_above_one_folds": 3,
+    "profit_factor_above_one_fraction": 0.5,
+    "total_closed_trades_across_independent_folds": 65,
+    "trade_count_weighted_expectancy_r": 1.0466116302465311,
+    "worst_fold_max_drawdown": -0.0424915398453275
+  },
+  "predeclared_questions": {
+    "minimum_positive_expectancy_folds": 4,
+    "minimum_profit_factor_above_one_folds": 4,
+    "positive_expectancy_threshold_met": false,
+    "profit_factor_threshold_met": false,
+    "weak_fold_checks": {
+      "2025": {
+        "nonpositive_expectancy": true,
+        "nonpositive_total_return": true,
+        "present": true
+      },
+      "2026-ytd": {
+        "nonpositive_expectancy": true,
+        "nonpositive_total_return": true,
+        "present": true
+      }
+    }
+  },
+  "decision": "PREDECLARED TEMPORAL-STABILITY THRESHOLDS NOT MET — CONTINUE RESEARCH — DO NOT DEPLOY"
+}

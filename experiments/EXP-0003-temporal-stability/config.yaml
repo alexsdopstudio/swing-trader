@@ -1,0 +1,35 @@
+experiment:
+  id: EXP-0003
+  name: temporal-stability
+  research_stage: retrospective-temporal-diagnostic
+  base_experiment_config: experiments/EXP-0001-baseline/config.yaml
+  reference_results: experiments/EXP-0001-baseline/results.json
+  snapshot_start: 2020-01-01
+  snapshot_end: 2026-09-01
+
+folds:
+  - name: "2021"
+    evaluation_start: 2021-01-01
+    evaluation_end: 2022-01-01
+  - name: "2022"
+    evaluation_start: 2022-01-01
+    evaluation_end: 2023-01-01
+  - name: "2023"
+    evaluation_start: 2023-01-01
+    evaluation_end: 2024-01-01
+  - name: "2024"
+    evaluation_start: 2024-01-01
+    evaluation_end: 2025-01-01
+  - name: "2025"
+    evaluation_start: 2025-01-01
+    evaluation_end: 2026-01-01
+  - name: 2026-ytd
+    evaluation_start: 2026-01-01
+    evaluation_end: 2026-09-01
+
+research_questions:
+  minimum_positive_expectancy_folds: 4
+  minimum_profit_factor_above_one_folds: 4
+  weak_folds_to_confirm:
+    - "2025"
+    - 2026-ytd
