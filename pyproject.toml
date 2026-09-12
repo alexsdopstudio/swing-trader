@@ -27,6 +27,7 @@ swing-temporal-stability = "swing_trader.temporal_stability_cli:main"
 swing-reference-comparison = "swing_trader.reference_comparison_cli:main"
 swing-parameter-neighborhood = "swing_trader.parameter_neighborhood_cli:main"
 swing-holdout-record = "swing_trader.prospective_recorder_cli:main"
+swing-universe-breadth = "swing_trader.universe_breadth_cli:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
