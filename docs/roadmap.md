@@ -4,12 +4,12 @@
 
 - Keep v1 frozen for `PROSPECTIVE-v1-holdout`, which begins 2026-09-14.
 - Let the provenance-preserving forward recorder begin with the first active 2026-09-15 UTC capture; do not backfill missed prospective dates.
-- Preregister and run broader-universe testing to reduce survivor and selection bias.
+- Build a read-only prospective holdout evaluator/trade-state replay on top of captured evidence without allowing interim v1 tuning.
 - Preserve and verify provenance for every prospective observation and provider revision.
 
 ## Next
 
-- Build a read-only prospective holdout evaluator/trade-state replay on top of captured evidence without feeding interim performance into v1 tuning.
+- If further historical universe work is justified, preregister a point-in-time membership/survivorship methodology rather than selecting additional current survivors.
 - Persistent experiment registry/index automation.
 - Daily scan persistence.
 
@@ -34,6 +34,7 @@ Interim monitoring is allowed. Interim performance must not be used to tune v1.
 - EXP-0003 retrospective temporal-stability diagnostic using six independent calendar folds.
 - EXP-0004 cost-aware passive/reference comparison using per-symbol and initial equal-weight buy-and-hold baselines on one shared snapshot.
 - EXP-0005 preregistered 27-scenario parameter-neighborhood diagnostic; all preregistered local-robustness criteria passed without selecting a replacement parameter set.
+- EXP-0006 configured-universe breadth diagnostic using the complete pre-existing 11-asset universe and a same-snapshot four-symbol control; all preregistered breadth criteria passed without selecting a preferred subset.
 - Preregistered `PROSPECTIVE-v1-holdout` protocol separating future unseen evidence from retrospective diagnostics.
 - Byte-locked, current-date-only prospective provider-state recorder with complete snapshots, deterministic archive/source digests, yearly durable release publication, and explicit no-backfill semantics.
 
