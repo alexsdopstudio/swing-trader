@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import date
+from datetime import datetime, timezone
 
 import pandas as pd
 import yfinance as yf
@@ -10,7 +10,7 @@ REQUIRED_COLUMNS = ["Open", "High", "Low", "Close", "Volume"]
 
 
 def download_daily(symbol: str, start: str = "2015-01-01", end: str | None = None) -> pd.DataFrame:
-    end = end or date.today().isoformat()
+    end = end or datetime.now(timezone.utc).date().isoformat()
     df = yf.download(
         symbol,
         start=start,
