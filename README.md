@@ -164,27 +164,35 @@ Commits and PR titles follow Conventional Commits, and the repository validates 
 
 See `CONTRIBUTING.md` for the complete workflow.
 
-## AI development memory
+## Autonomous AI development continuity
 
-The repository is designed to be continued across AI coding sessions without depending on one chat history.
+The repository is designed so a new ChatGPT/Codex/Copilot/Claude-style coding session can continue work without depending on previous chat history or manual user context transfer.
 
-Primary memory sources:
+Canonical memory/state sources:
 
-- `AGENTS.md` — agent guide and repository map
+- `AGENTS.md` — agent guide, bootstrap protocol, and repository map
 - `ARCHITECTURE.md` — system boundaries and module responsibilities
 - `.ai/current-state.md` — current project state and milestone
 - `docs/decisions/` — durable architecture/research decisions
 - `docs/plans/active/` — active implementation plans
 - `docs/solutions/` — reusable engineering and trading-research lessons
 - `experiments/` — reproducible research memory, including failed ideas
+- open pull requests — canonical transient lifecycle state through their `Agent handoff` sections
 
-Generate a compact working context before an AI coding session:
+At the start of a coding session, the **AI agent**, not the user, should run:
 
 ```bash
-python scripts/build_context.py
+python scripts/agent_bootstrap.py
 ```
 
-This writes `.ai/context.md`, which is intentionally ignored by Git because it is derived working memory.
+The command generates two ignored working files:
+
+- `.ai/context.md` — compact repository/project context;
+- `.ai/handoff.md` — local Git state, open PRs, inferred active PR, PR lifecycle record, active plan, and continuation rules.
+
+If shell access is unavailable, the agent must reconstruct the same state directly through repository/GitHub tools. The user should not be asked to copy chat summaries, run bootstrap commands, identify the active PR, or repeat repository state that is discoverable.
+
+GitHub Copilot and Claude-compatible coding agents receive thin repository adapters that point back to the same canonical `AGENTS.md` process.
 
 ## Repository layout
 
@@ -194,7 +202,7 @@ src/swing_trader/       production code
 tests/                  unit tests
 docs/                   strategy, domain, decisions, plans, solutions, roadmap
 experiments/             reproducible research history and prospective protocols
-.ai/                     current state and task/context helpers
+.ai/                     current state and generated context/handoff helpers
 .github/workflows/      CI, PR convention checks, and experiment runs
 ```
 
