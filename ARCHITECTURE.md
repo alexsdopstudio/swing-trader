@@ -36,13 +36,11 @@ The scanner uses the same indicator and scoring concepts for the latest bar, whi
 - `backtest.py`: legacy/minimal single-asset event-driven backtest.
 - `portfolio.py`: shared-account multi-asset event loop, cash/risk constraints and realized trade ledger.
 - `metrics.py`: reusable equity-curve metrics plus portfolio performance and trade statistics.
-- `experiment.py`: reproducible frozen-strategy experiment orchestration and provenance.
-- `cost_sensitivity.py`: controlled execution-cost sensitivity on shared inputs.
-- `temporal_stability.py`: retrospective calendar-fold diagnostics on one frozen snapshot.
+- `backtest_cli.py`: cost-aware historical portfolio research entry point.
 - `reference_baselines.py`: deterministic cost-aware passive buy-and-hold references.
-- `reference_comparison.py`: controlled active-vs-passive orchestration on one shared snapshot.
-- `parameter_neighborhood.py`: preregistered local parameter-surface diagnostics with full-path scenario reruns and no winner selection.
-- `context_builder.py`: compact AI working-context snapshot from repository memory.
+- `reference_comparison.py`: controlled active-vs-passive experiment orchestration on one shared snapshot.
+- `parameter_neighborhood.py`: preregistered local score/stop/trail robustness diagnostics with full-path reruns on shared inputs and no winner selection.
+- `context_builder.py`: builds a compact AI working-context snapshot from repository memory.
 
 ## Execution and risk boundary
 
@@ -55,14 +53,14 @@ For long trades:
 3. `execution.py` converts the market-reference open into an adverse buy fill and commission;
 4. `risk.py` sizes from cost-adjusted loss to the technical initial stop;
 5. `portfolio.py` enforces shared cash, position count, notional and aggregate open-risk limits;
-6. stop/end-of-test references are converted into adverse sell fills and commissions;
-7. the ledger records gross/net results and execution costs.
+6. stop/end-of-test market-reference exits are converted into adverse sell fills and commissions;
+7. the trade ledger records gross and net results plus execution costs.
 
-The technical stop remains a market-reference trigger. Execution cost changes realized fill, cash flow and risk, not the chronological information available to the strategy.
+The technical stop remains a market-reference trigger. Execution cost changes the realized fill, cash flow and risk, not the chronological information available to the strategy.
 
-Passive references deliberately do not inherit v1 sizing/stops because they answer an opportunity-cost question. They still share evaluation dates, provider snapshot, and execution-cost conventions with the active strategy.
+Passive references deliberately do not inherit v1 sizing/stops: they answer an opportunity-cost question. They must still share evaluation dates, provider snapshot, and execution-cost conventions with the active strategy so the comparison is controlled.
 
-Parameter-neighborhood scenarios deliberately rerun the full portfolio path when stop/trail/entry threshold changes can affect sizing, exits, cash, open risk, and later opportunities. The diagnostic reports the surface and preregistered criteria; it does not select a replacement strategy.
+Parameter-neighborhood scenarios rerun the full portfolio path because score thresholds and ATR stop/trail distances can alter entries, sizing, exits, cash, open risk, and later opportunities. The diagnostic evaluates a preregistered surface and never promotes the historical winner into frozen v1.
 
 ## AI boundary
 
@@ -82,8 +80,8 @@ Data → Features → Strategy → Portfolio Backtester → Experiment Store
                     Paper Execution
 ```
 
-Retrospective diagnostics can challenge the frozen strategy, but they do not become unseen evidence. Genuine validation remains separated into preregistered prospective protocols.
+Retrospective diagnostics and passive references can challenge the frozen strategy, but they do not become unseen evidence. Genuine validation remains separated into preregistered prospective protocols.
 
 ## Current architectural milestone
 
-The research engine now has reproducible baseline, cost-sensitivity, temporal-stability, passive/reference, and parameter-neighborhood workflows. The next retrospective diagnostic is broader-universe testing to reduce selection/survivorship bias. In parallel, the preregistered prospective holdout needs a provenance-preserving forward recording layer before paper execution is considered.
+The cost-aware portfolio research engine now has reproducible baseline, execution-cost sensitivity, temporal-stability, passive/reference comparison, and parameter-neighborhood workflows. The next retrospective diagnostic is broader-universe testing to reduce selection/survivorship bias. In parallel, the prospective holdout needs a provenance-preserving forward recording layer before paper execution is considered.
