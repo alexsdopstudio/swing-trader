@@ -76,11 +76,19 @@ class FakeGitHubClient:
         return self.plan_text
 
 
+class FailingGitHubClient:
+    def list_open_pull_requests(self, repository: str) -> list[PullRequestSummary]:
+        raise RuntimeError(f"remote unavailable for {repository}")
+
+    def fetch_text_file(self, repository: str, path: str, ref: str) -> str | None:
+        raise AssertionError("fetch_text_file should not run after PR discovery fails")
+
+
 def _fake_git(root: Path, *args: str) -> str:
     values = {
         ("branch", "--show-current"): "feat/handoff",
         ("log", "-1", "--oneline"): "abc123 feat(agents): work",
-        ("status", "--short"): "clean",
+        ("status", "--short"): "",
         ("remote", "get-url", "origin"): "https://github.com/example/project.git",
     }
     return values[args]
@@ -112,6 +120,7 @@ def test_build_handoff_includes_active_pr_body_and_remote_plan(
     assert "Current stage: Implementation" in rendered
     assert "# Agent Handoff Plan" in rendered
     assert "current branch matches open PR" in rendered
+    assert "```text\nclean\n```" in rendered
     assert client.fetch_calls == [
         ("example/project", "docs/plans/active/agent-handoff.md", "sha-8")
     ]
@@ -132,3 +141,16 @@ def test_build_handoff_degrades_to_local_state_when_remote_is_disabled(
     assert "No remote pull requests available." in rendered
     assert "# Local Plan" in rendered
     assert "Never require manual user context transfer" in rendered
+
+
+def test_build_handoff_degrades_to_local_state_when_remote_discovery_fails(
+    tmp_path: Path,
+    monkeypatch,
+) -> None:
+    monkeypatch.setattr(handoff, "_git", _fake_git)
+
+    rendered = build_handoff(tmp_path, client=FailingGitHubClient())
+
+    assert "remote discovery unavailable: RuntimeError" in rendered
+    assert "No remote pull requests available." in rendered
+    assert "repository: example/project" in rendered
