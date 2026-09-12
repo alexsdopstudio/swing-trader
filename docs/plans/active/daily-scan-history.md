@@ -27,9 +27,9 @@ The scanner currently prints only the latest ranking to stdout. There is no dura
 
 ## Proposed evidence model
 
-For observation date `D`, download the configured assets plus unique benchmarks with an exclusive provider cutoff at `D`. Store normalized source CSVs, a deterministic scan result JSON/CSV, and a manifest containing observation/cutoff, universe/config SHA, code SHA, runtime/provider metadata, per-source SHA/coverage, and output SHA.
+For observation date `D`, download the configured assets plus unique benchmarks with an exclusive provider cutoff at `D`. Store the exact universe config, normalized source CSVs, deterministic scan-result JSON/CSV, and a manifest containing observation/cutoff, config SHA, code SHA, runtime/provider metadata, per-source SHA/coverage, and output SHA.
 
-The archive filename should include the full archive SHA-256 and use fixed ZIP metadata/order. Production CLI derives `D` from current UTC time and exposes no date override. Tests may inject a clock through the Python API.
+The archive filename includes the full archive SHA-256 and uses fixed ZIP metadata/order. Production CLI derives `D` from current UTC time and exposes no date override. Tests may inject a clock through the Python API.
 
 ## Publication
 
@@ -41,9 +41,9 @@ Daily scan history is contemporaneous operational evidence, but it is not the pr
 
 ## Implementation plan
 
-- Add a recorder module that reuses scanner scoring semantics while accepting already-captured normalized frames.
-- Avoid duplicate provider downloads for symbols that are also benchmarks.
-- Add deterministic archive verification.
+- Refactor scanner scoring so already-captured frames can be scored without a second provider read.
+- Download configured assets and benchmarks exactly once per unique symbol.
+- Add a daily recorder with exact captured config, normalized source data, deterministic outputs, manifest, and archive verification.
 - Add a production CLI with no historical observation-date option.
 - Add focused synthetic tests for cutoff, source deduplication, determinism, overwrite refusal, and archive verification.
 - Add a read-only PR validation job plus scheduled/manual publication job.
@@ -51,11 +51,11 @@ Daily scan history is contemporaneous operational evidence, but it is not the pr
 
 ## Simplify
 
-Prefer reuse of existing indicator/scoring functions and recorder integrity helpers where their contracts fit. Do not generalize the prospective holdout recorder into a multi-purpose framework if doing so weakens its protocol-specific invariants.
+Keep the holdout recorder protocol-specific rather than introducing a shared abstraction that could blur evidence boundaries. Reuse the scanner's scoring semantics through a small `scan_frames` interface and keep the operational archive implementation explicit.
 
 ## Compound
 
-After implementation, capture any reusable lesson about separating operational observations from preregistered validation evidence if the distinction produces a concrete recurring pattern.
+Capture the reusable distinction between operational observations and preregistered validation evidence in durable project memory before final review.
 
 ## Validation plan
 
