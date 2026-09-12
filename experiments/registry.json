@@ -1,0 +1,105 @@
+{
+  "historical_experiments": [
+    {
+      "artifact_id": null,
+      "artifact_sha256": null,
+      "config_sha256": "088c84162ab3b684e87cd67b9ac6af57cae9f80f98f3f4fbfc159a240f2d2f52",
+      "decision": null,
+      "directory": "experiments/EXP-0001-baseline",
+      "id": "EXP-0001",
+      "name": "cost-aware-baseline",
+      "notes_sha256": "649ff44542ced213c74783532005ca2ea9e8908eaac5d5162ac2503581381a36",
+      "producer_code_sha": "ee5101967545569eace1c93bda7123aac8db3ec8",
+      "research_stage": "exploratory",
+      "results_sha256": "7accd37f2b233f4436823493b2185aa749f689580a4304035bc0fe938dcf6f1d",
+      "workflow_run_id": null
+    },
+    {
+      "artifact_id": 10302117801,
+      "artifact_sha256": "3041370a940bf44c6448c02b9a99acb1594d5f514c8101422bbcac898a1e67b7",
+      "config_sha256": "cefe66f16237f70c17b914d571d013a398edbe7cfcb79d95f2a263414da2a03a",
+      "decision": "COST ROBUSTNESS SUPPORTED IN-SAMPLE \u2014 CONTINUE RESEARCH \u2014 DO NOT DEPLOY",
+      "directory": "experiments/EXP-0002-cost-sensitivity",
+      "id": "EXP-0002",
+      "name": "execution-cost-sensitivity",
+      "notes_sha256": "b2707033c989446cad0e690e142dda170bf9f886acfc27fd524b93fc2521c955",
+      "producer_code_sha": "36475d98ce36e4b1fef533a540be0d9b03c5bcd6",
+      "research_stage": "sensitivity",
+      "results_sha256": "1896cdd6fe5d4f9287f620648ef8e369cafae5c8cbcfcce7a136832757b57082",
+      "workflow_run_id": 34708027981
+    },
+    {
+      "artifact_id": 10302716912,
+      "artifact_sha256": "99cf0e0d70eb4d23591e1206af055270eab6b483d6fc8fd1517b6e7298c0ee7f",
+      "config_sha256": "1169bd82f4197fc93f65b32a0ac634647f01f4716df17d6a986b5962c2990a95",
+      "decision": "PREDECLARED TEMPORAL-STABILITY THRESHOLDS NOT MET \u2014 CONTINUE RESEARCH \u2014 DO NOT DEPLOY",
+      "directory": "experiments/EXP-0003-temporal-stability",
+      "id": "EXP-0003",
+      "name": "temporal-stability",
+      "notes_sha256": "e36d4821c214a3d62a7c9ba99ebb99500860227f7de0a43ac648721a29ac7438",
+      "producer_code_sha": "40fdfe6b665c16d1d3d5e861ca5c4c752b8fe67b",
+      "research_stage": "retrospective-temporal-diagnostic",
+      "results_sha256": "cfb97c5e28bf900446dd2d77dc4be7c44d4ac19675c1553b39a5c2acaa31964e",
+      "workflow_run_id": 34708885986
+    },
+    {
+      "artifact_id": 10303308018,
+      "artifact_sha256": "a145fa51e2f03e449218b857270264ef6f7c3f49f4a0230c5be9cc243ffb32af",
+      "config_sha256": "c106a19354eb0634af5e9f7f325342859c915b6becf745c1937e703f38d47c62",
+      "decision": "REFERENCE BASELINES ADDED \u2014 CONTINUE RESEARCH \u2014 DO NOT DEPLOY \u2014 KEEP V1 FROZEN",
+      "directory": "experiments/EXP-0004-reference-baselines",
+      "id": "EXP-0004",
+      "name": "reference-baselines",
+      "notes_sha256": "e4b77126c7bcd3a1974fd3d68641cabb8999fa45ff46ef6f688224f2a587d6be",
+      "producer_code_sha": "7401577f0eaf80878091b7ac317e688c369b4a67",
+      "research_stage": "retrospective-reference-comparison",
+      "results_sha256": "6a3a5e497a16df7a2ce26ba92d5593bee521ab2d59d04e13e6df11ab81ca7f85",
+      "workflow_run_id": 34711644430
+    },
+    {
+      "artifact_id": 10303114360,
+      "artifact_sha256": "27c1d576a1d0417f2019f3ab6f2091e1e43a1944f45a07aede91fbefd37f1c28",
+      "config_sha256": "53904c8f86a93f4bb30588826bb2f683b245116a61cedfc6200dd135b30aace0",
+      "decision": "LOCAL PARAMETER ROBUSTNESS SUPPORTED RETROSPECTIVELY \u2014 KEEP V1 FROZEN \u2014 CONTINUE RESEARCH \u2014 DO NOT DEPLOY",
+      "directory": "experiments/EXP-0005-parameter-neighborhood",
+      "id": "EXP-0005",
+      "name": "parameter-neighborhood",
+      "notes_sha256": "15d6445fe8a966a79730028a535260eac1788a5e45b78eab6ed057b3dc6e3ab9",
+      "producer_code_sha": "7db5ac84b03c01af6dbbdc1c72922fe6bc25fb3b",
+      "research_stage": "retrospective-parameter-neighborhood",
+      "results_sha256": "31e80df0eec40768931d5f609cb7603327b4811c4a7a21838e8ec08fc59cc23c",
+      "workflow_run_id": 34712328760
+    },
+    {
+      "artifact_id": 10304203946,
+      "artifact_sha256": "c08bebb910dcdf98e60e8b4b0fabb2d984dd4b8ce945d6d4e669f5e85b6960c6",
+      "config_sha256": "c18d4c93531802f06288a857a5e366cde7290661819bf3b478fe8d042ab063a1",
+      "decision": "BREADTH SUPPORTED IN CONFIGURED UNIVERSE \u2014 CONTINUE RESEARCH \u2014 DO NOT DEPLOY \u2014 KEEP V1 FROZEN",
+      "directory": "experiments/EXP-0006-configured-universe-breadth",
+      "id": "EXP-0006",
+      "name": "configured-universe-breadth",
+      "notes_sha256": "b082a9d6029d6c0310d8d2dfa8db1bbfff8be5ebcb173d10aa8dd41731e38da2",
+      "producer_code_sha": "ba7340405f6a27dd092c47447147f64db955fa82",
+      "research_stage": "retrospective-universe-breadth",
+      "results_sha256": "fd8dfc814784b8d2d99b432c4999cb6c07b9ab3a24ec10fe68c417ecc548ee64",
+      "workflow_run_id": 34715353773
+    }
+  ],
+  "prospective_protocols": [
+    {
+      "directory": "experiments/PROSPECTIVE-v1-holdout",
+      "evaluation_start": "2026-09-14",
+      "frozen_source_commit": "dbb45a8a3910298e3565a02758b835975308e88c",
+      "id": "PROSPECTIVE-v1-holdout",
+      "minimum_closed_trades": 30,
+      "minimum_observation_end": "2028-09-14",
+      "protocol_lock_sha256": "a4a4462f9f81111b6a1355a62177a227aa1ce20b5bc70cfdf8cece52c7213417",
+      "protocol_sha256": "aabbf9c8ed47024a537f569265f4e80ee57db46a2edbadd733e2a94e567b4df8",
+      "readme_sha256": "707478846f93aed2082623756a0d8f578795ea047efdae61eb833c1fa7dac373",
+      "registered_on": "2026-09-12",
+      "status": "preregistered",
+      "strategy_version": "v1"
+    }
+  ],
+  "schema_version": 1
+}
