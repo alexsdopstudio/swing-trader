@@ -1,0 +1,7 @@
+experiment:
+  id: EXP-0004
+  name: passive-reference-baseline
+  research_stage: historical-reference
+  base_experiment_config: experiments/EXP-0001-baseline/config.yaml
+
+weights: equal
