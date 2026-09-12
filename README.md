@@ -194,6 +194,16 @@ Validation claims are blocked until both gates are satisfied:
 
 Interim monitoring is allowed, but interim results must not be used to tune v1. Any strategy or risk change requires a new prospective protocol/version.
 
+The forward recorder preserves one canonical provider-state archive per active UTC observation date. The read-only evaluator replays frozen v1 from a locally downloaded contiguous archive chain without provider access, processing only the newly observable market date from each archive and stopping at the first missing observation.
+
+```bash
+swing-holdout-evaluate \
+  --archives .artifacts/PROSPECTIVE-v1-holdout/archives \
+  --output-dir .artifacts/PROSPECTIVE-v1-holdout/evaluation
+```
+
+Evaluator outputs are derived interim state/trade records, not validation and not tuning inputs. See `experiments/PROSPECTIVE-v1-holdout/README.md` for capture, archive, gap, and replay semantics.
+
 See `experiments/README.md` and each experiment's `notes.md` for reviewed interpretation and limitations.
 
 ## Development workflow
@@ -250,7 +260,7 @@ experiments/             reproducible research history and prospective protocols
 
 1. Keep v1 frozen and record the prospective holdout from 2026-09-14 onward without interim tuning.
 2. Preserve complete provider states with the provenance-preserving forward recorder; never backfill missed prospective dates.
-3. Build a read-only prospective evaluator/trade-state replay over captured evidence.
+3. Replay those captured observations through the read-only information-time evaluator without feeding interim results into tuning.
 4. If more historical universe research is warranted, use preregistered point-in-time membership rather than adding current survivors.
 5. Add persistent daily scan history and later an AI research layer for catalysts, filings, earnings and crypto-specific events.
 6. Add broker/exchange execution only after paper-trading infrastructure and prospective evidence are trustworthy.
