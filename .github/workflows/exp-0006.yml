@@ -1,0 +1,161 @@
+name: EXP-0006
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "src/swing_trader/universe_breadth.py"
+      - "src/swing_trader/universe_breadth_cli.py"
+      - "src/swing_trader/experiment.py"
+      - "src/swing_trader/data.py"
+      - "src/swing_trader/portfolio.py"
+      - "src/swing_trader/risk.py"
+      - "src/swing_trader/metrics.py"
+      - "src/swing_trader/execution.py"
+      - "src/swing_trader/historical.py"
+      - "src/swing_trader/scoring.py"
+      - "src/swing_trader/indicators.py"
+      - "config/universe.yaml"
+      - "config/execution-costs.yaml"
+      - "experiments/EXP-0001-baseline/config.yaml"
+      - "experiments/EXP-0001-baseline/results.json"
+      - "experiments/EXP-0006-configured-universe-breadth/config.yaml"
+      - ".github/workflows/exp-0006.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  run-experiment:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout PR head
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install project
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev]"
+
+      - name: Run EXP-0006
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf .artifacts/EXP-0006
+          for attempt in 1 2 3; do
+            if swing-universe-breadth \
+              --config experiments/EXP-0006-configured-universe-breadth/config.yaml \
+              --output-dir .artifacts/EXP-0006; then
+              break
+            fi
+            if [ "$attempt" -eq 3 ]; then
+              echo "EXP-0006 failed after 3 attempts" >&2
+              exit 1
+            fi
+            echo "EXP-0006 attempt $attempt failed; retrying after 10 seconds..." >&2
+            sleep 10
+          done
+
+      - name: Validate generated artifact
+        run: |
+          python - <<'PY'
+          import csv
+          import json
+          from pathlib import Path
+
+          root = Path('.artifacts/EXP-0006')
+          required = ['results.json', 'symbol-contribution.csv', 'resolved-config.yaml', 'notes.md']
+          missing = [name for name in required if not (root / name).exists()]
+          if missing:
+              raise SystemExit(f'Missing EXP-0006 artifacts: {missing}')
+
+          results = json.loads((root / 'results.json').read_text(encoding='utf-8'))
+          experiment = results['experiment']
+          if experiment['id'] != 'EXP-0006':
+              raise SystemExit('Unexpected experiment id')
+          if experiment['true_out_of_sample_claim']:
+              raise SystemExit('EXP-0006 must not claim true out-of-sample evidence')
+          if not experiment['historical_data_already_observed']:
+              raise SystemExit('EXP-0006 must declare already-observed history')
+          if 'selected_symbol_subset' in experiment:
+              raise SystemExit('EXP-0006 must not select a preferred symbol subset')
+
+          expected_control = ['BTC-USD', 'SOL-USD', 'META', 'NVDA']
+          expected_expanded = [
+              'BTC-USD', 'ETH-USD', 'SOL-USD', 'META', 'NVDA', 'MSFT',
+              'AAPL', 'AMZN', 'GOOGL', 'AVGO', 'TSLA',
+          ]
+          expected_added = ['ETH-USD', 'MSFT', 'AAPL', 'AMZN', 'GOOGL', 'AVGO', 'TSLA']
+          if results['control_symbols'] != expected_control:
+              raise SystemExit('Control universe changed')
+          if results['expanded_symbols'] != expected_expanded:
+              raise SystemExit('Expanded universe changed')
+          if results['added_symbols'] != expected_added:
+              raise SystemExit('Added-symbol set changed')
+
+          consistency = results['data_consistency']
+          if consistency['shared_provider_download_count'] != 12:
+              raise SystemExit('Expected exactly 12 shared provider downloads')
+          if consistency['expected_provider_download_count'] != 12:
+              raise SystemExit('Unexpected expected-provider-download count')
+          if not consistency['identical_overlapping_source_digests']:
+              raise SystemExit('Overlapping control/expanded inputs must be identical')
+
+          criteria = results['preregistered_criteria']
+          if criteria['minimum_positive_symbol_contributors'] != 4:
+              raise SystemExit('Positive-contributor threshold changed')
+          if criteria['minimum_positive_added_symbol_contributors'] != 2:
+              raise SystemExit('Added-contributor threshold changed')
+          if criteria['maximum_largest_positive_contributor_share'] != 0.60:
+              raise SystemExit('Concentration threshold changed')
+          if criteria['control_reference_tolerances'] != {
+              'total_return': 0.01,
+              'cagr': 0.0025,
+              'max_drawdown': 0.005,
+              'expectancy_r': 0.1,
+              'trade_count': 2,
+          }:
+              raise SystemExit('Control-reference tolerances changed')
+
+          expected_checks = {
+              'expanded_joint_positive',
+              'added_symbols_aggregate_pnl',
+              'positive_symbol_contributors',
+              'positive_added_symbol_contributors',
+              'positive_equity_contributor',
+              'positive_crypto_contributor',
+              'largest_positive_contributor_share',
+              'control_joint_positive',
+              'control_reproduction',
+          }
+          if set(results['breadth']['criteria']) != expected_checks:
+              raise SystemExit('Unexpected breadth criteria output')
+
+          rows = list(csv.DictReader((root / 'symbol-contribution.csv').open(encoding='utf-8')))
+          if len(rows) != 15:
+              raise SystemExit(f'Expected 15 path/symbol contribution rows, observed {len(rows)}')
+
+          for path_name in ('control', 'expanded'):
+              path_root = root / 'paths' / path_name
+              for name in ('results.json', 'trades.csv', 'equity.csv', 'resolved-config.yaml'):
+                  if not (path_root / name).exists():
+                      raise SystemExit(f'Missing {path_name}/{name}')
+          PY
+
+      - name: Upload EXP-0006 artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: EXP-0006-configured-universe-breadth
+          path: .artifacts/EXP-0006
+          if-no-files-found: error
+          retention-days: 30
