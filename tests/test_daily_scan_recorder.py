@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+import hashlib
 import shutil
+import zipfile
 from datetime import UTC, datetime
 from pathlib import Path
 
@@ -143,6 +145,34 @@ def test_verifier_rejects_archive_digest_filename_mismatch(tmp_path: Path) -> No
 
     with pytest.raises(RuntimeError, match="SHA-256"):
         verify_daily_scan_archive(wrong_name)
+
+
+def test_verifier_rejects_tampered_source_with_valid_outer_digest(tmp_path: Path) -> None:
+    result = capture_daily_scan(
+        tmp_path,
+        downloader=_downloader,
+        recorded_at=datetime(2026, 9, 13, 2, 37, tzinfo=UTC),
+        commit_sha="test-sha",
+    )
+    temporary = tmp_path / "tampered.zip"
+    changed = False
+    with zipfile.ZipFile(result.archive_path, "r") as source, zipfile.ZipFile(
+        temporary, "w"
+    ) as target:
+        for info in source.infolist():
+            payload = source.read(info.filename)
+            if not changed and info.filename.startswith("source/"):
+                payload += b"\n"
+                changed = True
+            target.writestr(info, payload)
+    assert changed
+
+    digest = hashlib.sha256(temporary.read_bytes()).hexdigest()
+    tampered = tmp_path / f"daily-scan-history-2026-09-13-{digest}.zip"
+    temporary.replace(tampered)
+
+    with pytest.raises(RuntimeError, match="source SHA-256 mismatch"):
+        verify_daily_scan_archive(tampered)
 
 
 def test_capture_rejects_naive_injected_clock(tmp_path: Path) -> None:
