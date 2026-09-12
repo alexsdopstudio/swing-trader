@@ -38,6 +38,7 @@ This README is the lightweight solution-memory index consumed by the AI context 
 
 - [`separate-durable-memory-from-inflight-state.md`](engineering/separate-durable-memory-from-inflight-state.md) — keep durable project knowledge versioned while deriving fast-changing branch/PR/check/review state into replaceable cross-agent handoffs.
 - [`keep-derived-repository-indexes-regenerable.md`](engineering/keep-derived-repository-indexes-regenerable.md) — keep generated repository indexes deterministic and mechanically derived from canonical records, and make CI stale checks include untracked first-generation output.
+- [`separate-operational-observations-from-validation-evidence.md`](engineering/separate-operational-observations-from-validation-evidence.md) — use separate namespaces, consumers, and explicit eligibility flags for operational audit history versus preregistered validation evidence even when both use the same provenance techniques.
 
 ### Trading research
 
