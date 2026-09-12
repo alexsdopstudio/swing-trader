@@ -10,6 +10,7 @@ MEMORY_FILES = (
     "docs/product/strategy-v1.md",
     "docs/domain/risk-model.md",
     "docs/roadmap.md",
+    "docs/solutions/README.md",
 )
 
 
@@ -56,13 +57,15 @@ def build_context(root: Path) -> str:
     active_plans = sorted((root / "docs/plans/active").glob("*.md"))
     for plan in active_plans:
         relative = plan.relative_to(root).as_posix()
-        sections.extend(("", f"## Active plan: `{relative}`", "", plan.read_text(encoding="utf-8").strip()))
+        sections.extend(
+            ("", f"## Active plan: `{relative}`", "", plan.read_text(encoding="utf-8").strip())
+        )
 
     sections.extend(
         (
             "",
             "## Instruction",
-            "Treat repository files as the source of truth. Inspect implementation and tests before editing, and update durable memory when decisions change.",
+            "Treat repository files as the source of truth. Inspect implementation, tests, decisions, and the solution-memory index before editing. Update durable memory when decisions or reusable learnings change.",
             "",
         )
     )
