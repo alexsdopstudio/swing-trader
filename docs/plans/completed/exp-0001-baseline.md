@@ -46,7 +46,8 @@ Added a lightweight versioned experiment runner that:
 - slices data to an explicit evaluation window before portfolio simulation;
 - records requested and actual provider coverage;
 - writes strict JSON results, trade ledger, equity/exposure/position curves, resolved config, and a generated summary;
-- records the exact code SHA that produced the run.
+- records the exact code SHA that produced the run;
+- records Python/package versions and SHA-256 digests of downloaded source series so provider revisions can be detected.
 
 Added a dedicated GitHub Actions workflow that runs EXP-0001 against real yfinance data, validates the artifact, and uploads it for review.
 
@@ -54,13 +55,25 @@ Added a dedicated GitHub Actions workflow that runs EXP-0001 against real yfinan
 
 The first real-data run exposed a serialization bug because YAML ISO dates were parsed as `datetime.date`. The runner was fixed to normalize dates and non-finite metrics before strict JSON serialization, and a regression test was added.
 
-The reviewed successful run used code SHA `926ce69b6214b237866fbcff97e0de7a16ddff3d`.
+Pre-review inspection then identified a provenance gap: commit/config metadata alone cannot detect dependency upgrades or historical-data revisions by the provider. Runtime package versions and deterministic source-series digests were added before the final reviewed experiment run.
 
-Workflow run: `34706655020`
+The reviewed producer run used code SHA `ee5101967545569eace1c93bda7123aac8db3ec8`.
 
-Artifact digest: `sha256:6edcddf3341e34e3c3122177442b17e488bcb68d7780c7058990f6abc18b4bb6`
+Workflow run: `34706974001`
 
-The standard CI suite and PR conventions also passed on the implementation head.
+Artifact id: `10302101432`
+
+Artifact digest: `sha256:879dd1767be30f92d24a242bbcc76922daa7a95d290b708f657d5f8515286585`
+
+Runtime recorded by the run:
+
+- Python 3.12.14
+- NumPy 2.5.3
+- pandas 3.0.5
+- PyYAML 6.0.3
+- yfinance 1.7.0
+
+The reviewed `results.json` contains the exact SHA-256 of each required downloaded source series. The standard CI suite and PR conventions were also required to pass before final review.
 
 ## Research result
 
@@ -91,13 +104,15 @@ The experiment runner remains orchestration over existing modules. No database, 
 
 Generated large artifacts remain CI outputs; the repository stores the immutable config, reviewed results, provenance, and interpretation needed for durable experiment memory.
 
+Raw provider history is not snapshotted in the repository. Source digests detect if a later yfinance download differs, but a mismatch means exact replay requires an external copy of the original dataset/artifact.
+
 ## Compound outcome
 
 The run confirmed that warm-up history and evaluation history must be modeled as separate versioned windows. This is now captured in:
 
 `docs/solutions/trading-research/separate-warmup-and-evaluation-windows.md`
 
-The solution note also requires recording actual provider coverage because requested history and available history can differ by asset.
+The solution note requires recording actual provider coverage because requested history and available history can differ by asset. The final review also strengthened experiment provenance by recording runtime versions and input-series digests when the data provider can revise history.
 
 ## Next research step
 
