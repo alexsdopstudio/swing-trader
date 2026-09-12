@@ -21,8 +21,10 @@ Last updated: 2026-09-12
 - temporal-stability runner with independent calendar folds and one shared provider snapshot
 - passive/reference comparison runner with cost-aware per-symbol and initial equal-weight buy-and-hold baselines
 - parameter-neighborhood runner with a preregistered 27-scenario local grid, shared inputs, full-path reruns, and no winner selection
-- preregistered prospective-v1 holdout protocol
-- CI workflows capable of running real-data experiments and uploading artifacts
+- preregistered prospective-v1 holdout protocol with byte-locked protocol fingerprint
+- current-date-only prospective holdout recorder preserving complete provider snapshots with exclusive UTC cutoffs and end-to-end digests
+- scheduled/manual GitHub Release publication path with yearly durable evidence releases, duplicate-date skip, and no overwrite/backfill semantics
+- CI workflows capable of running real-data experiments and validating the prospective recorder
 - experiment index and durable reviewed experiment memory
 - CI with pytest and Ruff
 - repo-native AI memory and context builder
@@ -54,6 +56,8 @@ Last updated: 2026-09-12
 - EXP-0005 exact frozen-v1 center reproduced EXP-0001 within every preregistered provider-revision tolerance
 - EXP-0005 supports local retrospective parameter robustness but does not select a replacement parameter set; expectancy still spans roughly +0.43R to +1.73R across the grid
 - `PROSPECTIVE-v1-holdout` is preregistered to start 2026-09-14 with no interim v1 tuning
+- prospective recorder tests cover protocol-lock mismatch, exclusive cutoff behavior, pre-start no-op, exactly five provider downloads, deterministic archives, and the absence of a production backfill date argument
+- first active prospective capture is expected on 2026-09-15 after the completed 2026-09-14 bar is available; no prospective observation exists yet
 - no validated portfolio-level trading edge yet
 - no live or paper execution yet
 
@@ -69,13 +73,14 @@ Last updated: 2026-09-12
 - EXP-0005 supports local sign/quality robustness but parameter choice still materially affects historical magnitude
 - EXP-0003, EXP-0004, and EXP-0005 are retrospective diagnostics, not true out-of-sample validation
 - the prospective holdout cannot support validation claims before both 2028-09-14 and 30 closed trades
-- yfinance adjusted equity/QQQ history has changed across repeated runs; exact provider replay is not guaranteed without immutable snapshots
+- pre-recorder historical yfinance snapshots cannot be reconstructed exactly after provider revisions; forward holdout captures will preserve complete provider states once active
+- GitHub Release append-only behavior is enforced by workflow convention and digests, not by an administrator-proof storage primitive
 - no broader-universe survivorship/selection-bias study
-- no provenance-preserving forward holdout observation store
+- no prospective holdout evaluator/trade-state replay yet; capture is deliberately separated from evaluation
 - no semantic retrieval for solution memory
 - no persistent daily scan history
 - no catalyst/news agent
 
 ## Current milestone
 
-Keep v1 frozen for the prospective holdout. Build provenance-preserving forward holdout recording for observations beginning 2026-09-14, and run broader-universe testing next to reduce selection/survivorship bias. Do not further mine the completed EXP-0005 surface for replacement v1 parameters.
+Keep v1 frozen. Let the forward recorder begin with the first active UTC observation on 2026-09-15 and treat any missed scheduled day as a gap rather than backfill it. Preregister and run broader-universe testing next to reduce selection/survivorship bias. A separate future evaluator may replay frozen v1 from stored prospective evidence without feeding interim results into tuning.

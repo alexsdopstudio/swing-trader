@@ -40,6 +40,7 @@ The scanner uses the same indicator and scoring concepts for the latest bar, whi
 - `reference_baselines.py`: deterministic cost-aware passive buy-and-hold references.
 - `reference_comparison.py`: controlled active-vs-passive experiment orchestration on one shared snapshot.
 - `parameter_neighborhood.py`: preregistered local score/stop/trail robustness diagnostics with full-path reruns on shared inputs and no winner selection.
+- `prospective_recorder.py`: byte-locked, current-date-only forward provider-state capture with exclusive cutoffs, complete source snapshots, and deterministic archive verification.
 - `context_builder.py`: builds a compact AI working-context snapshot from repository memory.
 
 ## Execution and risk boundary
@@ -62,6 +63,16 @@ Passive references deliberately do not inherit v1 sizing/stops: they answer an o
 
 Parameter-neighborhood scenarios rerun the full portfolio path because score thresholds and ATR stop/trail distances can alter entries, sizing, exits, cash, open risk, and later opportunities. The diagnostic evaluates a preregistered surface and never promotes the historical winner into frozen v1.
 
+## Prospective evidence boundary
+
+Prospective evidence capture is deliberately separate from strategy evaluation. `prospective_recorder.py` records the complete normalized provider state visible before the current UTC observation cutoff and produces no signals, fills, PnL, parameter choices, or validation outcome.
+
+`PROSPECTIVE-v1-holdout` is byte-locked before the forward record begins. Production capture derives its observation date from the current UTC clock; it cannot label a later download as an earlier prospective observation. Missing capture dates therefore remain gaps.
+
+Each active date is stored as a digest-named full snapshot archive. The scheduled workflow publishes one asset per canonical date to a yearly GitHub Release and skips an existing date instead of replacing it. This preserves provider revisions without adding generated daily data commits to `main`.
+
+A future holdout evaluator must be read-only over this evidence and must replay the frozen v1 specification. Interim evaluation cannot feed tuning.
+
 ## AI boundary
 
 AI may help with research, code generation, review, experiment interpretation and later catalyst/news analysis. It must not override position size, stops, execution assumptions, portfolio-risk limits or other hard controls.
@@ -80,8 +91,8 @@ Data → Features → Strategy → Portfolio Backtester → Experiment Store
                     Paper Execution
 ```
 
-Retrospective diagnostics and passive references can challenge the frozen strategy, but they do not become unseen evidence. Genuine validation remains separated into preregistered prospective protocols.
+Retrospective diagnostics and passive references can challenge the frozen strategy, but they do not become unseen evidence. Genuine validation remains separated into preregistered prospective protocols and timestamped forward provider snapshots.
 
 ## Current architectural milestone
 
-The cost-aware portfolio research engine now has reproducible baseline, execution-cost sensitivity, temporal-stability, passive/reference comparison, and parameter-neighborhood workflows. The next retrospective diagnostic is broader-universe testing to reduce selection/survivorship bias. In parallel, the prospective holdout needs a provenance-preserving forward recording layer before paper execution is considered.
+The research engine now has reproducible retrospective baseline, cost-sensitivity, temporal-stability, passive/reference, and parameter-neighborhood workflows plus a provenance-preserving prospective capture path. The next retrospective diagnostic is broader-universe testing to reduce selection/survivorship bias. The next prospective infrastructure step is read-only replay/evaluation from captured evidence after the recorder begins, before paper execution is considered.
