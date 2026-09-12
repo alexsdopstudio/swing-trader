@@ -1,6 +1,6 @@
 # Contributing
 
-All changes to this repository follow a branch-and-pull-request workflow. Direct development on `main` is not part of the normal process.
+All changes to this repository follow the gated lifecycle defined in `docs/workflow/development-lifecycle.md`. Direct development on `main` is not part of the normal process.
 
 ## Repository language
 
@@ -23,6 +23,25 @@ This applies to:
 Market symbols, proper nouns, external source text, and raw data values are not translated when translation would change their meaning. Any explanation, annotation, metadata, or surrounding prose added by this project must still be written in English.
 
 Human conversations outside the repository may use any language, but text committed to the repository must be English before review and merge.
+
+## Required lifecycle
+
+The default lifecycle for every non-trivial change is:
+
+```text
+Intake
+  -> Design
+  -> Dedicated branch
+  -> Draft PR
+  -> Implementation
+  -> Validation
+  -> Formal PR review
+  -> Squash merge
+```
+
+For non-trivial changes, create a design plan under `docs/plans/active/` using `.ai/design-template.md` before implementing production code. Open the PR as Draft once the design is clear enough to review, then implement the feature on the same branch and PR.
+
+A PR is not complete when the code is written. It is complete only after validation, a formal diff-based `PASS` review, green required CI checks, updated project memory, and merge into `main`.
 
 ## Branches
 
@@ -52,7 +71,7 @@ experiment/breakout-50-day
 ci/cache-python-dependencies
 ```
 
-Do not reuse branches for unrelated work. Delete the branch after merge.
+Do not reuse branches for unrelated work. Delete the branch after merge when possible.
 
 ## Commits
 
@@ -89,44 +108,76 @@ feat(config)!: replace flat risk settings with profiles
 
 Every feature, fix, refactor, experiment, and other non-trivial code change must be developed on a dedicated branch and merged through a pull request into `main`.
 
+Open the PR as Draft after the design phase. Keep design and implementation in the same PR so the full reasoning and change history are reviewable together.
+
 PR titles use the same Conventional Commit format as commits. The title and PR description must be written in English. The title should describe the complete logical change because squash merge is the preferred merge strategy.
 
 A PR should:
 
 1. Cover one logical change.
-2. Explain the motivation and implementation.
-3. State trading/research assumptions affected by the change.
-4. List tests performed.
-5. Call out look-ahead, execution, risk, data-quality, or reproducibility implications when applicable.
-6. Update durable project memory (`AGENTS.md`, ADRs, active plans, current state, strategy docs) when the decision changes future agent behavior.
-7. Keep all repository-facing text introduced by the PR in English.
-8. Pass all required CI checks before merge.
+2. Link or name the active design plan when required.
+3. Explain the motivation and proposed design before implementation details.
+4. State trading/research assumptions affected by the change.
+5. List tests and validation performed.
+6. Call out look-ahead, execution, risk, data-quality, overfitting, or reproducibility implications when applicable.
+7. Update durable project memory (`AGENTS.md`, ADRs, plans, current state, strategy docs) when future agent behavior should change.
+8. Keep all repository-facing text introduced by the PR in English.
+9. Pass a formal diff-based review.
+10. Pass all required CI checks before merge.
 
-Prefer squash merge. Delete the source branch after merge.
+## Formal review
 
-## Pull request lifecycle
+Before merge, perform a review of the actual diff. Do not review only the PR description.
+
+The review must cover:
+
+- correctness and acceptance criteria;
+- meaningful tests and edge cases;
+- look-ahead, survivorship, data leakage, and execution timing;
+- deterministic risk controls and trading assumptions;
+- architecture, complexity, maintainability, and duplication;
+- English-only repository content;
+- required documentation/memory updates;
+- green CI and unresolved review threads.
+
+The review outcome must be explicitly recorded as one of:
 
 ```text
-main
-  └── dedicated branch
-        ├── focused Conventional Commits
-        ├── tests + docs
-        └── Pull Request
-              ├── CI green
-              ├── self-review / review
-              └── squash merge → main
+PASS
+CHANGES REQUESTED
+BLOCKED
 ```
+
+If the reviewer finds issues, fix them on the same branch and repeat the review. Merge only after `PASS`.
+
+When the PR author and reviewer share the same GitHub identity, record the formal review as a review comment because GitHub does not provide an independent self-approval signal.
+
+## Merge
+
+The agent or engineer responsible for the PR owns finishing the lifecycle rather than leaving a merge-ready PR open indefinitely.
+
+Merge only when:
+
+- the design and acceptance criteria are satisfied;
+- formal review outcome is `PASS`;
+- required CI is green;
+- no unresolved review threads or known blockers remain;
+- repository memory and documentation reflect the post-merge state.
+
+Prefer squash merge. Use the Conventional Commit PR title as the squash commit title. Delete the source branch after merge when possible.
 
 ## AI agents
 
-AI coding agents must follow the same workflow as humans:
+AI coding agents follow the same process as humans and should execute it autonomously when the task and project decisions are clear:
 
-1. Read `AGENTS.md` and relevant project memory.
-2. Start from updated `main`.
-3. Create a dedicated branch before editing.
-4. Write all repository content in English.
-5. Make Conventional Commits in English.
-6. Open a PR in English; do not push the feature directly to `main`.
-7. Leave the PR unmerged until CI is green and the change has been reviewed.
+1. Read repository context and existing decisions.
+2. Write/update the design plan.
+3. Create the dedicated branch.
+4. Open a Draft PR.
+5. Implement and validate on that branch.
+6. Update durable memory.
+7. Mark the PR ready and perform a formal diff-based review.
+8. Fix findings and re-review if necessary.
+9. Merge after `PASS` and green CI.
 
-Agents must not bypass this workflow merely because they have write access to the repository.
+Agents must not bypass review or leave a completed PR unmerged merely because they have write access. Ask for user input only when a material product, trading-risk, architecture, or scope decision cannot be safely inferred from existing project decisions.
