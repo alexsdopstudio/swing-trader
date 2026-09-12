@@ -1,0 +1,25 @@
+schema_version: 1
+id: SRC-0008
+title: CRSP US Stock & Indexes Databases Data Descriptions Guide
+authors:
+  - Center for Research in Security Prices
+year: 2026
+source_type: official_documentation
+publisher: Center for Research in Security Prices
+publication: CRSP US Stock & Indexes Databases
+url: https://www.crsp.org/crsp_pdf/crsp-us-stock-indexes-databases-data-descriptions-guide-crspaccess/
+accessed_on: 2026-09-13
+topics:
+  - survivorship-bias
+  - delistings
+  - equities
+  - data-quality
+redistribution:
+  full_text_committed: false
+project_relevance: >-
+  Documents explicit delisting-return fields and treatment after a security stops trading, reinforcing
+  that disappeared securities and post-delisting economic outcomes matter when constructing historical
+  equity evidence.
+limitations:
+  - CRSP is a separate commercial data source and is not the provider currently used by Swing Trader.
+  - Delisting-return handling addresses only one component of survivorship-free historical universe construction.
