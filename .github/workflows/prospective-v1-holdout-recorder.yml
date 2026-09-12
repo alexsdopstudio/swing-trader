@@ -1,0 +1,209 @@
+name: Prospective v1 holdout recorder
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "src/swing_trader/prospective_recorder.py"
+      - "src/swing_trader/prospective_recorder_cli.py"
+      - "tests/test_prospective_recorder.py"
+      - "experiments/PROSPECTIVE-v1-holdout/protocol.yaml"
+      - "experiments/PROSPECTIVE-v1-holdout/protocol-lock.json"
+      - ".github/workflows/prospective-v1-holdout-recorder.yml"
+  schedule:
+    - cron: "17 2 * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: prospective-v1-holdout-recorder
+  cancel-in-progress: false
+
+jobs:
+  validate:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout PR head
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install project
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev]"
+
+      - name: Validate recorder
+        run: pytest -q tests/test_prospective_recorder.py
+
+  record:
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install project
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev]"
+
+      - name: Resolve current observation
+        id: observation
+        shell: bash
+        run: |
+          python - <<'PY'
+          from datetime import UTC, date, datetime
+          import os
+          from pathlib import Path
+          import yaml
+
+          protocol = yaml.safe_load(
+              Path('experiments/PROSPECTIVE-v1-holdout/protocol.yaml').read_text(encoding='utf-8')
+          )
+          today = datetime.now(UTC).date()
+          start = date.fromisoformat(str(protocol['holdout']['evaluation_start']))
+          active = today > start
+          with open(os.environ['GITHUB_OUTPUT'], 'a', encoding='utf-8') as output:
+              output.write(f"active={'true' if active else 'false'}\n")
+              output.write(f"date={today.isoformat()}\n")
+              output.write(f"tag=prospective-v1-holdout-data-{today.year}\n")
+              output.write(f"prefix=PROSPECTIVE-v1-holdout-{today.isoformat()}-\n")
+          print(f"UTC observation date: {today}; active: {active}")
+          PY
+
+      - name: Check existing date asset
+        id: existing
+        if: steps.observation.outputs.active == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ steps.observation.outputs.tag }}
+          ASSET_PREFIX: ${{ steps.observation.outputs.prefix }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          exists=false
+          if gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
+            assets="$(gh release view "$RELEASE_TAG" --json assets --jq '.assets[].name')"
+            while IFS= read -r name; do
+              if [[ "$name" == "$ASSET_PREFIX"*.zip ]]; then
+                echo "Observation asset already exists: $name"
+                exists=true
+                break
+              fi
+            done <<< "$assets"
+          fi
+          echo "exists=$exists" >> "$GITHUB_OUTPUT"
+
+      - name: Record current provider state
+        if: >-
+          steps.observation.outputs.active == 'true' &&
+          steps.existing.outputs.exists != 'true'
+        run: |
+          swing-holdout-record \
+            --protocol experiments/PROSPECTIVE-v1-holdout/protocol.yaml \
+            --lock experiments/PROSPECTIVE-v1-holdout/protocol-lock.json \
+            --output-dir .artifacts/PROSPECTIVE-v1-holdout
+
+      - name: Validate generated archive
+        id: archive
+        if: >-
+          steps.observation.outputs.active == 'true' &&
+          steps.existing.outputs.exists != 'true'
+        env:
+          OBSERVATION_DATE: ${{ steps.observation.outputs.date }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import os
+          from pathlib import Path
+          from swing_trader.prospective_recorder import verify_snapshot_archive
+
+          root = Path('.artifacts/PROSPECTIVE-v1-holdout')
+          observation_date = os.environ['OBSERVATION_DATE']
+          matches = list(root.glob(f'PROSPECTIVE-v1-holdout-{observation_date}-*.zip'))
+          if len(matches) != 1:
+              raise SystemExit(f'Expected exactly one archive for {observation_date}, found {len(matches)}')
+          archive = matches[0]
+          manifest = verify_snapshot_archive(archive)
+          expected = {'BTC-USD', 'SOL-USD', 'META', 'NVDA', 'QQQ'}
+          if set(manifest['source']) != expected:
+              raise SystemExit(f"Unexpected source set: {set(manifest['source'])}")
+          if manifest['capture']['observation_date'] != observation_date:
+              raise SystemExit('Observation date mismatch')
+          if manifest['research_integrity']['historical_backfill_supported']:
+              raise SystemExit('Production recorder must not support historical backfill')
+          if manifest['research_integrity']['strategy_evaluation_included']:
+              raise SystemExit('Recorder must not include strategy evaluation')
+          with open(os.environ['GITHUB_OUTPUT'], 'a', encoding='utf-8') as output:
+              output.write(f'path={archive}\n')
+              output.write(f'name={archive.name}\n')
+          PY
+
+      - name: Create yearly evidence release if absent
+        if: >-
+          steps.observation.outputs.active == 'true' &&
+          steps.existing.outputs.exists != 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ steps.observation.outputs.tag }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if ! gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
+            gh release create "$RELEASE_TAG" \
+              --target "$(git rev-parse HEAD)" \
+              --title "Prospective v1 holdout data ${RELEASE_TAG##*-}" \
+              --notes "Append-only daily provider snapshots for PROSPECTIVE-v1-holdout. Asset filenames embed their archive SHA-256. Missing dates are not backfilled."
+          fi
+
+      - name: Publish current observation
+        if: >-
+          steps.observation.outputs.active == 'true' &&
+          steps.existing.outputs.exists != 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ steps.observation.outputs.tag }}
+          ARCHIVE_PATH: ${{ steps.archive.outputs.path }}
+        run: gh release upload "$RELEASE_TAG" "$ARCHIVE_PATH"
+
+      - name: Retain workflow copy
+        if: >-
+          steps.observation.outputs.active == 'true' &&
+          steps.existing.outputs.exists != 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: prospective-v1-holdout-${{ steps.observation.outputs.date }}
+          path: ${{ steps.archive.outputs.path }}
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Report pre-start skip
+        if: steps.observation.outputs.active != 'true'
+        run: echo "Holdout has not reached its first active observation date; no asset published."
+
+      - name: Report duplicate-date skip
+        if: >-
+          steps.observation.outputs.active == 'true' &&
+          steps.existing.outputs.exists == 'true'
+        run: echo "Canonical observation for this UTC date already exists; no replacement published."
