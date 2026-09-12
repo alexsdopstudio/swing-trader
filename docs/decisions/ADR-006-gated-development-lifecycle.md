@@ -14,14 +14,16 @@ All non-trivial repository changes follow a gated lifecycle:
 
 ```text
 Intake
-  -> Design
   -> Dedicated branch
+  -> Design
   -> Draft PR
   -> Implementation
   -> Validation
   -> Formal diff-based review
   -> Merge
 ```
+
+The dedicated branch is created before version-controlled design work so the design plan, implementation, review fixes, and final documentation remain in one auditable change history.
 
 Design and implementation remain in one pull request so the complete reasoning and implementation history are auditable together.
 
@@ -40,7 +42,7 @@ Benefits:
 - trading/research risks are considered before code is written;
 - AI agents have a deterministic development protocol;
 - completed work is less likely to remain indefinitely unmerged;
-- one PR provides an audit trail from design through merge.
+- one branch and PR provide an audit trail from design through merge.
 
 Costs:
 
