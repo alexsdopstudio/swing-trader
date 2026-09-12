@@ -1,12 +1,15 @@
 from __future__ import annotations
 
+import hashlib
 import json
 import math
+import platform
 import subprocess
 from collections import Counter
 from collections.abc import Callable
 from dataclasses import asdict
 from datetime import date, datetime
+from importlib.metadata import version
 from pathlib import Path
 from typing import Any
 
@@ -103,6 +106,19 @@ def _coverage(data: pd.DataFrame) -> dict[str, Any]:
     }
 
 
+def _frame_digest(data: pd.DataFrame) -> str:
+    payload = data.to_csv(
+        index=True,
+        float_format="%.12g",
+        date_format="%Y-%m-%dT%H:%M:%S",
+    ).encode("utf-8")
+    return hashlib.sha256(payload).hexdigest()
+
+
+def _source_record(data: pd.DataFrame) -> dict[str, Any]:
+    return {**_coverage(data), "sha256": _frame_digest(data)}
+
+
 def _trade_rows(result) -> list[dict[str, Any]]:
     rows: list[dict[str, Any]] = []
     for trade in result.trades:
@@ -190,12 +206,12 @@ def run_experiment(
                 asset_class=asset_class,
             )
         )
-        source_coverage[symbol] = _coverage(raw_cache[symbol])
+        source_coverage[symbol] = _source_record(raw_cache[symbol])
         evaluation_coverage[symbol] = _coverage(sliced_data)
 
     for benchmark_symbol in set(benchmark_symbols.values()):
         if benchmark_symbol in raw_cache:
-            source_coverage.setdefault(benchmark_symbol, _coverage(raw_cache[benchmark_symbol]))
+            source_coverage.setdefault(benchmark_symbol, _source_record(raw_cache[benchmark_symbol]))
 
     backtest_config = PortfolioBacktestConfig(
         initial_equity=float(portfolio_cfg.get("initial_equity", 5_000.0)),
@@ -238,6 +254,13 @@ def run_experiment(
                 "evaluation_start": experiment["evaluation_start"],
                 "evaluation_end_exclusive": experiment["evaluation_end"],
                 "code_commit_sha": commit_sha or _git_sha(),
+            },
+            "runtime": {
+                "python": platform.python_version(),
+                "numpy": version("numpy"),
+                "pandas": version("pandas"),
+                "PyYAML": version("PyYAML"),
+                "yfinance": version("yfinance"),
             },
             "portfolio": {
                 **{key: value for key, value in portfolio_cfg.items()},
