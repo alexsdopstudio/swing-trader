@@ -45,6 +45,7 @@ The scanner uses the same indicator and scoring concepts for the latest bar, whi
 - `prospective_recorder.py`: byte-locked, current-date-only forward provider-state capture with exclusive cutoffs, complete source snapshots, and deterministic archive verification.
 - `prospective_evaluator.py`: read-only information-time replay of the frozen holdout from verified canonical archives, with state continuity and fail-closed gap handling.
 - `experiment_registry.py`: deterministic derived index and integrity validation for durable historical experiment records and prospective protocol locks.
+- `knowledge_registry.py`: deterministic validation/indexing for durable external sources, time-bounded news observations, and curated project-authored knowledge notes.
 - `context_builder.py`: builds a compact AI working-context snapshot from repository memory.
 
 ## Execution and risk boundary
@@ -79,6 +80,23 @@ Universe-breadth paths also rerun the full shared-account portfolio because adde
 
 The generated registry is versioned for review and fast discovery, but it is not a second editable research schema. CI regenerates it and fails when the committed bytes differ, so changes to canonical experiment/protocol memory must update the derived index in the same PR.
 
+## Knowledge provenance boundary
+
+The knowledge layer classifies records by epistemic role rather than merely by file format.
+
+- `knowledge/sources/` contains durable external references (`SRC-*`): papers, standards, official methodology, and documentation.
+- `knowledge/news/` contains time-bounded external observations (`NEWS-*`) with canonical URL, UTC publication/retrieval time, source class, retrieval method, observed-content fingerprint, entities/topics, and project-authored summary/claims.
+- `knowledge/notes/` contains curated project interpretation (`KN-*`) that explicitly cites durable sources, news observations, or both and separates evidence, project implication, and non-conclusions.
+- `knowledge/registry.json` is a deterministic derived machine index, not another editable source of truth.
+
+A URL alone is never treated as complete knowledge because mutable external content may change, disappear, or be corrected after the information boundary. The `NEWS-*` record represents what was observed at retrieval time; the URL is one provenance field inside that record.
+
+The design borrows the provenance principle of keeping entities, activities/transformations, agents/sources, attribution, derivation, and time reconstructable. It does not claim formal W3C PROV-O conformance.
+
+Knowledge is not project validation. External literature may justify a research prior or methodology control, and news may provide catalyst context, but neither can establish Swing Trader profitability. Project-specific evidence remains under `experiments/`, and genuine validation remains subject to the prospective holdout protocol.
+
+Likewise, knowledge/news retrieval cannot directly change deterministic strategy, sizing, stops, execution, or portfolio-risk controls. Any material behavior change must pass the normal design/research/experiment lifecycle.
+
 ## Operational observation boundary
 
 Daily scanner history is contemporaneous operational memory, not strategy validation. `daily_scan_recorder.py` captures exactly what the configured scanner could observe at the current UTC information boundary: the exact universe config, one normalized provider snapshot per unique asset/benchmark, and the resulting deterministic WATCH/BUY rows.
@@ -103,22 +121,26 @@ The evaluator has no provider fallback and uses the same deterministic portfolio
 
 AI may help with research, code generation, review, experiment interpretation and later catalyst/news analysis. It must not override position size, stops, execution assumptions, portfolio-risk limits or other hard controls.
 
+Future AI retrieval should use the evidence-class metadata and stable IDs in the knowledge/experiment registries rather than flattening every text fragment into an equivalent chunk. Semantic/vector retrieval, if added later, must remain a derived search layer over canonical records and provenance.
+
 ## Research architecture
 
 ```text
-                  Research / Catalyst Agent
-                          ↓
+              Sources / News / Knowledge
+                       ↓
+                  Research Agent
+                       ↓
 Data → Features → Strategy → Portfolio Backtester → Experiment Store
-                          ↓            ↓
-                  Deterministic Risk  Execution Costs
-                          ↓            ↓
-                       Shared Portfolio
-                          ↓
-                    Paper Execution
+                       ↓            ↓
+               Deterministic Risk  Execution Costs
+                       ↓            ↓
+                    Shared Portfolio
+                       ↓
+                 Paper Execution
 ```
 
 Retrospective diagnostics and passive references can challenge the frozen strategy, but they do not become unseen evidence. Genuine validation remains separated into preregistered prospective protocols, timestamped forward provider snapshots, and read-only information-time replay.
 
 ## Current architectural milestone
 
-The research engine now has reproducible retrospective diagnostics, provenance-preserving prospective capture, read-only replay, a deterministic experiment/protocol registry, and provenance-preserving daily operational scanner history. The immediate evidence milestone remains the first active 2026-09-15 holdout recorder observation and continued gap-free capture. The next repository-infrastructure milestones are a source-governed knowledge system and a read-only project dashboard derived from canonical repository/evidence state.
+The research engine now has reproducible retrospective diagnostics, provenance-preserving prospective capture, read-only replay, deterministic experiment/protocol indexing, provenance-preserving daily operational scanner history, and a source-governed knowledge layer for durable references, news observations, and curated interpretation. The immediate evidence milestone remains the first active 2026-09-15 holdout recorder observation and continued gap-free capture. The next repository-infrastructure milestone is a read-only project dashboard derived from canonical repository/evidence state.
