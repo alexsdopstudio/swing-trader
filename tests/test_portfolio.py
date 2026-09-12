@@ -14,8 +14,9 @@ def _asset(
     lows: list[float],
     closes: list[float],
     scores: list[int],
+    index: pd.DatetimeIndex | None = None,
 ) -> PortfolioAsset:
-    index = pd.date_range("2026-01-01", periods=len(opens), freq="D")
+    index = index or pd.date_range("2026-01-01", periods=len(opens), freq="D")
     data = pd.DataFrame(
         {
             "Open": opens,
@@ -58,6 +59,35 @@ def test_signal_executes_at_next_open_and_liquidates_at_end() -> None:
     assert result.equity_curve.iloc[-1] == pytest.approx(1_010.0)
 
 
+def test_next_open_is_next_asset_bar_not_next_portfolio_date() -> None:
+    sparse_index = pd.to_datetime(["2026-01-01", "2026-01-03"])
+    sparse = _asset(
+        "SPARSE",
+        opens=[100.0, 120.0],
+        lows=[95.0, 115.0],
+        closes=[110.0, 130.0],
+        scores=[80, 0],
+        index=sparse_index,
+    )
+    filler = _asset(
+        "DAILY",
+        opens=[100.0, 100.0, 100.0],
+        lows=[95.0, 95.0, 95.0],
+        closes=[100.0, 100.0, 100.0],
+        scores=[0, 0, 0],
+    )
+
+    result = backtest_portfolio(
+        [sparse, filler],
+        PortfolioBacktestConfig(initial_equity=1_000.0),
+    )
+
+    trade = result.trades[0]
+    assert trade.symbol == "SPARSE"
+    assert trade.entry_date == pd.Timestamp("2026-01-03")
+    assert trade.entry == 120.0
+
+
 def test_initial_stop_is_active_on_entry_bar() -> None:
     asset = _asset(
         "TEST",
@@ -77,11 +107,11 @@ def test_initial_stop_is_active_on_entry_bar() -> None:
     assert trade.r_multiple == pytest.approx(-1.0)
 
 
-def test_gap_through_trailing_stop_fills_at_open() -> None:
+def test_close_derived_trailing_stop_cannot_trigger_on_same_bar() -> None:
     asset = _asset(
         "TEST",
         opens=[100.0, 120.0, 100.0],
-        lows=[95.0, 115.0, 95.0],
+        lows=[95.0, 111.0, 95.0],
         closes=[110.0, 125.0, 105.0],
         scores=[80, 0, 0],
     )
