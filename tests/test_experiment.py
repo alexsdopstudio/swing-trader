@@ -1,4 +1,5 @@
 import json
+from datetime import date
 from pathlib import Path
 
 import numpy as np
@@ -27,13 +28,15 @@ def test_slice_evaluation_excludes_warmup_bars() -> None:
     assert list(sliced_regime.index) == list(sliced_data.index)
 
 
-def test_json_safe_converts_non_finite_values_to_none() -> None:
+def test_json_safe_converts_non_finite_and_date_values() -> None:
     payload = _json_safe(
         {
             "nan": float("nan"),
             "positive_infinity": float("inf"),
             "negative_infinity": float("-inf"),
             "numpy_nan": np.float64(np.nan),
+            "date": date(2026, 9, 1),
+            "timestamp": pd.Timestamp("2026-09-01"),
             "value": 1.25,
         }
     )
@@ -43,6 +46,8 @@ def test_json_safe_converts_non_finite_values_to_none() -> None:
         "positive_infinity": None,
         "negative_infinity": None,
         "numpy_nan": None,
+        "date": "2026-09-01",
+        "timestamp": "2026-09-01T00:00:00",
         "value": 1.25,
     }
     json.dumps(payload, allow_nan=False)
