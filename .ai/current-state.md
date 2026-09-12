@@ -1,13 +1,15 @@
 # Current State
 
-Last updated: 2026-09-12
+Last updated: 2026-09-13
 
 ## Working
 
 - daily data loader
 - technical indicators
 - Swing Score and historical score series
-- scanner
+- scanner with one provider read per unique configured asset/benchmark and reusable scoring from captured frames
+- provenance-preserving current-date-only daily scan history with exact captured universe config, normalized source snapshots, deterministic JSON/CSV results, archive digests, and verification
+- scheduled/manual yearly GitHub Release publication for operational scan history with duplicate-date skip and no historical backfill
 - deterministic position sizing
 - ATR initial/trailing stops
 - single-asset backtester
@@ -40,7 +42,8 @@ Last updated: 2026-09-12
 
 ## Validation status
 
-- unit test suite is passing in CI
+- unit test suite is passing in CI on `main`; daily scan history final-head validation is required before PR merge
+- daily scan history synthetic tests cover unique-symbol provider reads, exclusive current-date cutoff, deterministic archives, same-date refusal, archive digest verification, production CLI backfill absence, and append-only workflow semantics
 - experiment registry tests cover deterministic bytes, stale detection, identity/file mismatch rejection, duplicate ids, README coverage, normalized legacy/top-level provenance, and prospective protocol-lock mismatch
 - dedicated registry CI regenerates `experiments/registry.json` and rejects modified or newly generated/untracked registry state
 - portfolio execution/risk semantics are covered by synthetic tests
@@ -92,12 +95,13 @@ Last updated: 2026-09-12
 - GitHub Release append-only behavior is enforced by workflow convention and digests, not by an administrator-proof storage primitive
 - evaluator outputs are derived/reproducible monitoring state rather than a second durable evidence store
 - evaluator infrastructure has only synthetic evidence so far because the first real active archive is not expected until 2026-09-15
+- daily scanner history is operational evidence and is intentionally ineligible as a substitute for the prospective validation holdout
 - the generated experiment registry validates structural/provenance integrity but deliberately does not replace human interpretation or prove research conclusions correct
 - no point-in-time universe membership/survivorship study
-- no semantic retrieval for solution memory
-- no persistent daily scan history
+- no source-governed project knowledge base or semantic retrieval yet
+- no project monitoring dashboard yet
 - no catalyst/news agent
 
 ## Current milestone
 
-Keep v1 frozen. Let the forward recorder produce the first active UTC observation on 2026-09-15 and treat any missed scheduled day as a gap rather than backfill it. Replay captured evidence only through the read-only information-time evaluator and never feed interim state/trades into tuning. The experiment/protocol registry is now automated and should remain a derived integrity index rather than a second research source of truth. If historical universe work continues, preregister point-in-time membership rather than adding more current survivors; otherwise the next infrastructure candidate is persistent daily scan history.
+Keep v1 frozen. Let the forward recorder produce the first active UTC observation on 2026-09-15 and treat any missed scheduled day as a gap rather than backfill it. Replay captured evidence only through the read-only information-time evaluator and never feed interim state/trades into tuning. Preserve daily scanner history as a separate operational audit trail rather than validation evidence. The next infrastructure milestones are a repo-native authoritative knowledge system and a read-only project dashboard derived from canonical repository/evidence state. If historical universe work continues, preregister point-in-time membership rather than adding more current survivors.
