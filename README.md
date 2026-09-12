@@ -87,9 +87,9 @@ The technical stop remains a market-reference trigger. Execution costs affect th
 
 ## Reproducible experiments
 
-Versioned research lives under `experiments/`. Experiment configs separate indicator warm-up history from the actual evaluation window and record the code revision, data coverage, portfolio parameters, execution costs, metrics, and reviewed conclusion.
+Versioned research lives under `experiments/`. Experiment configs separate indicator warm-up history from the actual evaluation window and record code revision, data coverage, source-data digests, portfolio parameters, execution assumptions, metrics, and reviewed conclusions.
 
-Run an experiment locally with:
+Run the baseline experiment locally with:
 
 ```bash
 swing-experiment \
@@ -97,15 +97,29 @@ swing-experiment \
   --output-dir .artifacts/EXP-0001
 ```
 
-The runner generates strict `results.json`, `trades.csv`, `equity.csv`, `resolved-config.yaml`, and a factual generated summary. GitHub Actions can run the same experiment against real market data and upload the generated directory as a review artifact.
+Run execution-cost sensitivity with:
+
+```bash
+swing-cost-sensitivity \
+  --config experiments/EXP-0002-cost-sensitivity/config.yaml \
+  --output-dir .artifacts/EXP-0002
+```
+
+GitHub Actions runs the same real-data experiments and retains detailed trade/equity artifacts for review.
 
 ### EXP-0001 baseline
 
 The first exploratory cost-aware baseline used BTC-USD, SOL-USD, META, and NVDA from 2021-01-01 through 2026-08-31, with warm-up history beginning in 2020.
 
-Headline result: 65 trades, +1.05R expectancy, 3.18 profit factor, 6.01% CAGR and -4.25% maximum drawdown. The result is explicitly **not considered validated** because the sample is small, profits are concentrated in a few assets/trades, 2025–2026 is negative, and no held-out, cost-sensitivity, parameter-robustness, or broader-universe test has been completed.
+Headline result: 65 trades, +1.05R expectancy, 3.18 profit factor, 6.01% CAGR and -4.25% maximum drawdown. The result is explicitly **not considered validated** because the sample is small, profits are concentrated in a few assets/trades, 2025–2026 is negative, and no held-out, parameter-robustness, or broader-universe test has been completed.
 
-See `experiments/EXP-0001-baseline/notes.md` for the reviewed interpretation.
+### EXP-0002 execution-cost sensitivity
+
+EXP-0002 freezes the EXP-0001 strategy and tests 0.5x, 1.0x, 2.0x and 4.0x execution-cost assumptions on one shared market-data snapshot.
+
+The 2.0x scenario retains +0.99R expectancy and a 3.03 profit factor. The 4.0x stress scenario retains +0.82R expectancy and a 2.62 profit factor. This supports execution-cost robustness **inside the same historical sample**, but it is not held-out validation and does not justify deployment.
+
+See `experiments/README.md` and each experiment's `notes.md` for reviewed interpretation and limitations.
 
 ## Development workflow
 
@@ -159,10 +173,10 @@ experiments/             reproducible research history
 
 ## Roadmap
 
-1. Run execution-cost sensitivity on the frozen v1 / EXP-0001 setup.
-2. Add walk-forward / held-out evaluation.
-3. Add parameter robustness sweeps.
-4. Test a broader universe and explicit passive/reference baselines.
+1. Run held-out / walk-forward evaluation with v1 frozen.
+2. Add simple passive/reference baselines.
+3. Run parameter-neighborhood robustness sweeps only after held-out evidence is recorded.
+4. Test a broader universe to reduce survivor/selection bias.
 5. Add a persistent daily scan database.
 6. Add an AI research layer for catalysts, filings, earnings and crypto-specific events.
 7. Add broker/exchange execution only after paper-trading validation.

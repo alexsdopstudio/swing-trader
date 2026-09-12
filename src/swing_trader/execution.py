@@ -73,6 +73,23 @@ class ExecutionCostModel:
             raise ValueError("price must be positive")
 
 
+def scale_execution_cost_models(
+    models: dict[str, ExecutionCostModel],
+    multiplier: float,
+) -> dict[str, ExecutionCostModel]:
+    """Return immutable cost models with every basis-point component scaled equally."""
+    if multiplier < 0:
+        raise ValueError("execution-cost multiplier cannot be negative")
+    return {
+        name: ExecutionCostModel(
+            commission_bps=model.commission_bps * multiplier,
+            spread_bps=model.spread_bps * multiplier,
+            slippage_bps=model.slippage_bps * multiplier,
+        )
+        for name, model in models.items()
+    }
+
+
 def load_execution_cost_models(path: str | Path) -> dict[str, ExecutionCostModel]:
     """Load named asset-class execution-cost assumptions from YAML."""
     with Path(path).open("r", encoding="utf-8") as handle:
