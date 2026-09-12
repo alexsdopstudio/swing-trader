@@ -1,0 +1,91 @@
+name: PR conventions
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize, reopened, ready_for_review]
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Validate branch name
+        env:
+          BRANCH: ${{ github.head_ref }}
+        shell: bash
+        run: |
+          pattern='^(feat|fix|docs|refactor|perf|test|build|ci|chore|experiment)/[a-z0-9]+([.-][a-z0-9]+)*$'
+          if [[ ! "$BRANCH" =~ $pattern ]]; then
+            echo "Invalid branch name: $BRANCH"
+            echo "Expected <type>/<kebab-case>, for example feat/portfolio-backtester"
+            exit 1
+          fi
+
+      - name: Validate PR title
+        env:
+          TITLE: ${{ github.event.pull_request.title }}
+        shell: bash
+        run: |
+          pattern='^(feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert|experiment)(\([a-z0-9._/-]+\))?!?: .+'
+          if [[ ! "$TITLE" =~ $pattern ]]; then
+            echo "Invalid PR title: $TITLE"
+            echo "Use Conventional Commits, for example: feat(backtest): add portfolio engine"
+            exit 1
+          fi
+
+      - name: Validate PR body sections
+        env:
+          BODY: ${{ github.event.pull_request.body }}
+        shell: bash
+        run: |
+          required_sections=(
+            "## Summary"
+            "## Design"
+            "## Acceptance criteria"
+            "## Validation"
+            "## Formal review"
+            "## Merge"
+          )
+
+          missing=0
+          for section in "${required_sections[@]}"; do
+            if ! grep -Fq "$section" <<< "$BODY"; then
+              echo "Missing required PR section: $section"
+              missing=1
+            fi
+          done
+
+          if [[ "$missing" -ne 0 ]]; then
+            echo "PR descriptions must follow the repository pull request template."
+            exit 1
+          fi
+
+      - name: Validate commit subjects
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        shell: bash
+        run: |
+          pattern='^(feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert|experiment)(\([a-z0-9._/-]+\))?!?: .+'
+          invalid=0
+
+          while IFS= read -r subject; do
+            [[ -z "$subject" ]] && continue
+            if [[ ! "$subject" =~ $pattern ]]; then
+              echo "Invalid commit subject: $subject"
+              invalid=1
+            fi
+          done < <(git log --format='%s' --no-merges "$BASE_SHA..$HEAD_SHA")
+
+          if [[ "$invalid" -ne 0 ]]; then
+            echo "All non-merge commit subjects must follow Conventional Commits."
+            exit 1
+          fi
