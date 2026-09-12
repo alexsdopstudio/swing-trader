@@ -1,0 +1,26 @@
+experiment:
+  id: EXP-0001
+  name: cost-aware-baseline
+  strategy_version: v1
+  research_stage: exploratory
+  data_provider: yfinance
+  universe_config: config/universe.yaml
+  cost_config: config/execution-costs.yaml
+  symbols:
+    - BTC-USD
+    - SOL-USD
+    - META
+    - NVDA
+  warmup_start: 2020-01-01
+  evaluation_start: 2021-01-01
+  evaluation_end: 2026-09-01
+
+portfolio:
+  initial_equity: 5000.0
+  risk_fraction: 0.005
+  max_open_risk_fraction: 0.02
+  max_positions: 4
+  max_position_fraction: 0.25
+  min_score: 70
+  stop_atr: 2.0
+  trail_atr: 2.5
