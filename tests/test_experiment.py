@@ -6,7 +6,12 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from swing_trader.experiment import _json_safe, _slice_evaluation, load_experiment_config
+from swing_trader.experiment import (
+    _frame_digest,
+    _json_safe,
+    _slice_evaluation,
+    load_experiment_config,
+)
 
 
 def test_slice_evaluation_excludes_warmup_bars() -> None:
@@ -51,6 +56,16 @@ def test_json_safe_converts_non_finite_and_date_values() -> None:
         "value": 1.25,
     }
     json.dumps(payload, allow_nan=False)
+
+
+def test_frame_digest_is_stable_and_changes_with_data() -> None:
+    index = pd.date_range("2026-01-01", periods=2, freq="D")
+    first = pd.DataFrame({"Close": [100.0, 101.0]}, index=index)
+    same = first.copy()
+    changed = pd.DataFrame({"Close": [100.0, 102.0]}, index=index)
+
+    assert _frame_digest(first) == _frame_digest(same)
+    assert _frame_digest(first) != _frame_digest(changed)
 
 
 def test_load_experiment_config_validates_time_order(tmp_path: Path) -> None:
