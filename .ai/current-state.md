@@ -17,7 +17,8 @@ Last updated: 2026-09-12
 - cost-aware position sizing, shared cash, aggregate risk, and realized PnL
 - `swing-backtest` historical research CLI with reproducible cost configuration
 - versioned experiment runner with warm-up/evaluation separation and strict JSON artifacts
-- CI workflow capable of running real-data experiments and uploading artifacts
+- execution-cost sensitivity runner with shared market-data snapshots across scenarios
+- CI workflows capable of running real-data experiments and uploading artifacts
 - experiment index and durable reviewed experiment memory
 - CI with pytest and Ruff
 - repo-native AI memory and context builder
@@ -32,18 +33,22 @@ Last updated: 2026-09-12
 - cost-aware sizing and execution arithmetic are covered by synthetic tests
 - EXP-0001 real-data workflow completed successfully on BTC-USD, SOL-USD, META, and NVDA
 - EXP-0001 exploratory baseline: 65 trades, +1.05R expectancy, 3.18 profit factor, 6.01% CAGR, -4.25% max drawdown
-- EXP-0001 is not out-of-sample validation and does not justify deployment
+- EXP-0002 execution-cost sensitivity completed with one shared provider snapshot across all scenarios
+- EXP-0002 high 2.0x-cost scenario: 65 trades, +0.99R expectancy, 3.03 profit factor, 5.67% CAGR
+- EXP-0002 stress 4.0x-cost scenario: 66 trades, +0.82R expectancy, 2.62 profit factor, 4.77% CAGR
+- EXP-0002 supports execution-cost robustness inside the same historical sample but is not out-of-sample validation
 - no validated portfolio-level trading edge yet
 - no live or paper execution yet
 
 ## Known limitations
 
 - execution costs use linear basis-point assumptions rather than order-book or nonlinear market-impact models
-- baseline cost assumptions are research inputs, not broker/exchange quotes
-- EXP-0001 has only 65 trades and a narrow, survivor/high-profile universe
-- EXP-0001 profit contribution is concentrated in SOL-USD and NVDA and in a small number of large winners
-- 2025 and the available 2026 EXP-0001 subperiods are negative
-- no execution-cost sensitivity experiment yet
+- baseline cost assumptions and sensitivity multipliers are research inputs, not broker/exchange quotes
+- EXP-0001/EXP-0002 have only about 65 trades and a narrow, survivor/high-profile universe
+- profit contribution in EXP-0001 is concentrated in SOL-USD, NVDA, and a small number of large winners
+- 2025 and the available 2026 EXP-0001 baseline subperiods are negative
+- EXP-0002 reuses the same exploratory historical window, so cost robustness does not establish temporal robustness
+- yfinance revised adjusted history for META, NVDA, and QQQ between EXP-0001 and EXP-0002; baseline metrics remained effectively unchanged but exact provider replay is not guaranteed without snapshots
 - no walk-forward / held-out validation
 - no parameter robustness analysis
 - no broader-universe survivorship/selection-bias study
@@ -54,4 +59,4 @@ Last updated: 2026-09-12
 
 ## Current milestone
 
-Test whether the encouraging EXP-0001 baseline survives execution-cost sensitivity without changing v1 strategy parameters, then move to walk-forward / held-out validation.
+Run a held-out / walk-forward evaluation with v1 strategy and risk parameters frozen. Do not tune parameters before that evidence is recorded.
