@@ -12,6 +12,7 @@ Last updated: 2026-09-12
 - ATR initial/trailing stops
 - single-asset backtester
 - shared-account portfolio backtester
+- reusable stateful daily portfolio replay session shared by historical and prospective paths
 - portfolio trade ledger, equity/exposure curves, and metrics
 - asset-class execution cost models for commission, spread, and slippage
 - cost-aware position sizing, shared cash, aggregate risk, and realized PnL
@@ -25,7 +26,9 @@ Last updated: 2026-09-12
 - preregistered prospective-v1 holdout protocol with byte-locked protocol fingerprint
 - current-date-only prospective holdout recorder preserving complete provider snapshots with exclusive UTC cutoffs and end-to-end digests
 - scheduled/manual GitHub Release publication path with yearly durable evidence releases, duplicate-date skip, and no overwrite/backfill semantics
-- CI workflows capable of running real-data experiments and validating the prospective recorder
+- read-only prospective holdout evaluator replaying one newly observable market date per verified canonical archive with no provider fallback
+- deterministic prospective derived state/trade outputs with fail-closed handling of missing or duplicate observation dates
+- CI workflows capable of running real-data experiments and validating prospective recorder/evaluator infrastructure
 - experiment index and durable reviewed experiment memory
 - CI with pytest and Ruff
 - repo-native AI memory and context builder
@@ -38,6 +41,8 @@ Last updated: 2026-09-12
 
 - unit test suite is passing in CI
 - portfolio execution/risk semantics are covered by synthetic tests
+- stateful replay preserves next-asset-bar, stop ordering, terminal-liquidation separation, and pending-state continuity
+- all real-data EXP-0001 through EXP-0006 workflows remain green after the portfolio event-loop refactor
 - cost-aware sizing and execution arithmetic are covered by synthetic tests
 - EXP-0001 real-data workflow completed successfully on BTC-USD, SOL-USD, META, and NVDA
 - EXP-0001 exploratory baseline: 65 trades, +1.05R expectancy, 3.18 profit factor, 6.01% CAGR, -4.25% max drawdown
@@ -62,6 +67,7 @@ Last updated: 2026-09-12
 - EXP-0006 supports broader retrospective contribution but not superiority of the expanded portfolio; expectancy/PF fell and drawdown/exposure rose relative to the four-symbol control
 - `PROSPECTIVE-v1-holdout` is preregistered to start 2026-09-14 with no interim v1 tuning
 - prospective recorder tests cover protocol-lock mismatch, exclusive cutoff behavior, pre-start no-op, exactly five provider downloads, deterministic archives, and the absence of a production backfill date argument
+- prospective evaluator tests cover canonical daily-chain processing, zero provider downloads, deterministic repeated output, provider revisions without retroactive replay, pending next-asset-bar continuity, duplicate/pre-start rejection, and stop-at-first-gap behavior
 - first active prospective capture is expected on 2026-09-15 after the completed 2026-09-14 bar is available; no prospective observation exists yet
 - no validated portfolio-level trading edge yet
 - no live or paper execution yet
@@ -79,14 +85,15 @@ Last updated: 2026-09-12
 - EXP-0005 supports local sign/quality robustness but parameter choice still materially affects historical magnitude
 - EXP-0003, EXP-0004, EXP-0005, and EXP-0006 are retrospective diagnostics, not true out-of-sample validation
 - the prospective holdout cannot support validation claims before both 2028-09-14 and 30 closed trades
-- pre-recorder historical yfinance snapshots cannot be reconstructed exactly after provider revisions; forward holdout captures will preserve complete provider states once active
+- pre-recorder historical yfinance snapshots cannot be reconstructed exactly after provider revisions; forward holdout captures preserve complete provider states only once active
 - GitHub Release append-only behavior is enforced by workflow convention and digests, not by an administrator-proof storage primitive
+- evaluator outputs are derived/reproducible monitoring state rather than a second durable evidence store
+- evaluator infrastructure has only synthetic evidence so far because the first real active archive is not expected until 2026-09-15
 - no point-in-time universe membership/survivorship study
-- no prospective holdout evaluator/trade-state replay yet; capture is deliberately separated from evaluation
 - no semantic retrieval for solution memory
 - no persistent daily scan history
 - no catalyst/news agent
 
 ## Current milestone
 
-Keep v1 frozen. Let the forward recorder begin with the first active UTC observation on 2026-09-15 and treat any missed scheduled day as a gap rather than backfill it. Build a read-only prospective holdout evaluator/trade-state replay over stored evidence without feeding interim results into tuning. If historical universe work continues, use preregistered point-in-time membership rather than adding more current survivors.
+Keep v1 frozen. Let the forward recorder produce the first active UTC observation on 2026-09-15 and treat any missed scheduled day as a gap rather than backfill it. Replay captured evidence only through the read-only information-time evaluator and never feed interim state/trades into tuning. If historical universe work continues, preregister point-in-time membership rather than adding more current survivors; otherwise the next infrastructure candidates are persistent experiment/index automation and daily scan persistence.
