@@ -17,7 +17,7 @@ Describe the problem or opportunity and why it matters.
 
 ## Relevant context
 
-List affected modules, ADRs, strategy assumptions, prior experiments, and current limitations.
+List affected modules, ADRs, strategy assumptions, prior solutions, experiments, and current limitations.
 
 ## Proposed design
 
@@ -55,15 +55,32 @@ Record meaningful alternatives and why they were rejected.
 
 Describe unit, integration, backtest, regression, and manual checks required before merge.
 
+## Simplification plan
+
+Identify likely sources of accidental complexity and what should be challenged after implementation. Include abstractions, interfaces, duplication, state, and data flow where relevant.
+
+## Compound plan
+
+Identify likely reusable learnings. State where they would belong if confirmed:
+
+- existing ADR/domain/architecture memory;
+- `docs/solutions/engineering/`;
+- `docs/solutions/trading-research/`;
+- `experiments/`;
+- or `No reusable learning`.
+
+Do not pre-commit to creating a solution note if the implementation produces no reusable lesson.
+
 ## Documentation and memory updates
 
-List ADRs, strategy docs, architecture docs, `.ai/current-state.md`, experiment records, or other durable memory that must change.
+List ADRs, strategy docs, architecture docs, `.ai/current-state.md`, solution notes, experiment records, or other durable memory that must change.
 
 ## Implementation plan
 
 1. List the implementation steps in dependency order.
 2. Keep each step independently understandable.
 3. Include tests and documentation as part of implementation, not as afterthoughts.
+4. Include Simplify and Compound before final review.
 
 ## Review checklist
 
@@ -71,6 +88,8 @@ List ADRs, strategy docs, architecture docs, `.ai/current-state.md`, experiment 
 - [ ] Design is consistent with project invariants.
 - [ ] Trading/research risks are addressed.
 - [ ] Test strategy is sufficient.
+- [ ] Simplification risks are identified.
+- [ ] Potential compound knowledge destinations are identified.
 - [ ] Required memory/documentation changes are identified.
 
 ## Definition of done
