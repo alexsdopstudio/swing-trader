@@ -52,12 +52,36 @@ or:
 python -m swing_trader.cli --config config/universe.yaml
 ```
 
+## AI development memory
+
+The repository is designed to be continued across AI coding sessions without depending on one chat history.
+
+Primary memory sources:
+
+- `AGENTS.md` — agent guide and repository map
+- `ARCHITECTURE.md` — system boundaries and module responsibilities
+- `.ai/current-state.md` — current project state and milestone
+- `docs/decisions/` — durable architecture/research decisions
+- `docs/plans/active/` — active implementation plans
+- `experiments/` — reproducible research memory, including failed ideas
+
+Generate a compact working context before an AI coding session:
+
+```bash
+python scripts/build_context.py
+```
+
+This writes `.ai/context.md`, which is intentionally ignored by Git because it is derived working memory.
+
 ## Repository layout
 
 ```text
 config/                 universe and strategy configuration
 src/swing_trader/       production code
 tests/                  unit tests
+docs/                   strategy, domain, decisions, plans, roadmap
+experiments/             reproducible research history
+.ai/                     current state and task/context helpers
 .github/workflows/      CI
 ```
 
@@ -69,7 +93,7 @@ tests/                  unit tests
 4. Add transaction costs and slippage models.
 5. Add parameter robustness sweeps.
 6. Add a persistent daily scan database.
-7. Add an AI research agent for catalysts, filings, earnings and crypto-specific events.
+7. Add an AI research layer for catalysts, filings, earnings and crypto-specific events.
 8. Add broker/exchange execution only after paper-trading validation.
 
 ## Risk model for the initial €5k account
