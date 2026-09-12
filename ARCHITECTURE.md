@@ -30,7 +30,8 @@ The scanner uses the same indicator and scoring concepts for the latest bar, whi
 - `indicators.py`: SMA, ROC, breakout levels, volume ratio and ATR.
 - `scoring.py`: deterministic 0–100 Swing Score for the latest bar.
 - `historical.py`: historical score and market-regime series without future data.
-- `scanner.py`: universe scan and ranking.
+- `scanner.py`: universe scan and ranking, including scoring from already-captured frames.
+- `daily_scan_recorder.py`: current-date-only operational scanner capture with exact universe config, complete normalized source snapshots, deterministic scan outputs, and archive verification.
 - `risk.py`: deterministic position sizing, initial stop and trailing stop helpers.
 - `execution.py`: immutable commission, spread and slippage assumptions plus cost-config loading.
 - `backtest.py`: legacy/minimal single-asset event-driven backtest.
@@ -78,6 +79,14 @@ Universe-breadth paths also rerun the full shared-account portfolio because adde
 
 The generated registry is versioned for review and fast discovery, but it is not a second editable research schema. CI regenerates it and fails when the committed bytes differ, so changes to canonical experiment/protocol memory must update the derived index in the same PR.
 
+## Operational observation boundary
+
+Daily scanner history is contemporaneous operational memory, not strategy validation. `daily_scan_recorder.py` captures exactly what the configured scanner could observe at the current UTC information boundary: the exact universe config, one normalized provider snapshot per unique asset/benchmark, and the resulting deterministic WATCH/BUY rows.
+
+Production capture derives its date from the current UTC clock and provides no historical-date override. The scheduled workflow publishes at most one digest-named asset per date to a yearly release and skips an existing date rather than replacing it. Missed operational dates remain gaps.
+
+Operational history may use the broader configured universe and can support auditability, UI monitoring, debugging, and later research-question generation. It must not be supplied to the prospective holdout evaluator or described as unseen validation evidence.
+
 ## Prospective evidence boundary
 
 Prospective evidence capture is deliberately separate from strategy evaluation. `prospective_recorder.py` records the complete normalized provider state visible before the current UTC observation cutoff and produces no signals, fills, PnL, parameter choices, or validation outcome.
@@ -112,4 +121,4 @@ Retrospective diagnostics and passive references can challenge the frozen strate
 
 ## Current architectural milestone
 
-The research engine now has reproducible retrospective baseline, cost-sensitivity, temporal-stability, passive/reference, parameter-neighborhood, and configured-universe breadth workflows plus provenance-preserving prospective capture, read-only replay infrastructure, and a deterministic derived experiment/protocol registry. The immediate operational milestone is the first active 2026-09-15 recorder observation and continued gap-free evidence capture. Any stronger historical survivorship study should use preregistered point-in-time universe membership rather than adding further present-day survivors.
+The research engine now has reproducible retrospective diagnostics, provenance-preserving prospective capture, read-only replay, a deterministic experiment/protocol registry, and provenance-preserving daily operational scanner history. The immediate evidence milestone remains the first active 2026-09-15 holdout recorder observation and continued gap-free capture. The next repository-infrastructure milestones are a source-governed knowledge system and a read-only project dashboard derived from canonical repository/evidence state.
