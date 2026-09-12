@@ -27,7 +27,7 @@ topics:
   - earnings
 provenance:
   retrieval_method: web
-  observed_content_sha256: 0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
+  observed_content_sha256: "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
 rights:
   full_text_committed: false
 summary: >-
@@ -42,7 +42,7 @@ status: observed
 
 - `canonical_url` identifies the external resource but is not sufficient provenance by itself.
 - `published_at` and `retrieved_at` use explicit UTC `Z` timestamps; retrieval cannot precede publication.
-- `observed_content_sha256` fingerprints the representation seen by the retriever. It does not grant redistribution rights and is not a substitute for storing full text when lawful archival is required.
+- `observed_content_sha256` is always a quoted lowercase hexadecimal string and fingerprints the representation seen by the retriever. It does not grant redistribution rights and is not a substitute for storing full text when lawful archival is required.
 - `entities` contain stable market/entity identifiers meaningful to the project, such as tickers or crypto symbols where appropriate.
 - `topics` use lowercase kebab-case tags.
 - `summary` and `claims` are project-authored descriptions, not copied article text.
