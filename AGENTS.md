@@ -21,10 +21,13 @@ When working from a local clone, agents may run `python scripts/build_handoff.py
 
 Do not ask the user to copy chat history, paste a handoff, run bootstrap commands, or manually shuttle context when repository/GitHub access is available. Ask only for a genuinely unresolved product, trading-risk, architecture, or scope decision that cannot be inferred safely from project memory.
 
+See `docs/workflow/agent-session-handoff.md` for the complete cross-agent resume protocol.
+
 ## Read before changing code
 
 - `CONTRIBUTING.md`
 - `docs/workflow/development-lifecycle.md`
+- `docs/workflow/agent-session-handoff.md`
 - `ARCHITECTURE.md`
 - `docs/product/strategy-v1.md`
 - `docs/domain/risk-model.md`
