@@ -21,6 +21,7 @@ Last updated: 2026-09-12
 - temporal-stability runner with independent calendar folds and one shared provider snapshot
 - passive/reference comparison runner with cost-aware per-symbol and initial equal-weight buy-and-hold baselines
 - parameter-neighborhood runner with a preregistered 27-scenario local grid, shared inputs, full-path reruns, and no winner selection
+- configured-universe breadth runner with same-snapshot control/expanded paths and symbol/asset-class contribution attribution
 - preregistered prospective-v1 holdout protocol with byte-locked protocol fingerprint
 - current-date-only prospective holdout recorder preserving complete provider snapshots with exclusive UTC cutoffs and end-to-end digests
 - scheduled/manual GitHub Release publication path with yearly durable evidence releases, duplicate-date skip, and no overwrite/backfill semantics
@@ -55,6 +56,10 @@ Last updated: 2026-09-12
 - EXP-0005 joint-positive scenarios: 27 of 27; joint-positive immediate axial neighbors: 6 of 6; median expectancy: +0.92R versus preregistered +0.50R threshold
 - EXP-0005 exact frozen-v1 center reproduced EXP-0001 within every preregistered provider-revision tolerance
 - EXP-0005 supports local retrospective parameter robustness but does not select a replacement parameter set; expectancy still spans roughly +0.43R to +1.73R across the grid
+- EXP-0006 configured-universe breadth diagnostic completed on the exact 11 assets that predated the experiment, with a same-snapshot four-symbol EXP-0001 control
+- EXP-0006 expanded path: 141 trades, +39.98% total return, +0.49R expectancy, 2.04 profit factor, 6.12% CAGR, -5.13% max drawdown, and 14.98% average exposure
+- EXP-0006 breadth criteria all passed: added-symbol aggregate net PnL +514.76; 8 of 11 total and 5 of 7 added symbols positive; both asset classes positive; largest positive contributor share 30.58% versus a 60% ceiling
+- EXP-0006 supports broader retrospective contribution but not superiority of the expanded portfolio; expectancy/PF fell and drawdown/exposure rose relative to the four-symbol control
 - `PROSPECTIVE-v1-holdout` is preregistered to start 2026-09-14 with no interim v1 tuning
 - prospective recorder tests cover protocol-lock mismatch, exclusive cutoff behavior, pre-start no-op, exactly five provider downloads, deterministic archives, and the absence of a production backfill date argument
 - first active prospective capture is expected on 2026-09-15 after the completed 2026-09-14 bar is available; no prospective observation exists yet
@@ -65,17 +70,18 @@ Last updated: 2026-09-12
 
 - execution costs use linear basis-point assumptions rather than order-book or nonlinear market-impact models
 - baseline cost assumptions and sensitivity multipliers are research inputs, not broker/exchange quotes
-- EXP-0001/EXP-0002/EXP-0003/EXP-0004/EXP-0005 use the same narrow, survivor/high-profile universe
-- profit contribution is concentrated in a small number of large winners and favorable calendar regimes
+- EXP-0001 through EXP-0006 still use current/high-profile survivor assets rather than a point-in-time investable-universe reconstruction
+- EXP-0006 reduces dependence on the original four-symbol subset but does not eliminate survivorship/selection bias
+- profit contribution remains regime-dependent even though EXP-0006 broadened positive contribution across symbols and asset classes
 - passive-reference returns are strongly influenced by exceptional SOL and NVDA paths and do not remove selection/survivorship bias
-- passive references are nearly fully invested while v1 averages about 6% exposure; no volatility/leverage normalization has been preregistered or tested
+- passive references are nearly fully invested while v1 averages about 6% exposure in the four-symbol baseline; no volatility/leverage normalization has been preregistered or tested
 - the aggregate historical edge is not temporally uniform: 2025 and 2026-YTD are negative and 2022 is inactive
 - EXP-0005 supports local sign/quality robustness but parameter choice still materially affects historical magnitude
-- EXP-0003, EXP-0004, and EXP-0005 are retrospective diagnostics, not true out-of-sample validation
+- EXP-0003, EXP-0004, EXP-0005, and EXP-0006 are retrospective diagnostics, not true out-of-sample validation
 - the prospective holdout cannot support validation claims before both 2028-09-14 and 30 closed trades
 - pre-recorder historical yfinance snapshots cannot be reconstructed exactly after provider revisions; forward holdout captures will preserve complete provider states once active
 - GitHub Release append-only behavior is enforced by workflow convention and digests, not by an administrator-proof storage primitive
-- no broader-universe survivorship/selection-bias study
+- no point-in-time universe membership/survivorship study
 - no prospective holdout evaluator/trade-state replay yet; capture is deliberately separated from evaluation
 - no semantic retrieval for solution memory
 - no persistent daily scan history
@@ -83,4 +89,4 @@ Last updated: 2026-09-12
 
 ## Current milestone
 
-Keep v1 frozen. Let the forward recorder begin with the first active UTC observation on 2026-09-15 and treat any missed scheduled day as a gap rather than backfill it. Preregister and run broader-universe testing next to reduce selection/survivorship bias. A separate future evaluator may replay frozen v1 from stored prospective evidence without feeding interim results into tuning.
+Keep v1 frozen. Let the forward recorder begin with the first active UTC observation on 2026-09-15 and treat any missed scheduled day as a gap rather than backfill it. Build a read-only prospective holdout evaluator/trade-state replay over stored evidence without feeding interim results into tuning. If historical universe work continues, use preregistered point-in-time membership rather than adding more current survivors.
