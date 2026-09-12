@@ -12,6 +12,10 @@ Last updated: 2026-09-12
 - ATR initial/trailing stops
 - single-asset backtester
 - CI with pytest and Ruff
+- repo-native AI memory and context builder
+- gated branch/design/PR/review/merge development lifecycle
+- Simplify and Compound stages for AI-assisted development
+- reusable solution-memory taxonomy for engineering and trading research
 
 ## Validation status
 
@@ -25,6 +29,7 @@ Last updated: 2026-09-12
 - no costs/slippage model
 - no walk-forward validation
 - no experiment database/index
+- no semantic retrieval for solution memory
 - no persistent daily scan history
 - no catalyst/news agent
 

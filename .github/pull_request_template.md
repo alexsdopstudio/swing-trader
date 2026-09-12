@@ -33,6 +33,10 @@ Design plan: `docs/plans/active/...`
 
 <!-- Summarize the implementation after the design has been applied. Call out material deviations from the original design. -->
 
+## Simplify
+
+<!-- Record the dedicated simplification pass: complexity removed, abstractions reduced, duplication removed, or `No simplification needed` with rationale. -->
+
 ## Validation
 
 - [ ] `pytest -q`
@@ -43,16 +47,21 @@ Design plan: `docs/plans/active/...`
 - [ ] Risk controls remain deterministic
 - [ ] All repository content introduced by this PR is written in English
 
+## Compound
+
+<!-- What should a future agent not have to rediscover? Link durable updates/solution notes, or explicitly write `No reusable learning`. -->
+
 ## Memory / documentation
 
 - [ ] No durable project knowledge changed
 - [ ] Updated relevant docs / ADR / plan / `.ai/current-state.md`
+- [ ] Updated `docs/solutions/` when reusable solution knowledge was created
 - [ ] Recorded experiment results when applicable
 - [ ] Active plan finalized for the post-merge state
 
 ## Formal review
 
-<!-- Complete after implementation. Review the actual diff, not only this description. -->
+<!-- Complete after Implementation, Simplify, Validation, and Compound. Review the actual final diff, not only this description. -->
 
 Review outcome: `PENDING`
 
@@ -60,6 +69,8 @@ Review outcome: `PENDING`
 - [ ] Diff reviewed for correctness and edge cases
 - [ ] Trading/research integrity reviewed
 - [ ] Architecture and maintainability reviewed
+- [ ] Simplify outcome reviewed
+- [ ] Compound outcome reviewed
 - [ ] Tests are meaningful
 - [ ] Documentation/memory is current
 - [ ] No unresolved review threads

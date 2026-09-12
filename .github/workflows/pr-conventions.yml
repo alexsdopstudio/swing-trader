@@ -50,7 +50,9 @@ jobs:
             "## Summary"
             "## Design"
             "## Acceptance criteria"
+            "## Simplify"
             "## Validation"
+            "## Compound"
             "## Formal review"
             "## Merge"
           )
