@@ -4,8 +4,20 @@ from dataclasses import dataclass
 from math import sqrt
 
 import numpy as np
+import pandas as pd
 
 from .portfolio import PortfolioBacktestResult
+
+
+@dataclass(frozen=True)
+class EquityCurveMetrics:
+    start_equity: float
+    end_equity: float
+    total_return: float
+    cagr: float
+    max_drawdown: float
+    sharpe: float
+    sortino: float
 
 
 @dataclass(frozen=True)
@@ -34,16 +46,21 @@ def _safe_mean(values: list[float]) -> float:
     return float(np.mean(values)) if values else float("nan")
 
 
-def calculate_metrics(
-    result: PortfolioBacktestResult,
+def calculate_equity_curve_metrics(
+    equity_curve: pd.Series,
     periods_per_year: float | None = None,
-) -> BacktestMetrics:
-    """Calculate deterministic summary metrics for a portfolio backtest result."""
-    equity = result.equity_curve.dropna().astype(float)
+    *,
+    initial_equity: float | None = None,
+) -> EquityCurveMetrics:
+    """Calculate return and risk metrics from a marked equity curve."""
+    equity = equity_curve.dropna().astype(float)
     if equity.empty:
         raise ValueError("equity curve cannot be empty")
 
-    start_equity = float(equity.iloc[0])
+    if initial_equity is not None and initial_equity <= 0:
+        raise ValueError("initial_equity must be positive")
+
+    start_equity = float(initial_equity) if initial_equity is not None else float(equity.iloc[0])
     end_equity = float(equity.iloc[-1])
     total_return = end_equity / start_equity - 1.0 if start_equity > 0 else float("nan")
 
@@ -54,10 +71,20 @@ def calculate_metrics(
     else:
         cagr = float("nan")
 
-    drawdown = equity / equity.cummax() - 1.0
+    drawdown_base = pd.concat(
+        [
+            pd.Series([start_equity], index=[equity.index[0]]),
+            equity,
+        ]
+    )
+    drawdown = drawdown_base / drawdown_base.cummax() - 1.0
     max_drawdown = float(drawdown.min())
 
-    returns = equity.pct_change().dropna()
+    returns = equity.pct_change()
+    if initial_equity is not None:
+        returns.iloc[0] = float(equity.iloc[0]) / start_equity - 1.0
+    returns = returns.dropna()
+
     annualization = periods_per_year
     if annualization is None:
         annualization = len(returns) / years if years > 0 and len(returns) > 0 else 365.25
@@ -68,11 +95,32 @@ def calculate_metrics(
     else:
         sharpe = float("nan")
 
-    downside_deviation = float(np.sqrt(np.mean(np.square(np.minimum(returns, 0.0)))))
-    if len(returns) > 0 and downside_deviation > 0:
+    if len(returns) > 0:
+        downside_deviation = float(np.sqrt(np.mean(np.square(np.minimum(returns, 0.0)))))
+    else:
+        downside_deviation = 0.0
+    if downside_deviation > 0:
         sortino = float(returns.mean() / downside_deviation * sqrt(annualization))
     else:
         sortino = float("nan")
+
+    return EquityCurveMetrics(
+        start_equity=start_equity,
+        end_equity=end_equity,
+        total_return=total_return,
+        cagr=cagr,
+        max_drawdown=max_drawdown,
+        sharpe=sharpe,
+        sortino=sortino,
+    )
+
+
+def calculate_metrics(
+    result: PortfolioBacktestResult,
+    periods_per_year: float | None = None,
+) -> BacktestMetrics:
+    """Calculate deterministic summary metrics for a portfolio backtest result."""
+    curve_metrics = calculate_equity_curve_metrics(result.equity_curve, periods_per_year)
 
     trades = list(result.trades)
     pnls = [trade.pnl for trade in trades]
@@ -107,13 +155,13 @@ def calculate_metrics(
         top5_profit_share = float("nan")
 
     return BacktestMetrics(
-        start_equity=start_equity,
-        end_equity=end_equity,
-        total_return=total_return,
-        cagr=cagr,
-        max_drawdown=max_drawdown,
-        sharpe=sharpe,
-        sortino=sortino,
+        start_equity=curve_metrics.start_equity,
+        end_equity=curve_metrics.end_equity,
+        total_return=curve_metrics.total_return,
+        cagr=curve_metrics.cagr,
+        max_drawdown=curve_metrics.max_drawdown,
+        sharpe=curve_metrics.sharpe,
+        sortino=curve_metrics.sortino,
         profit_factor=profit_factor,
         win_rate=win_rate,
         average_winner_r=average_winner_r,

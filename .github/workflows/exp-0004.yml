@@ -1,0 +1,122 @@
+name: EXP-0004
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "src/swing_trader/reference_baselines.py"
+      - "src/swing_trader/reference_comparison.py"
+      - "src/swing_trader/reference_comparison_cli.py"
+      - "src/swing_trader/experiment.py"
+      - "src/swing_trader/data.py"
+      - "src/swing_trader/indicators.py"
+      - "src/swing_trader/historical.py"
+      - "src/swing_trader/portfolio.py"
+      - "src/swing_trader/metrics.py"
+      - "src/swing_trader/execution.py"
+      - "config/universe.yaml"
+      - "config/execution-costs.yaml"
+      - "experiments/EXP-0001-baseline/config.yaml"
+      - "experiments/EXP-0004-reference-baselines/config.yaml"
+      - ".github/workflows/exp-0004.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  run-experiment:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout PR head
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install project
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev]"
+
+      - name: Run EXP-0004
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf .artifacts/EXP-0004
+          for attempt in 1 2 3; do
+            if swing-reference-comparison \
+              --config experiments/EXP-0004-reference-baselines/config.yaml \
+              --output-dir .artifacts/EXP-0004; then
+              break
+            fi
+            if [ "$attempt" -eq 3 ]; then
+              echo "EXP-0004 failed after 3 attempts" >&2
+              exit 1
+            fi
+            echo "EXP-0004 attempt $attempt failed; retrying after 10 seconds..." >&2
+            sleep 10
+          done
+
+      - name: Validate generated artifact
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          root = Path('.artifacts/EXP-0004')
+          required = [
+              'results.json',
+              'comparison.csv',
+              'baseline-equity.csv',
+              'resolved-config.yaml',
+              'notes.md',
+          ]
+          missing = [name for name in required if not (root / name).exists()]
+          if missing:
+              raise SystemExit(f'Missing EXP-0004 artifacts: {missing}')
+
+          strategy_root = root / 'strategy'
+          for name in ['results.json', 'trades.csv', 'equity.csv', 'resolved-config.yaml']:
+              if not (strategy_root / name).exists():
+                  raise SystemExit(f'Missing strategy/{name}')
+
+          results = json.loads((root / 'results.json').read_text(encoding='utf-8'))
+          if results['experiment']['id'] != 'EXP-0004':
+              raise SystemExit('Unexpected experiment id')
+          if results['experiment']['true_out_of_sample_claim']:
+              raise SystemExit('EXP-0004 must not claim true out-of-sample evidence')
+
+          consistency = results['data_consistency']
+          if consistency['shared_provider_download_count'] != 5:
+              raise SystemExit('EXP-0004 should download the four assets plus QQQ once each')
+          if consistency['provider_downloads_after_strategy'] != 5:
+              raise SystemExit('Frozen strategy should populate the complete five-symbol snapshot')
+          if not consistency['no_additional_provider_downloads_for_baselines']:
+              raise SystemExit('Passive baselines must reuse the frozen strategy snapshot')
+          source = consistency['source']
+          if len(source) != 5 or any('sha256' not in record for record in source.values()):
+              raise SystemExit('Complete source-data provenance is required')
+
+          expected = {'BTC-USD', 'SOL-USD', 'META', 'NVDA'}
+          observed = set(results['reference_baselines']['per_symbol'])
+          if observed != expected:
+              raise SystemExit(f'Unexpected passive baseline set: {observed}')
+          definitions = results['reference_baselines']['definitions']
+          if definitions['portfolio'] != 'equal-weight-buy-and-hold':
+              raise SystemExit('Equal-weight passive definition changed unexpectedly')
+          PY
+
+      - name: Upload EXP-0004 artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: EXP-0004-reference-baselines
+          path: .artifacts/EXP-0004
+          if-no-files-found: error
+          retention-days: 30

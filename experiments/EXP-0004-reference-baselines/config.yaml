@@ -1,0 +1,12 @@
+experiment:
+  id: EXP-0004
+  name: reference-baselines
+  research_stage: retrospective-reference-comparison
+  base_experiment_config: experiments/EXP-0001-baseline/config.yaml
+
+reference_baselines:
+  per_symbol: buy-and-hold
+  portfolio: equal-weight-buy-and-hold
+  rebalance: none
+  entry: first-evaluation-open
+  exit: final-evaluation-close
