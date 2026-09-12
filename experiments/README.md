@@ -26,6 +26,24 @@ Generated trade ledgers, equity curves, and resolved configuration files may be 
 
 Do not delete failed experiments merely because they performed poorly. Negative results are project memory and help prevent repeated overfitting.
 
+## Machine registry
+
+`registry.json` is a deterministic mechanical index derived from the canonical experiment/protocol files. It records identity, file SHA-256 values, existing producer/workflow provenance, and prospective protocol-lock facts. It does not replace reviewed notes or the human research interpretation below.
+
+Regenerate it after changing a durable experiment or prospective protocol record:
+
+```bash
+swing-experiment-registry --root .
+```
+
+Verify that the committed registry is current without rewriting it:
+
+```bash
+swing-experiment-registry --root . --check
+```
+
+CI runs the same validation, rejects directory/config/result identity drift, verifies prospective protocol bytes against their lock, and requires this README to link every discovered experiment/protocol.
+
 ## Experiment index
 
 | Experiment | Status | Question | Decision |
