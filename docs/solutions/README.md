@@ -36,7 +36,7 @@ This README is the lightweight solution-memory index consumed by the AI context 
 
 ### Engineering
 
-_No reusable engineering solution notes recorded yet._
+- [`derive-agent-handoff-from-workflow-state.md`](engineering/derive-agent-handoff-from-workflow-state.md) — derive resumable cross-agent session state from Git, pull requests, plans, CI, and durable repository memory instead of maintaining a duplicate versioned handoff state.
 
 ### Trading research
 
