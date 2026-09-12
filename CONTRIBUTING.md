@@ -30,8 +30,8 @@ The default lifecycle for every non-trivial change is:
 
 ```text
 Intake
-  -> Design
   -> Dedicated branch
+  -> Design
   -> Draft PR
   -> Implementation
   -> Validation
@@ -39,7 +39,7 @@ Intake
   -> Squash merge
 ```
 
-For non-trivial changes, create a design plan under `docs/plans/active/` using `.ai/design-template.md` before implementing production code. Open the PR as Draft once the design is clear enough to review, then implement the feature on the same branch and PR.
+Create the dedicated branch before committing the design plan so design and implementation remain in one auditable history. For non-trivial changes, create a design plan under `docs/plans/active/` using `.ai/design-template.md` before implementing production code. Open the PR as Draft once the design is clear enough to review, then implement the feature on the same branch and PR.
 
 A PR is not complete when the code is written. It is complete only after validation, a formal diff-based `PASS` review, green required CI checks, updated project memory, and merge into `main`.
 
@@ -171,8 +171,8 @@ Prefer squash merge. Use the Conventional Commit PR title as the squash commit t
 AI coding agents follow the same process as humans and should execute it autonomously when the task and project decisions are clear:
 
 1. Read repository context and existing decisions.
-2. Write/update the design plan.
-3. Create the dedicated branch.
+2. Create the dedicated branch from the latest `main`.
+3. Write/update the design plan.
 4. Open a Draft PR.
 5. Implement and validate on that branch.
 6. Update durable memory.
