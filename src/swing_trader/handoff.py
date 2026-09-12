@@ -43,7 +43,7 @@ class GitHubClient:
         if self.token:
             headers["Authorization"] = f"Bearer {self.token}"
         request = Request(url, headers=headers)
-        with urlopen(request, timeout=self.timeout) as response:  # noqa: S310 - fixed GitHub host
+        with urlopen(request, timeout=self.timeout) as response:
             return json.loads(response.read().decode("utf-8"))
 
     def list_open_pull_requests(self, repository: str) -> list[PullRequestSummary]:
@@ -51,6 +51,8 @@ class GitHubClient:
             f"https://api.github.com/repos/{repository}/pulls"
             "?state=open&sort=updated&direction=desc&per_page=100"
         )
+        if not isinstance(payload, list):
+            raise ValueError("GitHub pull-request response must be a list")
         return [
             PullRequestSummary(
                 number=int(item["number"]),
@@ -91,7 +93,7 @@ def _git(root: Path, *args: str) -> str:
         )
     except (OSError, subprocess.CalledProcessError):
         return "unavailable"
-    return result.stdout.strip() or "clean"
+    return result.stdout.strip()
 
 
 def parse_github_repository(remote: str) -> str | None:
@@ -114,7 +116,12 @@ def select_active_pr(
     pull_requests: list[PullRequestSummary],
 ) -> tuple[PullRequestSummary | None, str]:
     """Select resumable work without requiring a user to identify the PR."""
-    matching = [pr for pr in pull_requests if branch not in {"", "main", "master", "unavailable"} and pr.head_ref == branch]
+    matching = [
+        pr
+        for pr in pull_requests
+        if branch not in {"", "main", "master", "unavailable", "detached HEAD"}
+        and pr.head_ref == branch
+    ]
     if matching:
         return matching[0], "current branch matches open PR"
     if len(pull_requests) == 1:
@@ -165,7 +172,17 @@ def _remote_state(
             else None
         )
         return pull_requests, active_pr, reason, plan_path, plan_text
-    except (HTTPError, URLError, TimeoutError, OSError, ValueError, json.JSONDecodeError) as exc:
+    except (
+        HTTPError,
+        URLError,
+        TimeoutError,
+        OSError,
+        RuntimeError,
+        KeyError,
+        TypeError,
+        ValueError,
+        json.JSONDecodeError,
+    ) as exc:
         return [], None, f"remote discovery unavailable: {type(exc).__name__}", None, None
 
 
@@ -176,9 +193,9 @@ def build_handoff(
     allow_remote: bool = True,
 ) -> str:
     root = root.resolve()
-    branch = _git(root, "branch", "--show-current")
+    branch = _git(root, "branch", "--show-current") or "detached HEAD"
     latest_commit = _git(root, "log", "-1", "--oneline")
-    changed_files = _git(root, "status", "--short")
+    changed_files = _git(root, "status", "--short") or "clean"
     remote = _git(root, "remote", "get-url", "origin")
     repository = parse_github_repository(remote) if remote != "unavailable" else None
 
