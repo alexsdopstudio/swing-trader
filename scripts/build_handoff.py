@@ -2,7 +2,11 @@ from __future__ import annotations
 
 import argparse
 import json
+import sys
 from pathlib import Path
+
+REPO_ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(REPO_ROOT / "src"))
 
 from swing_trader.handoff import write_handoff
 
@@ -14,7 +18,7 @@ def main() -> None:
     parser.add_argument("--output-dir", default=None, help="Output directory. Defaults to .ai/.")
     args = parser.parse_args()
 
-    root = Path(args.root).resolve() if args.root else Path(__file__).resolve().parents[1]
+    root = Path(args.root).resolve() if args.root else REPO_ROOT
     metadata: dict = {}
     if args.metadata_file:
         metadata = json.loads(Path(args.metadata_file).read_text(encoding="utf-8"))
