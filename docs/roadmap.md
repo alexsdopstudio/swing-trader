@@ -6,11 +6,13 @@
 - Let the provenance-preserving forward recorder begin with the first active 2026-09-15 UTC capture; do not backfill missed prospective dates.
 - Replay captured evidence only through the read-only information-time evaluator; interim state/trades must not feed v1 tuning.
 - Preserve and verify provenance for every prospective observation and provider revision.
+- Preserve one current-date operational scanner observation without treating it as holdout evidence.
 
 ## Next
 
+- Build a repo-native knowledge system with authoritative-source metadata, evidence quality, topic indexing, and explicit links from sources to project decisions/experiments.
+- Build a read-only project dashboard derived from canonical repository records and durable operational/prospective artifacts.
 - If further historical universe work is justified, preregister a point-in-time membership/survivorship methodology rather than selecting additional current survivors.
-- Daily scan persistence.
 
 ## Prospective validation gate
 
@@ -39,9 +41,10 @@ Interim monitoring is allowed. Interim performance must not be used to tune v1.
 - Byte-locked, current-date-only prospective provider-state recorder with complete snapshots, deterministic archive/source digests, yearly durable release publication, and explicit no-backfill semantics.
 - Read-only prospective evaluator that verifies canonical archives, processes only each newly observable market date, preserves portfolio state across observations, performs zero provider downloads, and stops at the first evidence gap.
 - Deterministic machine-generated experiment/protocol registry with canonical-file digests, normalized existing provenance, prospective protocol-lock validation, and CI stale-state enforcement.
+- Current-date-only daily scanner history with exact captured config/source state, deterministic outputs, archive verification, unique-symbol downloads, and append-only-by-convention yearly release publication.
 
 ## Later
 
-- AI catalyst/research agent for earnings, filings, news and crypto-specific events.
+- AI catalyst/research agent for earnings, filings, news and crypto-specific events after source/evidence governance is explicit.
 - Paper-trading broker integration after the forward recording/evaluation layer is trustworthy.
-- Semantic retrieval over research memory if repository scale warrants it.
+- Semantic retrieval over knowledge/research memory if repository scale warrants it.
