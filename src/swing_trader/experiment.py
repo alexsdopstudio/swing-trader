@@ -6,6 +6,7 @@ import subprocess
 from collections import Counter
 from collections.abc import Callable
 from dataclasses import asdict
+from datetime import date, datetime
 from pathlib import Path
 from typing import Any
 
@@ -59,7 +60,7 @@ def _json_safe(value: Any) -> Any:
         return {str(key): _json_safe(item) for key, item in value.items()}
     if isinstance(value, (list, tuple)):
         return [_json_safe(item) for item in value]
-    if isinstance(value, pd.Timestamp):
+    if isinstance(value, (pd.Timestamp, datetime, date)):
         return value.isoformat()
     if isinstance(value, float) and not math.isfinite(value):
         return None
