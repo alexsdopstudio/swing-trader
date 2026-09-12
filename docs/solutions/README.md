@@ -36,7 +36,7 @@ This README is the lightweight solution-memory index consumed by the AI context 
 
 ### Engineering
 
-_No reusable engineering solution notes recorded yet._
+- [`separate-durable-memory-from-inflight-state.md`](engineering/separate-durable-memory-from-inflight-state.md) — keep durable project knowledge versioned while deriving fast-changing branch/PR/check/review state into replaceable cross-agent handoffs.
 
 ### Trading research
 
@@ -44,3 +44,4 @@ _No reusable engineering solution notes recorded yet._
 - [`include-costs-in-risk-accounting.md`](trading-research/include-costs-in-risk-accounting.md) — include commissions, spread, and slippage in sizing, cash constraints, aggregate risk, and R-multiple accounting rather than treating them only as final PnL adjustments.
 - [`separate-warmup-and-evaluation-windows.md`](trading-research/separate-warmup-and-evaluation-windows.md) — calculate rolling features on pre-test warm-up history, then slice to an explicit evaluation window and record actual provider coverage.
 - [`control-inputs-in-sensitivity-experiments.md`](trading-research/control-inputs-in-sensitivity-experiments.md) — reuse one market-data snapshot across sensitivity scenarios and rerun the full portfolio path when the tested assumption affects sizing, stops, cash, or risk.
+- [`preregister-true-holdout-windows.md`](trading-research/preregister-true-holdout-windows.md) — distinguish retrospective temporal diagnostics from genuine unseen evidence by preregistering future holdout windows and validation gates before they begin.
