@@ -54,6 +54,18 @@ or:
 python -m swing_trader.cli --config config/universe.yaml
 ```
 
+### Persist the current daily scan
+
+The operational scanner can preserve the exact provider state and results visible at the current UTC information boundary. Production recording intentionally has no historical date override: missed dates remain gaps.
+
+```bash
+swing-scan-record \
+  --config config/universe.yaml \
+  --output-dir .artifacts/daily-scan-history
+```
+
+Each archive contains the exact universe config, normalized source CSVs, deterministic JSON/CSV scan results, and an integrity manifest. Daily scan history is operational evidence only; it must never replace the preregistered prospective holdout for validation.
+
 ## Run the portfolio backtester
 
 The portfolio backtester shares one cash balance and one risk budget across all selected assets. It models execution costs at trade time: adverse spread/slippage changes fill prices, commissions reduce cash, and position sizing includes expected friction to the initial stop.
@@ -270,9 +282,12 @@ experiments/             reproducible research history and prospective protocols
 1. Keep v1 frozen and record the prospective holdout from 2026-09-14 onward without interim tuning.
 2. Preserve complete provider states with the provenance-preserving forward recorder; never backfill missed prospective dates.
 3. Replay those captured observations through the read-only information-time evaluator without feeding interim results into tuning.
-4. If more historical universe research is warranted, use preregistered point-in-time membership rather than adding current survivors.
-5. Add persistent daily scan history and later an AI research layer for catalysts, filings, earnings and crypto-specific events.
-6. Add broker/exchange execution only after paper-trading infrastructure and prospective evidence are trustworthy.
+4. Preserve contemporaneous daily scanner history as operational evidence without treating it as holdout validation.
+5. Build a repo-native authoritative knowledge system with traceable sources and evidence-to-decision links.
+6. Publish a read-only project dashboard derived from repository state and durable artifacts.
+7. If more historical universe research is warranted, use preregistered point-in-time membership rather than adding current survivors.
+8. Add an AI research layer for catalysts, filings, earnings and crypto-specific events only after the knowledge/evidence boundaries are explicit.
+9. Add broker/exchange execution only after paper-trading infrastructure and prospective evidence are trustworthy.
 
 ## Risk model for the initial €5k account
 

@@ -1,0 +1,187 @@
+name: Daily scan history
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "config/universe.yaml"
+      - "src/swing_trader/scanner.py"
+      - "src/swing_trader/daily_scan_recorder.py"
+      - "src/swing_trader/daily_scan_recorder_cli.py"
+      - "tests/test_daily_scan_recorder.py"
+      - "pyproject.toml"
+      - ".github/workflows/daily-scan-history.yml"
+  schedule:
+    - cron: "37 2 * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: daily-scan-history
+  cancel-in-progress: false
+
+jobs:
+  validate:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout PR head
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install project
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev]"
+
+      - name: Validate daily scan history
+        run: pytest -q tests/test_daily_scan_recorder.py
+
+  record:
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install project
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev]"
+
+      - name: Resolve current observation
+        id: observation
+        shell: bash
+        run: |
+          python - <<'PY'
+          from datetime import UTC, datetime
+          import os
+
+          today = datetime.now(UTC).date()
+          with open(os.environ['GITHUB_OUTPUT'], 'a', encoding='utf-8') as output:
+              output.write(f"date={today.isoformat()}\n")
+              output.write(f"tag=daily-scan-history-{today.year}\n")
+              output.write(f"prefix=daily-scan-history-{today.isoformat()}-\n")
+          print(f"UTC observation date: {today}")
+          PY
+
+      - name: Check existing date asset
+        id: existing
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ steps.observation.outputs.tag }}
+          ASSET_PREFIX: ${{ steps.observation.outputs.prefix }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          exists=false
+          if gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
+            assets="$(gh release view "$RELEASE_TAG" --json assets --jq '.assets[].name')"
+            while IFS= read -r name; do
+              if [[ "$name" == "$ASSET_PREFIX"*.zip ]]; then
+                echo "Observation asset already exists: $name"
+                exists=true
+                break
+              fi
+            done <<< "$assets"
+          fi
+          echo "exists=$exists" >> "$GITHUB_OUTPUT"
+
+      - name: Record current scanner state
+        if: steps.existing.outputs.exists != 'true'
+        run: |
+          swing-scan-record \
+            --config config/universe.yaml \
+            --output-dir .artifacts/daily-scan-history
+
+      - name: Validate generated archive
+        id: archive
+        if: steps.existing.outputs.exists != 'true'
+        env:
+          OBSERVATION_DATE: ${{ steps.observation.outputs.date }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import os
+          from pathlib import Path
+          from swing_trader.daily_scan_recorder import verify_daily_scan_archive
+          from swing_trader.scanner import load_universe, required_symbols
+
+          root = Path('.artifacts/daily-scan-history')
+          observation_date = os.environ['OBSERVATION_DATE']
+          matches = list(root.glob(f'daily-scan-history-{observation_date}-*.zip'))
+          if len(matches) != 1:
+              raise SystemExit(f'Expected exactly one archive for {observation_date}, found {len(matches)}')
+          archive = matches[0]
+          manifest = verify_daily_scan_archive(archive)
+          config = load_universe('config/universe.yaml')
+          expected = set(required_symbols(config))
+          if set(manifest['source']) != expected:
+              raise SystemExit(f"Unexpected source set: {set(manifest['source'])}")
+          if manifest['capture']['observation_date'] != observation_date:
+              raise SystemExit('Observation date mismatch')
+          integrity = manifest['research_integrity']
+          if integrity['historical_backfill_supported']:
+              raise SystemExit('Daily scan recorder must not support historical backfill')
+          if integrity['validation_evidence'] or integrity['holdout_substitution_allowed']:
+              raise SystemExit('Operational scan history must remain separate from validation evidence')
+          with open(os.environ['GITHUB_OUTPUT'], 'a', encoding='utf-8') as output:
+              output.write(f'path={archive}\n')
+              output.write(f'name={archive.name}\n')
+          PY
+
+      - name: Create yearly operational release if absent
+        if: steps.existing.outputs.exists != 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ steps.observation.outputs.tag }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if ! gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
+            gh release create "$RELEASE_TAG" \
+              --target "$(git rev-parse HEAD)" \
+              --title "Daily scan history ${RELEASE_TAG##*-}" \
+              --notes "Append-only operational scanner observations. Asset filenames embed their archive SHA-256. Missing dates are not backfilled. These assets are not prospective validation evidence."
+          fi
+
+      - name: Publish current observation
+        if: steps.existing.outputs.exists != 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ steps.observation.outputs.tag }}
+          ARCHIVE_PATH: ${{ steps.archive.outputs.path }}
+        run: gh release upload "$RELEASE_TAG" "$ARCHIVE_PATH"
+
+      - name: Retain workflow copy
+        if: steps.existing.outputs.exists != 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: daily-scan-history-${{ steps.observation.outputs.date }}
+          path: ${{ steps.archive.outputs.path }}
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Report duplicate-date skip
+        if: steps.existing.outputs.exists == 'true'
+        run: echo "Canonical scanner observation for this UTC date already exists; no replacement published."
