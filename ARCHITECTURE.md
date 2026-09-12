@@ -34,7 +34,7 @@ The scanner uses the same indicator and scoring concepts for the latest bar, whi
 - `risk.py`: deterministic position sizing, initial stop and trailing stop helpers.
 - `execution.py`: immutable commission, spread and slippage assumptions plus cost-config loading.
 - `backtest.py`: legacy/minimal single-asset event-driven backtest.
-- `portfolio.py`: shared-account multi-asset event loop, cash/risk constraints and realized trade ledger.
+- `portfolio.py`: shared-account multi-asset event loop plus reusable stateful daily replay session, cash/risk constraints, and realized trade ledger.
 - `metrics.py`: reusable equity-curve metrics plus portfolio performance and trade statistics.
 - `backtest_cli.py`: cost-aware historical portfolio research entry point.
 - `reference_baselines.py`: deterministic cost-aware passive buy-and-hold references.
@@ -42,6 +42,7 @@ The scanner uses the same indicator and scoring concepts for the latest bar, whi
 - `parameter_neighborhood.py`: preregistered local score/stop/trail robustness diagnostics with full-path reruns on shared inputs and no winner selection.
 - `universe_breadth.py`: controlled same-snapshot subset-vs-configured-universe full-path comparison with realized symbol/asset-class contribution and concentration diagnostics.
 - `prospective_recorder.py`: byte-locked, current-date-only forward provider-state capture with exclusive cutoffs, complete source snapshots, and deterministic archive verification.
+- `prospective_evaluator.py`: read-only information-time replay of the frozen holdout from verified canonical archives, with state continuity and fail-closed gap handling.
 - `context_builder.py`: builds a compact AI working-context snapshot from repository memory.
 
 ## Execution and risk boundary
@@ -60,6 +61,8 @@ For long trades:
 
 The technical stop remains a market-reference trigger. Execution cost changes the realized fill, cash flow and risk, not the chronological information available to the strategy.
 
+The same stateful daily portfolio session is used by finite historical backtests and prospective replay. Historical backtests explicitly mark each asset's final bar for terminal liquidation. Prospective replay does not: open positions, pending signals, stops, cash, and last prices carry forward to later canonical observations.
+
 Passive references deliberately do not inherit v1 sizing/stops: they answer an opportunity-cost question. They must still share evaluation dates, provider snapshot, and execution-cost conventions with the active strategy so the comparison is controlled.
 
 Parameter-neighborhood scenarios rerun the full portfolio path because score thresholds and ATR stop/trail distances can alter entries, sizing, exits, cash, open risk, and later opportunities. The diagnostic evaluates a preregistered surface and never promotes the historical winner into frozen v1.
@@ -74,7 +77,9 @@ Prospective evidence capture is deliberately separate from strategy evaluation. 
 
 Each active date is stored as a digest-named full snapshot archive. The scheduled workflow publishes one asset per canonical date to a yearly GitHub Release and skips an existing date instead of replacing it. This preserves provider revisions without adding generated daily data commits to `main`.
 
-A future holdout evaluator must be read-only over this evidence and must replay the frozen v1 specification. Interim evaluation cannot feed tuning.
+`prospective_evaluator.py` consumes those verified archives chronologically. Archive `D` contributes only newly observable market date `D-1`; earlier dates are never reprocessed from a later revised provider snapshot. A missing canonical archive stops replay before all later evidence rather than triggering retrospective reconstruction.
+
+The evaluator has no provider fallback and uses the same deterministic portfolio/risk/execution event loop as retrospective research. Its outputs are derived interim monitoring state, not durable source evidence and not a validation verdict. Interim replay cannot feed tuning; the preregistered 2028-09-14 plus 30-closed-trade gate remains authoritative.
 
 ## AI boundary
 
@@ -94,8 +99,8 @@ Data → Features → Strategy → Portfolio Backtester → Experiment Store
                     Paper Execution
 ```
 
-Retrospective diagnostics and passive references can challenge the frozen strategy, but they do not become unseen evidence. Genuine validation remains separated into preregistered prospective protocols and timestamped forward provider snapshots.
+Retrospective diagnostics and passive references can challenge the frozen strategy, but they do not become unseen evidence. Genuine validation remains separated into preregistered prospective protocols, timestamped forward provider snapshots, and read-only information-time replay.
 
 ## Current architectural milestone
 
-The research engine now has reproducible retrospective baseline, cost-sensitivity, temporal-stability, passive/reference, parameter-neighborhood, and configured-universe breadth workflows plus a provenance-preserving prospective capture path. The next prospective infrastructure step is read-only replay/evaluation from captured evidence after the recorder begins, before paper execution is considered. Any stronger historical survivorship study should use preregistered point-in-time universe membership rather than adding further present-day survivors.
+The research engine now has reproducible retrospective baseline, cost-sensitivity, temporal-stability, passive/reference, parameter-neighborhood, and configured-universe breadth workflows plus provenance-preserving prospective capture and read-only replay infrastructure. The immediate operational milestone is the first active 2026-09-15 recorder observation and continued gap-free evidence capture. Any stronger historical survivorship study should use preregistered point-in-time universe membership rather than adding further present-day survivors.
