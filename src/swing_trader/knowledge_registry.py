@@ -131,7 +131,13 @@ def _source_entry(path: Path, root: Path) -> dict[str, Any]:
             raise ValueError(f"{path}: invalid DOI")
         doi = doi.strip()
 
-    accessed_on = _nonempty_string(payload, "accessed_on", label=label)
+    raw_accessed_on = payload.get("accessed_on")
+    if isinstance(raw_accessed_on, date):
+        accessed_on = raw_accessed_on.isoformat()
+    elif isinstance(raw_accessed_on, str) and raw_accessed_on.strip():
+        accessed_on = raw_accessed_on.strip()
+    else:
+        raise ValueError(f"{path}: accessed_on must be YYYY-MM-DD")
     try:
         date.fromisoformat(accessed_on)
     except ValueError as exc:
