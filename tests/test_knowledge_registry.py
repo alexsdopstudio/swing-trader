@@ -49,7 +49,7 @@ topics:
   - earnings
 provenance:
   retrieval_method: web
-  observed_content_sha256: {content_sha256}
+  observed_content_sha256: "{content_sha256}"
 rights:
   full_text_committed: {full_text_committed}
 summary: >-
