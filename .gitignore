@@ -9,3 +9,6 @@ venv/
 data/*.csv
 data/*.parquet
 .ai/context.md
+.ai/handoff.md
+.ai/handoff.json
+.handoff-metadata.json
