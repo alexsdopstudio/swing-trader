@@ -14,6 +14,19 @@ from urllib.parse import quote
 from urllib.request import Request, urlopen
 
 
+REMOTE_ERRORS = (
+    HTTPError,
+    URLError,
+    TimeoutError,
+    OSError,
+    RuntimeError,
+    KeyError,
+    TypeError,
+    ValueError,
+    json.JSONDecodeError,
+)
+
+
 @dataclass(frozen=True)
 class PullRequestSummary:
     number: int
@@ -164,26 +177,25 @@ def _remote_state(
     client = client or GitHubClient()
     try:
         pull_requests = client.list_open_pull_requests(repository)
-        active_pr, reason = select_active_pr(branch, pull_requests)
-        plan_path = _plan_path_from_pr_body(active_pr.body) if active_pr else None
-        plan_text = (
-            client.fetch_text_file(repository, plan_path, active_pr.head_sha)
-            if active_pr and plan_path
-            else None
-        )
-        return pull_requests, active_pr, reason, plan_path, plan_text
-    except (
-        HTTPError,
-        URLError,
-        TimeoutError,
-        OSError,
-        RuntimeError,
-        KeyError,
-        TypeError,
-        ValueError,
-        json.JSONDecodeError,
-    ) as exc:
+    except REMOTE_ERRORS as exc:
         return [], None, f"remote discovery unavailable: {type(exc).__name__}", None, None
+
+    active_pr, reason = select_active_pr(branch, pull_requests)
+    plan_path = _plan_path_from_pr_body(active_pr.body) if active_pr else None
+    if not active_pr or not plan_path:
+        return pull_requests, active_pr, reason, plan_path, None
+
+    try:
+        plan_text = client.fetch_text_file(repository, plan_path, active_pr.head_sha)
+    except REMOTE_ERRORS as exc:
+        return (
+            pull_requests,
+            active_pr,
+            f"{reason}; remote plan unavailable: {type(exc).__name__}",
+            plan_path,
+            None,
+        )
+    return pull_requests, active_pr, reason, plan_path, plan_text
 
 
 def build_handoff(
