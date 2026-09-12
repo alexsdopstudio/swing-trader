@@ -25,6 +25,7 @@ swing-experiment = "swing_trader.experiment_cli:main"
 swing-cost-sensitivity = "swing_trader.cost_sensitivity_cli:main"
 swing-temporal-stability = "swing_trader.temporal_stability_cli:main"
 swing-reference-comparison = "swing_trader.reference_comparison_cli:main"
+swing-parameter-neighborhood = "swing_trader.parameter_neighborhood_cli:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
