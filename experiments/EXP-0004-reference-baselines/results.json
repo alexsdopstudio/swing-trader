@@ -1,0 +1,71 @@
+{
+  "experiment": {
+    "id": "EXP-0004",
+    "name": "reference-baselines",
+    "research_stage": "retrospective-reference-comparison",
+    "producer_code_sha": "7401577f0eaf80878091b7ac317e688c369b4a67",
+    "workflow_run_id": 34711644430,
+    "artifact_id": 10303308018,
+    "artifact_sha256": "a145fa51e2f03e449218b857270264ef6f7c3f49f4a0230c5be9cc243ffb32af",
+    "historical_data_already_observed": true,
+    "true_out_of_sample_claim": false,
+    "base_experiment_config": "experiments/EXP-0001-baseline/config.yaml",
+    "evaluation_start": "2021-01-01",
+    "evaluation_end_exclusive": "2026-09-01"
+  },
+  "runtime": {
+    "python": "3.12.14",
+    "numpy": "2.5.3",
+    "pandas": "3.0.5",
+    "PyYAML": "6.0.3",
+    "yfinance": "1.7.0"
+  },
+  "data_consistency": {
+    "shared_provider_download_count": 5,
+    "no_additional_provider_downloads_for_baselines": true,
+    "source": {
+      "BTC-USD": {"rows": 2435, "sha256": "3d1f12602576f0f20a843463695bfca10707d844985cf2dcd4c6ce7c957edc36"},
+      "SOL-USD": {"rows": 2335, "sha256": "f733e8c72ad3952f7d756a75bc2af6e01a9dcb61b13ee2ae5238b14ab65bfb48"},
+      "META": {"rows": 1674, "sha256": "1a791cc747555287309e44125fcda229d9f7802c7b5ec59f0ca90c8c914b0449"},
+      "NVDA": {"rows": 1674, "sha256": "13255e98273caface9cbbca29b5c47702164cbfce99454da4c842400bf6ab15e"},
+      "QQQ": {"rows": 1674, "sha256": "c894f7a2d81271c964adbf5766f72c5aba9a6d54bf052fdd07ad203e513b9bb2"}
+    }
+  },
+  "strategy_v1": {
+    "total_return": 0.39170342208096054,
+    "cagr": 0.060115553192968685,
+    "max_drawdown": -0.042491538555359365,
+    "sharpe": 1.2700262414599652,
+    "sortino": 2.156834615979321,
+    "average_exposure": 0.06037192248162581,
+    "trade_count": 65,
+    "total_execution_cost": 86.11163556823473
+  },
+  "references": {
+    "equal_weight_buy_and_hold": {
+      "total_return": 21.390063335843728,
+      "cagr": 0.7315963692731458,
+      "max_drawdown": -0.9518847056252882,
+      "sharpe": 1.057306370066358,
+      "sortino": 1.6179753599801454,
+      "average_exposure": 0.9988507456120707,
+      "total_execution_cost": 249.51620604137963
+    },
+    "per_symbol_buy_and_hold": {
+      "BTC-USD": {"total_return": 1.6956212774911, "cagr": 0.19141465357134813, "max_drawdown": -0.7663456370856909, "sharpe": 0.5919236251254781, "sortino": 0.8732580545854267},
+      "SOL-USD": {"total_return": 66.87978346812133, "cagr": 1.1063078981329824, "max_drawdown": -0.9627249768997591, "sharpe": 1.2249333117187369, "sortino": 1.948349211078528},
+      "META": {"total_return": 1.0976249503277464, "cagr": 0.14000327399828127, "max_drawdown": -0.767360924833365, "sharpe": 0.521327402134034, "sortino": 0.7561162331068115},
+      "NVDA": {"total_return": 15.887223647434745, "cagr": 0.6486414857038378, "max_drawdown": -0.6633509261332002, "sharpe": 1.2363892154295986, "sortino": 1.9233416607523957}
+    }
+  },
+  "reviewed_findings": {
+    "strategy_absolute_return_below_every_passive_reference": true,
+    "strategy_max_drawdown_materially_smaller_than_every_passive_reference": true,
+    "strategy_sharpe_above_every_passive_reference": true,
+    "strategy_sortino_above_every_passive_reference": true,
+    "strategy_average_exposure_materially_below_equal_weight_reference": true,
+    "passive_return_concentrated_in_SOL_and_NVDA": true,
+    "temporal_stability_failure_from_EXP_0003_remains_unresolved": true
+  },
+  "decision": "REFERENCE BASELINES ADDED — CONTINUE RESEARCH — DO NOT DEPLOY — KEEP V1 FROZEN"
+}

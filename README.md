@@ -113,6 +113,14 @@ swing-temporal-stability \
   --output-dir .artifacts/EXP-0003
 ```
 
+Run the passive/reference comparison with:
+
+```bash
+swing-reference-comparison \
+  --config experiments/EXP-0004-reference-baselines/config.yaml \
+  --output-dir .artifacts/EXP-0004
+```
+
 GitHub Actions runs the same real-data experiments and retains detailed trade/equity artifacts for review.
 
 ### EXP-0001 baseline
@@ -134,6 +142,14 @@ EXP-0003 decomposes the already-observed 2021–2026 history into six independen
 Only 3 of 6 folds had positive expectancy, positive return, and profit factor above 1. The preregistered 4-of-6 stability thresholds therefore failed. 2022 produced no trades, while 2025 and 2026-YTD were negative.
 
 This is a retrospective temporal diagnostic, **not** an out-of-sample claim. It shows that the positive aggregate result is concentrated in favorable regimes rather than being temporally uniform.
+
+### EXP-0004 passive/reference baselines
+
+EXP-0004 keeps v1 frozen and compares it with cost-aware buy-and-hold of each selected asset plus an initially equal-weight, never-rebalanced buy-and-hold basket. Strategy and references reuse one provider snapshot and the same asset-class execution-cost assumptions.
+
+The passive basket produced +2,139.01% total return and 73.16% CAGR versus v1's +39.17% and 6.01%, but the passive path was essentially fully invested and suffered a -95.19% maximum drawdown. v1 averaged only about 6.04% exposure, had a -4.25% maximum drawdown, and recorded higher Sharpe/Sortino than every passive reference in this selected sample.
+
+This does not establish economic superiority for either approach. The comparison exposes a large return-versus-capital-at-risk trade-off, is strongly influenced by exceptional SOL and NVDA histories, and remains retrospective rather than out-of-sample evidence.
 
 ### Prospective v1 holdout
 
@@ -176,7 +192,7 @@ Primary memory sources:
 - `docs/decisions/` — durable architecture/research decisions
 - `docs/plans/active/` — active implementation plans
 - `docs/solutions/` — reusable engineering and trading-research lessons
-- `experiments/` — reproducible research memory, including failed ideas
+- `experiments/` — reproducible research history and prospective protocols
 
 Generate a compact working context before an AI coding session:
 
@@ -200,13 +216,12 @@ experiments/             reproducible research history and prospective protocols
 
 ## Roadmap
 
-1. Add passive/reference baselines to make opportunity cost visible.
-2. Keep v1 frozen and record the prospective holdout from 2026-09-14 onward without interim tuning.
-3. Run parameter-neighborhood robustness diagnostics without modifying the frozen v1 specification.
-4. Test a broader universe to reduce survivor/selection bias.
-5. Add a persistent daily scan / prospective observation store.
-6. Add an AI research layer for catalysts, filings, earnings and crypto-specific events.
-7. Add broker/exchange execution only after paper-trading infrastructure and prospective evidence are trustworthy.
+1. Keep v1 frozen and record the prospective holdout from 2026-09-14 onward without interim tuning.
+2. Run parameter-neighborhood robustness diagnostics without modifying or reselecting the frozen v1 specification.
+3. Test a broader universe to reduce survivor/selection bias.
+4. Add a persistent daily scan / prospective observation store.
+5. Add an AI research layer for catalysts, filings, earnings and crypto-specific events.
+6. Add broker/exchange execution only after paper-trading infrastructure and prospective evidence are trustworthy.
 
 ## Risk model for the initial €5k account
 

@@ -35,8 +35,10 @@ The scanner uses the same indicator and scoring concepts for the latest bar, whi
 - `execution.py`: immutable commission, spread and slippage assumptions plus cost-config loading.
 - `backtest.py`: legacy/minimal single-asset event-driven backtest.
 - `portfolio.py`: shared-account multi-asset event loop, cash/risk constraints and realized trade ledger.
-- `metrics.py`: portfolio performance and trade statistics.
+- `metrics.py`: reusable equity-curve metrics plus portfolio performance and trade statistics.
 - `backtest_cli.py`: cost-aware historical portfolio research entry point.
+- `reference_baselines.py`: deterministic cost-aware passive buy-and-hold references.
+- `reference_comparison.py`: controlled active-vs-passive experiment orchestration on one shared snapshot.
 - `context_builder.py`: builds a compact AI working-context snapshot from repository memory.
 
 ## Execution and risk boundary
@@ -54,6 +56,8 @@ For long trades:
 7. the trade ledger records gross and net results plus execution costs.
 
 The technical stop remains a market-reference trigger. Execution cost changes the realized fill, cash flow and risk, not the chronological information available to the strategy.
+
+Passive references deliberately do not inherit v1 sizing/stops: they answer an opportunity-cost question. They must still share evaluation dates, provider snapshot, and execution-cost conventions with the active strategy so the comparison is controlled.
 
 ## AI boundary
 
@@ -73,6 +77,8 @@ Data → Features → Strategy → Portfolio Backtester → Experiment Store
                     Paper Execution
 ```
 
+Retrospective diagnostics and passive references can challenge the frozen strategy, but they do not become unseen evidence. Genuine validation remains separated into preregistered prospective protocols.
+
 ## Current architectural milestone
 
-The shared-account, cost-aware portfolio research engine is in place. The next milestone is reproducible real-data experimentation, followed by walk-forward/out-of-sample evaluation and execution-cost sensitivity analysis before paper execution is considered.
+The cost-aware portfolio research engine now has reproducible baseline, execution-cost sensitivity, temporal-stability, and passive/reference comparison workflows. The next retrospective diagnostic is parameter-neighborhood robustness without changing frozen v1, followed by broader-universe testing. In parallel, the prospective holdout needs a provenance-preserving forward recording layer before paper execution is considered.
