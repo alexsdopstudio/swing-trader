@@ -59,9 +59,19 @@ Design plan: `docs/plans/active/...`
 - [ ] Recorded experiment results when applicable
 - [ ] Active plan finalized for the post-merge state
 
+## Agent handoff
+
+<!-- Keep this current whenever the lifecycle stage, verified head, next actions, or blockers materially change. This is the canonical transient state for the next AI session. -->
+
+Current stage: Design / Implementation / Simplify / Validation / Compound / Review / Merge
+Last verified head: `pending`
+Next actions:
+- Replace with concrete next action.
+Blockers: None
+
 ## Formal review
 
-<!-- Complete after Implementation, Simplify, Validation, and Compound. Review the actual final diff, not only this description. -->
+<!-- Complete after Implementation, Simplify, Validation, Compound, and Agent handoff are current. Review the actual final diff, not only this description. -->
 
 Review outcome: `PENDING`
 
@@ -73,6 +83,7 @@ Review outcome: `PENDING`
 - [ ] Compound outcome reviewed
 - [ ] Tests are meaningful
 - [ ] Documentation/memory is current
+- [ ] Agent handoff is current for the reviewed head
 - [ ] No unresolved review threads
 - [ ] Required CI checks are green
 
