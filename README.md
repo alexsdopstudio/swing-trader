@@ -52,6 +52,22 @@ or:
 python -m swing_trader.cli --config config/universe.yaml
 ```
 
+## Development workflow
+
+Development uses dedicated branches and pull requests. Do not implement features directly on `main`.
+
+Examples:
+
+```text
+feat/portfolio-backtester
+fix/yfinance-missing-volume
+experiment/breakout-50-day
+```
+
+Commits and PR titles follow Conventional Commits, and the repository validates these conventions in CI. Squash merge is preferred after CI is green and the change has been reviewed.
+
+See `CONTRIBUTING.md` for the complete workflow.
+
 ## AI development memory
 
 The repository is designed to be continued across AI coding sessions without depending on one chat history.
@@ -82,7 +98,7 @@ tests/                  unit tests
 docs/                   strategy, domain, decisions, plans, roadmap
 experiments/             reproducible research history
 .ai/                     current state and task/context helpers
-.github/workflows/      CI
+.github/workflows/      CI and PR convention checks
 ```
 
 ## Roadmap
