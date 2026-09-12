@@ -19,10 +19,11 @@ def initial_stop(entry: float, atr: float, atr_multiple: float = 2.0) -> float:
     return entry - atr_multiple * atr
 
 
-def position_plan(
+def position_plan_for_risk(
     equity: float,
     entry: float,
     stop: float,
+    risk_per_unit: float,
     risk_fraction: float = 0.005,
     max_position_fraction: float = 0.25,
 ) -> PositionPlan:
@@ -32,10 +33,8 @@ def position_plan(
         raise ValueError("risk_fraction must be between 0 and 1")
     if not 0 < max_position_fraction <= 1:
         raise ValueError("max_position_fraction must be between 0 and 1")
-
-    risk_per_unit = entry - stop
     if risk_per_unit <= 0:
-        raise ValueError("stop must be below entry for a long position")
+        raise ValueError("risk_per_unit must be positive")
 
     target_risk_budget = equity * risk_fraction
     units_by_risk = target_risk_budget / risk_per_unit
@@ -49,6 +48,26 @@ def position_plan(
         notional=units * entry,
         risk_budget=units * risk_per_unit,
         risk_per_unit=risk_per_unit,
+    )
+
+
+def position_plan(
+    equity: float,
+    entry: float,
+    stop: float,
+    risk_fraction: float = 0.005,
+    max_position_fraction: float = 0.25,
+) -> PositionPlan:
+    risk_per_unit = entry - stop
+    if risk_per_unit <= 0:
+        raise ValueError("stop must be below entry for a long position")
+    return position_plan_for_risk(
+        equity=equity,
+        entry=entry,
+        stop=stop,
+        risk_per_unit=risk_per_unit,
+        risk_fraction=risk_fraction,
+        max_position_fraction=max_position_fraction,
     )
 
 

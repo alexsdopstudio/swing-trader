@@ -1,6 +1,7 @@
 import pandas as pd
 import pytest
 
+from swing_trader.execution import ExecutionCostModel
 from swing_trader.portfolio import (
     PortfolioAsset,
     PortfolioBacktestConfig,
@@ -15,6 +16,7 @@ def _asset(
     closes: list[float],
     scores: list[int],
     index: pd.DatetimeIndex | None = None,
+    asset_class: str = "default",
 ) -> PortfolioAsset:
     if index is None:
         index = pd.date_range("2026-01-01", periods=len(opens), freq="D")
@@ -36,6 +38,7 @@ def _asset(
         data=data,
         scores=pd.Series(scores, index=index),
         regime=pd.Series(True, index=index),
+        asset_class=asset_class,
     )
 
 
@@ -57,6 +60,7 @@ def test_signal_executes_at_next_open_and_liquidates_at_end() -> None:
     assert trade.exit_date == pd.Timestamp("2026-01-03")
     assert trade.exit == 140.0
     assert trade.exit_reason == "end_of_test"
+    assert trade.total_cost == 0.0
     assert result.equity_curve.iloc[-1] == pytest.approx(1_010.0)
 
 
@@ -178,3 +182,127 @@ def test_aggregate_open_risk_reduces_second_position_size() -> None:
     assert risks["AAA"] == pytest.approx(5.0)
     assert risks["BBB"] == pytest.approx(2.5)
     assert sum(risks.values()) == pytest.approx(7.5)
+
+
+def test_cost_aware_trade_records_fills_fees_and_net_pnl() -> None:
+    asset = _asset(
+        "CRYPTO",
+        opens=[100.0, 100.0],
+        lows=[95.0, 95.0],
+        closes=[110.0, 110.0],
+        scores=[80, 0],
+        asset_class="crypto",
+    )
+    model = ExecutionCostModel(
+        commission_bps=10.0,
+        spread_bps=20.0,
+        slippage_bps=10.0,
+    )
+    config = PortfolioBacktestConfig(
+        initial_equity=1_000.0,
+        cost_models={"default": ExecutionCostModel(), "crypto": model},
+    )
+
+    result = backtest_portfolio([asset], config)
+
+    trade = result.trades[0]
+    assert trade.entry_reference == pytest.approx(100.0)
+    assert trade.entry == pytest.approx(100.2)
+    assert trade.exit_reference == pytest.approx(110.0)
+    assert trade.exit == pytest.approx(109.78)
+    assert trade.entry_fee > 0
+    assert trade.exit_fee > 0
+    assert trade.gross_pnl is not None
+    assert trade.pnl < trade.gross_pnl
+    assert trade.total_cost > trade.entry_fee + trade.exit_fee
+    assert trade.initial_risk == pytest.approx(5.0)
+
+
+def test_cost_aware_sizing_reduces_units_for_same_risk_budget() -> None:
+    asset = _asset(
+        "TEST",
+        opens=[100.0, 100.0],
+        lows=[95.0, 95.0],
+        closes=[110.0, 110.0],
+        scores=[80, 0],
+        asset_class="costly",
+    )
+    zero_result = backtest_portfolio(
+        [asset],
+        PortfolioBacktestConfig(initial_equity=1_000.0),
+    )
+    costly_result = backtest_portfolio(
+        [asset],
+        PortfolioBacktestConfig(
+            initial_equity=1_000.0,
+            cost_models={
+                "default": ExecutionCostModel(),
+                "costly": ExecutionCostModel(
+                    commission_bps=10.0,
+                    spread_bps=20.0,
+                    slippage_bps=10.0,
+                ),
+            },
+        ),
+    )
+
+    assert costly_result.trades[0].units < zero_result.trades[0].units
+    assert costly_result.trades[0].initial_risk == pytest.approx(5.0)
+
+
+def test_asset_classes_use_different_execution_models() -> None:
+    equity = _asset(
+        "EQUITY",
+        opens=[100.0, 100.0],
+        lows=[95.0, 95.0],
+        closes=[110.0, 110.0],
+        scores=[90, 0],
+        asset_class="equity",
+    )
+    crypto = _asset(
+        "CRYPTO",
+        opens=[100.0, 100.0],
+        lows=[95.0, 95.0],
+        closes=[110.0, 110.0],
+        scores=[80, 0],
+        asset_class="crypto",
+    )
+    config = PortfolioBacktestConfig(
+        initial_equity=1_000.0,
+        max_positions=2,
+        cost_models={
+            "default": ExecutionCostModel(),
+            "equity": ExecutionCostModel(spread_bps=2.0),
+            "crypto": ExecutionCostModel(spread_bps=20.0),
+        },
+    )
+
+    result = backtest_portfolio([equity, crypto], config)
+    trades = {trade.symbol: trade for trade in result.trades}
+
+    assert trades["EQUITY"].entry == pytest.approx(100.01)
+    assert trades["CRYPTO"].entry == pytest.approx(100.1)
+
+
+def test_gap_stop_applies_sell_cost_after_gap_reference() -> None:
+    asset = _asset(
+        "TEST",
+        opens=[100.0, 120.0, 100.0],
+        lows=[95.0, 115.0, 95.0],
+        closes=[110.0, 125.0, 105.0],
+        scores=[80, 0, 0],
+        asset_class="costly",
+    )
+    model = ExecutionCostModel(spread_bps=20.0)
+    result = backtest_portfolio(
+        [asset],
+        PortfolioBacktestConfig(
+            initial_equity=1_000.0,
+            cost_models={"default": ExecutionCostModel(), "costly": model},
+        ),
+    )
+
+    trade = result.trades[0]
+    assert trade.exit_reason == "stop_gap"
+    assert trade.exit_reference == pytest.approx(100.0)
+    assert trade.exit == pytest.approx(99.9)

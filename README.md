@@ -56,7 +56,7 @@ python -m swing_trader.cli --config config/universe.yaml
 
 ## Run the portfolio backtester
 
-The portfolio backtester shares one cash balance and one risk budget across all selected assets. Results are currently **pre-cost**: transaction costs and slippage are not modeled yet.
+The portfolio backtester shares one cash balance and one risk budget across all selected assets. It models execution costs at trade time: adverse spread/slippage changes fill prices, commissions reduce cash, and position sizing includes expected friction to the initial stop.
 
 Default initial research portfolio:
 
@@ -64,12 +64,26 @@ Default initial research portfolio:
 swing-backtest \
   --symbols BTC-USD,SOL-USD,META,NVDA \
   --start 2018-01-01 \
-  --initial-equity 5000
+  --initial-equity 5000 \
+  --cost-config config/execution-costs.yaml
 ```
 
-The engine generates signals from a completed daily close, enters only at that asset's next available open, applies initial stops on the entry bar, fills gaps through stops at the open, and only applies close-derived trailing-stop updates to later bars.
+The engine generates signals from a completed daily close, enters only at that asset's next available open, applies initial stops on the entry bar, fills gaps through stops from the gap-open market reference, and only applies close-derived trailing-stop updates to later bars.
 
-The result includes a realized trade ledger plus portfolio equity/exposure curves and metrics including CAGR, maximum drawdown, Sharpe, Sortino, profit factor, win rate, expectancy in R, holding period, and average exposure.
+The result includes a realized trade ledger plus portfolio equity/exposure curves and metrics including CAGR, maximum drawdown, Sharpe, Sortino, profit factor, win rate, expectancy in R, holding period, average exposure, commissions, and aggregate execution costs.
+
+### Execution-cost assumptions
+
+`config/execution-costs.yaml` contains baseline research assumptions, not broker or exchange quotes. The default configuration currently uses:
+
+| Asset class | Commission | Full spread | Additional slippage per side |
+|---|---:|---:|---:|
+| Equity | 1 bps | 5 bps | 5 bps |
+| Crypto | 10 bps | 10 bps | 10 bps |
+
+A long buy pays half the configured spread plus slippage above the market reference; a sell receives half the spread plus slippage below it. Commission is charged on executed notional. Because these are research assumptions, strategy conclusions should be sensitivity-tested across multiple cost scenarios.
+
+The technical stop remains a market-reference trigger. Execution costs affect the realized exit fill and are included in position sizing, aggregate open-risk accounting, shared cash, and realized R multiples.
 
 ## Development workflow
 
@@ -112,7 +126,7 @@ This writes `.ai/context.md`, which is intentionally ignored by Git because it i
 ## Repository layout
 
 ```text
-config/                 universe and strategy configuration
+config/                 universe and execution-cost configuration
 src/swing_trader/       production code
 tests/                  unit tests
 docs/                   strategy, domain, decisions, plans, solutions, roadmap
@@ -123,14 +137,13 @@ experiments/             reproducible research history
 
 ## Roadmap
 
-1. Add transaction costs and slippage models.
-2. Run and record the first portfolio experiments on BTC, SOL, META, and NVDA.
-3. Add walk-forward / out-of-sample evaluation.
-4. Add parameter robustness sweeps.
-5. Add a persistent daily scan database.
-6. Add an AI research layer for catalysts, filings, earnings and crypto-specific events.
-7. Add broker/exchange execution only after paper-trading validation.
+1. Run and record the first cost-aware portfolio experiments on BTC, SOL, META, and NVDA.
+2. Add walk-forward / out-of-sample evaluation.
+3. Add parameter robustness sweeps, including execution-cost sensitivity.
+4. Add a persistent daily scan database.
+5. Add an AI research layer for catalysts, filings, earnings and crypto-specific events.
+6. Add broker/exchange execution only after paper-trading validation.
 
 ## Risk model for the initial €5k account
 
-The initial research assumption is 0.5% account risk per trade, or roughly €25 on €5,000. Position size is computed from the distance between entry and stop, and is also capped by maximum position notional and aggregate portfolio risk. This is a research default, not a recommendation.
+The initial research assumption is 0.5% account risk per trade, or roughly €25 on €5,000. Position size is derived from cost-adjusted loss to the initial stop and is also capped by maximum position notional, aggregate portfolio risk, and available cash including entry commission. This is a research default, not a recommendation.
