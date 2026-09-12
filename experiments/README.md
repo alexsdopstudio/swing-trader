@@ -22,4 +22,12 @@ Each experiment should record at least:
 - key metrics
 - conclusion and follow-up
 
+Generated trade ledgers, equity curves, and resolved configuration files may be stored as CI artifacts when they are reproducible from the recorded code/config. The durable repository record must still preserve enough provenance and reviewed results to understand what was run and why the conclusion was reached.
+
 Do not delete failed experiments merely because they performed poorly. Negative results are project memory and help prevent repeated overfitting.
+
+## Experiment index
+
+| Experiment | Status | Question | Decision |
+|---|---|---|---|
+| [`EXP-0001-baseline`](EXP-0001-baseline/) | Reviewed exploratory baseline | Does v1 show a positive cost-aware baseline on BTC, SOL, META, and NVDA? | Continue research; do not deploy |
