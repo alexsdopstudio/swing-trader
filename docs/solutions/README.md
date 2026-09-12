@@ -40,4 +40,4 @@ _No reusable engineering solution notes recorded yet._
 
 ### Trading research
 
-_No reusable trading-research solution notes recorded yet._
+- [`order-events-by-information-time.md`](trading-research/order-events-by-information-time.md) — preserve realistic open/intraday/close ordering, next-asset-bar execution, and stop semantics in bar-based multi-asset backtests.

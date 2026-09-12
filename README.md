@@ -20,6 +20,8 @@ The v1 system is deliberately simple: daily bars, long-only, trend + momentum + 
 - Trailing stop: 2.5 ATR
 - Default risk: 0.5% of account equity per trade
 - Max position notional: 25% of account equity
+- Max aggregate open risk: 2% of account equity
+- Max concurrent positions: 4
 
 ## Score
 
@@ -52,6 +54,23 @@ or:
 python -m swing_trader.cli --config config/universe.yaml
 ```
 
+## Run the portfolio backtester
+
+The portfolio backtester shares one cash balance and one risk budget across all selected assets. Results are currently **pre-cost**: transaction costs and slippage are not modeled yet.
+
+Default initial research portfolio:
+
+```bash
+swing-backtest \
+  --symbols BTC-USD,SOL-USD,META,NVDA \
+  --start 2018-01-01 \
+  --initial-equity 5000
+```
+
+The engine generates signals from a completed daily close, enters only at that asset's next available open, applies initial stops on the entry bar, fills gaps through stops at the open, and only applies close-derived trailing-stop updates to later bars.
+
+The result includes a realized trade ledger plus portfolio equity/exposure curves and metrics including CAGR, maximum drawdown, Sharpe, Sortino, profit factor, win rate, expectancy in R, holding period, and average exposure.
+
 ## Development workflow
 
 Development uses dedicated branches and pull requests. Do not implement features directly on `main`.
@@ -79,6 +98,7 @@ Primary memory sources:
 - `.ai/current-state.md` — current project state and milestone
 - `docs/decisions/` — durable architecture/research decisions
 - `docs/plans/active/` — active implementation plans
+- `docs/solutions/` — reusable engineering and trading-research lessons
 - `experiments/` — reproducible research memory, including failed ideas
 
 Generate a compact working context before an AI coding session:
@@ -95,7 +115,7 @@ This writes `.ai/context.md`, which is intentionally ignored by Git because it i
 config/                 universe and strategy configuration
 src/swing_trader/       production code
 tests/                  unit tests
-docs/                   strategy, domain, decisions, plans, roadmap
+docs/                   strategy, domain, decisions, plans, solutions, roadmap
 experiments/             reproducible research history
 .ai/                     current state and task/context helpers
 .github/workflows/      CI and PR convention checks
@@ -103,15 +123,14 @@ experiments/             reproducible research history
 
 ## Roadmap
 
-1. Add a portfolio-aware multi-asset backtester.
-2. Compute CAGR, max drawdown, Sharpe, Sortino, profit factor, expectancy in R and exposure.
+1. Add transaction costs and slippage models.
+2. Run and record the first portfolio experiments on BTC, SOL, META, and NVDA.
 3. Add walk-forward / out-of-sample evaluation.
-4. Add transaction costs and slippage models.
-5. Add parameter robustness sweeps.
-6. Add a persistent daily scan database.
-7. Add an AI research layer for catalysts, filings, earnings and crypto-specific events.
-8. Add broker/exchange execution only after paper-trading validation.
+4. Add parameter robustness sweeps.
+5. Add a persistent daily scan database.
+6. Add an AI research layer for catalysts, filings, earnings and crypto-specific events.
+7. Add broker/exchange execution only after paper-trading validation.
 
 ## Risk model for the initial €5k account
 
-The initial research assumption is 0.5% account risk per trade, or roughly €25 on €5,000. Position size is computed from the distance between entry and stop, and is also capped by maximum position notional. This is a research default, not a recommendation.
+The initial research assumption is 0.5% account risk per trade, or roughly €25 on €5,000. Position size is computed from the distance between entry and stop, and is also capped by maximum position notional and aggregate portfolio risk. This is a research default, not a recommendation.
