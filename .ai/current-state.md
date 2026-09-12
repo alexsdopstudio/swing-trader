@@ -24,6 +24,9 @@ Last updated: 2026-09-12
 - experiment index and durable reviewed experiment memory
 - CI with pytest and Ruff
 - repo-native AI memory and context builder
+- autonomous agent bootstrap that generates derived context and cross-session handoff state
+- open-PR discovery and active-PR inference for resumable AI sessions
+- mandatory PR `Agent handoff` contract for current stage, verified head, next actions, and blockers
 - gated branch/design/PR/review/merge development lifecycle
 - Simplify and Compound stages for AI-assisted development
 - reusable solution-memory taxonomy for engineering and trading research
@@ -56,6 +59,8 @@ Last updated: 2026-09-12
 - EXP-0003 is retrospective decomposition of already observed history, not true out-of-sample validation
 - the prospective holdout cannot support validation claims before both 2028-09-14 and 30 closed trades
 - yfinance adjusted equity/QQQ history has changed across repeated runs; exact provider replay is not guaranteed without immutable snapshots
+- autonomous handoff uses GitHub REST discovery when available and degrades to local repository state when remote access is unavailable
+- ambiguous multiple-PR situations are inferred from current branch and recency and must remain explicitly marked as inferred
 - no parameter-neighborhood robustness analysis yet
 - no broader-universe survivorship/selection-bias study
 - no passive/reference baseline comparison
