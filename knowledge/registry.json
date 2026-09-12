@@ -1,7 +1,9 @@
 {
+  "news_observations": [],
   "notes": [
     {
       "id": "KN-0001",
+      "news_ids": [],
       "path": "knowledge/notes/KN-0001-momentum-and-trend-evidence.md",
       "sha256": "cc0447c885f58664e3dbeb08c7ec880a1313e57e993b8a1923f67050c6373913",
       "source_ids": [
@@ -18,6 +20,7 @@
     },
     {
       "id": "KN-0002",
+      "news_ids": [],
       "path": "knowledge/notes/KN-0002-backtest-selection-bias.md",
       "sha256": "2f91692cd819b5b8d71b3399da71b120e607ab7ce974115e9cc19412e9ca1dd5",
       "source_ids": [
@@ -36,6 +39,7 @@
     },
     {
       "id": "KN-0003",
+      "news_ids": [],
       "path": "knowledge/notes/KN-0003-performance-statistics.md",
       "sha256": "af9436e5f8fa79b0b74cfc74aa5847bf9db8fff7abd62b215965c2d2aec9b1c5",
       "source_ids": [
@@ -51,6 +55,7 @@
     },
     {
       "id": "KN-0004",
+      "news_ids": [],
       "path": "knowledge/notes/KN-0004-point-in-time-universes.md",
       "sha256": "4c10156d0cb6199133a80ec0b4dc4a5e49e0f89638654845acaa3bfa5f060f8b",
       "source_ids": [
@@ -65,11 +70,27 @@
         "point-in-time-universe",
         "survivorship-bias"
       ]
+    },
+    {
+      "id": "KN-0005",
+      "news_ids": [],
+      "path": "knowledge/notes/KN-0005-provenance-for-agent-knowledge.md",
+      "sha256": "906a0d29ef2dbb14a0e3ce57cef99ada46b1360c22db087edaae23d84228c8eb",
+      "source_ids": [
+        "SRC-0009"
+      ],
+      "status": "curated",
+      "title": "Provenance for agent knowledge",
+      "topics": [
+        "ai-agents",
+        "knowledge-management",
+        "provenance"
+      ]
     }
   ],
   "policy": {
     "path": "knowledge/SOURCE_POLICY.md",
-    "sha256": "0584924119d04ac9bae285c2db185add87cdae70ffb98d854e4165067274ddab"
+    "sha256": "c906be3990b13a92a5a3a6521647a2be21c9b15d9c956881fa945bc9d784ec7f"
   },
   "schema_version": 1,
   "sources": [
@@ -206,7 +227,7 @@
       "authors": [
         "David H. Bailey",
         "Jonathan M. Borwein",
-        "Marcos L\u00f3pez de Prado",
+        "Marcos López de Prado",
         "Qiji Jim Zhu"
       ],
       "cited_by_note_ids": [
@@ -327,6 +348,38 @@
       ],
       "url": "https://www.crsp.org/crsp_pdf/crsp-us-stock-indexes-databases-data-descriptions-guide-crspaccess/",
       "year": 2026
+    },
+    {
+      "accessed_on": "2026-09-13",
+      "authors": [
+        "Timothy Lebo",
+        "Satya Sahoo",
+        "Deborah McGuinness"
+      ],
+      "cited_by_note_ids": [
+        "KN-0005"
+      ],
+      "doi": null,
+      "full_text_committed": false,
+      "id": "SRC-0009",
+      "limitations": [
+        "PROV-O is a general Web provenance ontology, not a trading-research or AI-agent knowledge-base specification.",
+        "The repository does not currently serialize its records as RDF/OWL or claim standards conformance."
+      ],
+      "path": "knowledge/sources/SRC-0009-w3c-prov-o-2013.yaml",
+      "project_relevance": "Provides an authoritative provenance model built around entities, activities, agents, derivation, attribution, and time. Swing Trader uses the same design principle to keep sources, observations, generated indexes, and curated interpretation traceable without claiming formal PROV-O conformance.",
+      "publication": "W3C Recommendation",
+      "publisher": "World Wide Web Consortium (W3C)",
+      "sha256": "1119f1ce166aabdcb080d73e70d16bcccf7b2ebba8ad5c3fae41b777752498bb",
+      "source_type": "official_documentation",
+      "title": "PROV-O: The PROV Ontology",
+      "topics": [
+        "ai-agents",
+        "knowledge-management",
+        "provenance"
+      ],
+      "url": "https://www.w3.org/TR/prov-o/",
+      "year": 2013
     }
   ]
 }
