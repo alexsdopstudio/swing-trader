@@ -29,7 +29,7 @@ Human conversations outside the repository may use any language, but text commit
 The default lifecycle for every non-trivial change is:
 
 ```text
-Intake
+Session resume / intake
   -> Dedicated branch
   -> Design
   -> Draft PR
@@ -41,13 +41,15 @@ Intake
   -> Squash merge
 ```
 
+Before intake creates new work, contributors and agents must inspect existing open PRs and resume matching in-flight work when appropriate. For AI agents, `docs/workflow/agent-session-handoff.md` defines the required autonomous discovery protocol.
+
 Create the dedicated branch before committing the design plan so design and implementation remain in one auditable history. For non-trivial changes, create a design plan under `docs/plans/active/` using `.ai/design-template.md` before implementing production code. Open the PR as Draft once the design is clear enough to review, then implement the feature on the same branch and PR.
 
-A PR is not complete when the code works. It is complete only after simplification, validation, compound knowledge capture, a formal diff-based `PASS` review, green required CI checks, updated project memory, and merge into `main`.
+A PR is not complete when the code works. It is complete only after simplification, validation, compound knowledge capture, a formal diff-based `PASS` review, green required CI checks, updated project memory, recoverable handoff state, and merge into `main`.
 
 ## Branches
 
-Create one dedicated branch per logical change from the latest `main`.
+Create one dedicated branch per logical change from the latest `main`, unless the logical change already has an open branch/PR that should be resumed.
 
 Allowed prefixes:
 
@@ -128,6 +130,7 @@ A PR should:
 10. Keep all repository-facing text introduced by the PR in English.
 11. Pass a formal diff-based review.
 12. Pass all required CI checks before merge.
+13. Remain resumable from repository/PR state without relying on one chat session.
 
 ## Simplify
 
@@ -177,6 +180,7 @@ The review must cover:
 - whether the Compound outcome captured reusable knowledge appropriately;
 - English-only repository content;
 - required documentation/memory updates;
+- recoverable agent handoff state for non-trivial work;
 - green CI and unresolved review threads.
 
 The review outcome must be explicitly recorded as one of:
@@ -206,21 +210,36 @@ Merge only when:
 
 Prefer squash merge. Use the Conventional Commit PR title as the squash commit title. Delete the source branch after merge when possible.
 
+## Cross-session continuity
+
+The user is not responsible for carrying technical context between AI sessions.
+
+When repository/GitHub access is available, AI agents must:
+
+1. inspect open PRs before starting a duplicate task;
+2. read the latest automated `<!-- agent-handoff -->` comment for relevant PRs;
+3. inspect the PR body, branch, diff, checks, active plan, reviews, and unresolved threads;
+4. reconstruct state from repository/GitHub sources before asking the user for context;
+5. run local handoff/context builders themselves when useful.
+
+The complete protocol is in `docs/workflow/agent-session-handoff.md`.
+
 ## AI agents
 
 AI coding agents follow the same process as humans and should execute it autonomously when the task and project decisions are clear:
 
-1. Read repository context and existing decisions.
-2. Create the dedicated branch from the latest `main`.
-3. Write/update the design plan.
-4. Open a Draft PR.
-5. Implement on that branch.
-6. Simplify the implementation.
-7. Validate tests, lint, integration/backtest behavior, and research invariants.
-8. Perform the Compound check and update durable knowledge when appropriate.
-9. Finalize project memory and the active plan.
-10. Mark the PR ready and perform a formal diff-based review.
-11. Fix findings and repeat the relevant stages if necessary.
-12. Merge after `PASS` and green CI.
+1. Run the session bootstrap/resume protocol and continue matching in-flight work when present.
+2. Read repository context and existing decisions.
+3. Create a dedicated branch from the latest `main` only when a matching branch/PR does not already exist.
+4. Write/update the design plan.
+5. Open a Draft PR.
+6. Implement on that branch.
+7. Simplify the implementation.
+8. Validate tests, lint, integration/backtest behavior, and research invariants.
+9. Perform the Compound check and update durable knowledge when appropriate.
+10. Finalize project memory and the active plan.
+11. Mark the PR ready and perform a formal diff-based review.
+12. Fix findings and repeat the relevant stages if necessary.
+13. Merge after `PASS` and green CI.
 
-Agents must not bypass review or leave a completed PR unmerged merely because they have write access. Ask for user input only when a material product, trading-risk, architecture, or scope decision cannot be safely inferred from existing project decisions.
+Agents must not bypass review, leave a completed PR unmerged merely because they have write access, or ask the user to manually shuttle context that is available from repository/GitHub state. Ask for user input only when a material product, trading-risk, architecture, or scope decision cannot be safely inferred from existing project decisions.
