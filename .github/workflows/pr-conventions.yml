@@ -53,6 +53,7 @@ jobs:
             "## Simplify"
             "## Validation"
             "## Compound"
+            "## Agent handoff"
             "## Formal review"
             "## Merge"
           )
@@ -67,6 +68,31 @@ jobs:
 
           if [[ "$missing" -ne 0 ]]; then
             echo "PR descriptions must follow the repository pull request template."
+            exit 1
+          fi
+
+      - name: Validate agent handoff fields
+        env:
+          BODY: ${{ github.event.pull_request.body }}
+        shell: bash
+        run: |
+          required_fields=(
+            "Current stage:"
+            "Last verified head:"
+            "Next actions:"
+            "Blockers:"
+          )
+
+          missing=0
+          for field in "${required_fields[@]}"; do
+            if ! grep -Fq "$field" <<< "$BODY"; then
+              echo "Missing Agent handoff field: $field"
+              missing=1
+            fi
+          done
+
+          if [[ "$missing" -ne 0 ]]; then
+            echo "The Agent handoff section must expose resumable transient state."
             exit 1
           fi
 
