@@ -6,16 +6,18 @@ Status: Reviewed exploratory baseline
 
 - experiment: `EXP-0001`
 - strategy: v1 long-only swing strategy
-- code SHA that produced the artifact: `926ce69b6214b237866fbcff97e0de7a16ddff3d`
-- GitHub Actions run: `34706655020`
-- artifact id: `10302140885`
-- artifact SHA-256: `6edcddf3341e34e3c3122177442b17e488bcb68d7780c7058990f6abc18b4bb6`
+- code SHA that produced the reviewed artifact: `ee5101967545569eace1c93bda7123aac8db3ec8`
+- GitHub Actions run: `34706974001`
+- artifact id: `10302101432`
+- artifact SHA-256: `879dd1767be30f92d24a242bbcc76922daa7a95d290b708f657d5f8515286585`
 - data provider: yfinance adjusted daily bars
 - evaluation window: 2021-01-01 through 2026-08-31
 - warm-up begins: 2020-01-01
 - initial equity: 5,000
 
-The workflow artifact contained `results.json`, `trades.csv`, `equity.csv`, `resolved-config.yaml`, and the generated run summary. The durable repository record keeps the versioned configuration, reviewed results, provenance, and interpretation; the full trade/equity files can be regenerated from the recorded code/config/data provider assumptions.
+The workflow artifact contained `results.json`, `trades.csv`, `equity.csv`, `resolved-config.yaml`, and the generated run summary. `results.json` also records Python/package versions and a SHA-256 digest of every downloaded source series so future reruns can detect provider-side data revisions.
+
+The durable repository record keeps the versioned configuration, reviewed results, provenance, and interpretation. The full trade/equity files remain generated CI artifacts and can be regenerated. Because the raw provider data is not snapshotted in the repository, a future digest mismatch means the original provider input has changed and exact replay is no longer guaranteed from yfinance alone.
 
 ## Headline result
 
@@ -87,7 +89,7 @@ Reasons not to deploy or optimize yet:
 - the universe is narrow and consists of known surviving/high-profile assets, so selection and survivorship bias remain material concerns;
 - the evaluation period is exploratory, not a held-out out-of-sample test;
 - execution costs are linear assumptions rather than actual broker/exchange fills;
-- historical data can be revised by the provider and is not snapshotted in this experiment.
+- historical data can be revised by the provider; source digests detect a revision but do not reconstruct the old provider snapshot.
 
 ## Decision
 
