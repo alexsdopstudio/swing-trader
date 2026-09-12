@@ -1,0 +1,52 @@
+name: Experiment registry
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "experiments/**"
+      - "src/swing_trader/experiment_registry.py"
+      - "src/swing_trader/experiment_registry_cli.py"
+      - "tests/test_experiment_registry.py"
+      - "pyproject.toml"
+      - ".github/workflows/experiment-registry.yml"
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout PR head
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install project
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev]"
+
+      - name: Run focused registry tests
+        run: pytest -q tests/test_experiment_registry.py
+
+      - name: Regenerate expected registry
+        run: swing-experiment-registry --root .
+
+      - name: Upload generated registry
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: generated-experiment-registry
+          path: experiments/registry.json
+          if-no-files-found: error
+          retention-days: 7
+
+      - name: Require committed registry to be current
+        run: git diff --exit-code -- experiments/registry.json
