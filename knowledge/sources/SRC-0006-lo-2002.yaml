@@ -1,0 +1,26 @@
+schema_version: 1
+id: SRC-0006
+title: The Statistics of Sharpe Ratios
+authors:
+  - Andrew W. Lo
+year: 2002
+source_type: peer_reviewed_primary
+publisher: CFA Institute
+publication: Financial Analysts Journal
+doi: 10.2469/faj.v58.n4.2453
+url: https://doi.org/10.2469/faj.v58.n4.2453
+accessed_on: 2026-09-13
+topics:
+  - performance-measurement
+  - sharpe-ratio
+  - serial-correlation
+  - statistics
+redistribution:
+  full_text_committed: false
+project_relevance: >-
+  Demonstrates that Sharpe-ratio estimates have sampling uncertainty and that simple square-root-time
+  annualization depends on return assumptions, supporting cautious interpretation of backtest Sharpe
+  values rather than treating them as exact strategy properties.
+limitations:
+  - The paper does not define a single universally correct performance metric for all trading strategies.
+  - It does not validate this repository's returns; it motivates diagnostics around dependence, sample size, and metric uncertainty.
