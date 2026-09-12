@@ -25,6 +25,7 @@
 - [ ] No look-ahead bias introduced
 - [ ] Execution assumptions remain realistic
 - [ ] Risk controls remain deterministic
+- [ ] All repository content introduced by this PR is written in English
 
 ## Memory / documentation
 
