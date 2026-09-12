@@ -10,7 +10,6 @@
 ## Next
 
 - If further historical universe work is justified, preregister a point-in-time membership/survivorship methodology rather than selecting additional current survivors.
-- Persistent experiment registry/index automation.
 - Daily scan persistence.
 
 ## Prospective validation gate
@@ -39,6 +38,7 @@ Interim monitoring is allowed. Interim performance must not be used to tune v1.
 - Preregistered `PROSPECTIVE-v1-holdout` protocol separating future unseen evidence from retrospective diagnostics.
 - Byte-locked, current-date-only prospective provider-state recorder with complete snapshots, deterministic archive/source digests, yearly durable release publication, and explicit no-backfill semantics.
 - Read-only prospective evaluator that verifies canonical archives, processes only each newly observable market date, preserves portfolio state across observations, performs zero provider downloads, and stops at the first evidence gap.
+- Deterministic machine-generated experiment/protocol registry with canonical-file digests, normalized existing provenance, prospective protocol-lock validation, and CI stale-state enforcement.
 
 ## Later
 
