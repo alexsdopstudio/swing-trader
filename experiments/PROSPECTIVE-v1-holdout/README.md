@@ -28,9 +28,31 @@ A missed observation is not backfilled from a later provider state. Manual workf
 
 Repository administrators can still delete release assets; the append-only property is therefore an automation contract rather than an access-control guarantee. Archive digests embedded in filenames and source digests in manifests make replacement or corruption detectable when evidence is collected.
 
+## Read-only replay
+
+`swing-holdout-evaluate` derives operational v1 state only from downloaded canonical recorder archives. It performs no provider download and does not replace old decisions with history from a later revised snapshot.
+
+For canonical observation date `D`, the evaluator verifies the archive against the registered protocol lock and processes only completed market date `D-1`. Cash, positions, pending next-asset-bar signals, stops, and closed trades persist into the next observation. Equity weekends and holidays therefore do not create artificial exits or force pending equity entries to execute without a bar.
+
+The archive chain must begin on 2026-09-15 and remain contiguous by UTC observation date. If a date is missing, replay stops before all later archives; later provider history is never used to reconstruct the missing observation.
+
+Derived outputs are `state.json`, `daily-state.csv`, `trades.csv`, and factual `notes.md`. They are reproducible monitoring state, not canonical source evidence. The source archives remain the durable evidence record.
+
+To replay a locally downloaded archive chain:
+
+```bash
+swing-holdout-evaluate \
+  --archives .artifacts/PROSPECTIVE-v1-holdout/archives \
+  --protocol experiments/PROSPECTIVE-v1-holdout/protocol.yaml \
+  --lock experiments/PROSPECTIVE-v1-holdout/protocol-lock.json \
+  --output-dir .artifacts/PROSPECTIVE-v1-holdout/evaluation
+```
+
 ## Evaluation boundary
 
-The recorder captures provider evidence only. It does not calculate interim PnL, validation status, preferred parameters, or strategy changes. Frozen v1 remains defined by this protocol, and interim observations must not be used to tune it.
+The recorder captures provider evidence only. The evaluator replays frozen v1 from that evidence but is deliberately read-only and interim. It does not declare validation, recommend parameters, modify v1, submit orders, or backfill missing observations.
+
+Frozen v1 remains defined by the preregistered protocol. Interim state and trades must not be used to tune it. Validation remains blocked until both 2028-09-14 and 30 closed trades are satisfied.
 
 To record locally for the current UTC date after the holdout starts:
 

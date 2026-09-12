@@ -88,6 +88,38 @@ class PortfolioBacktestResult:
     position_count_curve: pd.Series
 
 
+@dataclass(frozen=True)
+class PortfolioReplayBar:
+    symbol: str
+    row: pd.Series
+    score: float | int | None
+    regime: bool
+    asset_class: str = "default"
+
+
+@dataclass(frozen=True)
+class PortfolioPositionSnapshot:
+    symbol: str
+    entry_date: pd.Timestamp
+    entry_reference: float
+    entry: float
+    entry_fee: float
+    units: float
+    initial_stop: float
+    stop: float
+    highest_close: float
+    risk_per_unit: float
+    signal_score: int
+
+
+@dataclass(frozen=True)
+class PortfolioPendingSignal:
+    symbol: str
+    signal_date: pd.Timestamp
+    score: int
+    atr: float
+
+
 @dataclass
 class _Position:
     symbol: str
@@ -108,14 +140,15 @@ class _Position:
 class _PendingEntry:
     symbol: str
     signal_date: pd.Timestamp
-    execution_date: pd.Timestamp
     score: int
     atr: float
 
 
+_REQUIRED_BAR_FIELDS = {"Open", "High", "Low", "Close", "atr14", "high20", "sma50", "sma200"}
+
+
 def _prepare_asset(asset: PortfolioAsset) -> PortfolioAsset:
-    required = {"Open", "High", "Low", "Close", "atr14", "high20", "sma50", "sma200"}
-    missing = required.difference(asset.data.columns)
+    missing = _REQUIRED_BAR_FIELDS.difference(asset.data.columns)
     if missing:
         raise ValueError(f"{asset.symbol}: missing columns {sorted(missing)}")
     if not isinstance(asset.data.index, pd.DatetimeIndex):
@@ -129,17 +162,20 @@ def _prepare_asset(asset: PortfolioAsset) -> PortfolioAsset:
     return PortfolioAsset(asset.symbol, data, scores, regime, asset.asset_class)
 
 
-def _entry_signal(asset: PortfolioAsset, date: pd.Timestamp, min_score: int) -> bool:
-    row = asset.data.loc[date]
-    score = asset.scores.loc[date]
-    if pd.isna(score):
+def _entry_signal_values(
+    row: pd.Series,
+    score: float | int | None,
+    regime: bool,
+    min_score: int,
+) -> bool:
+    if score is None or pd.isna(score):
         return False
     return bool(
         int(score) >= min_score
         and row["Close"] > row["high20"]
         and row["Close"] > row["sma50"]
         and row["sma50"] > row["sma200"]
-        and asset.regime.loc[date]
+        and regime
     )
 
 
@@ -213,6 +249,245 @@ def _close_position(
     return cash + exit_notional - exit_fee
 
 
+class PortfolioReplaySession:
+    """Stateful daily portfolio event loop shared by backtests and forward replay."""
+
+    def __init__(self, config: PortfolioBacktestConfig | None = None) -> None:
+        self.config = config or PortfolioBacktestConfig()
+        self.cash = float(self.config.initial_equity)
+        self._positions: dict[str, _Position] = {}
+        self._pending: dict[str, _PendingEntry] = {}
+        self._trades: list[PortfolioTrade] = []
+        self._last_prices: dict[str, float] = {}
+        self._equity_points: dict[pd.Timestamp, float] = {}
+        self._exposure_points: dict[pd.Timestamp, float] = {}
+        self._position_count_points: dict[pd.Timestamp, int] = {}
+        self._last_processed_date: pd.Timestamp | None = None
+
+    @property
+    def trades(self) -> tuple[PortfolioTrade, ...]:
+        return tuple(self._trades)
+
+    @property
+    def open_positions(self) -> tuple[PortfolioPositionSnapshot, ...]:
+        return tuple(
+            PortfolioPositionSnapshot(
+                symbol=position.symbol,
+                entry_date=position.entry_date,
+                entry_reference=position.entry_reference,
+                entry=position.entry,
+                entry_fee=position.entry_fee,
+                units=position.units,
+                initial_stop=position.initial_stop,
+                stop=position.stop,
+                highest_close=position.highest_close,
+                risk_per_unit=position.risk_per_unit,
+                signal_score=position.signal_score,
+            )
+            for _, position in sorted(self._positions.items())
+        )
+
+    @property
+    def pending_signals(self) -> tuple[PortfolioPendingSignal, ...]:
+        return tuple(
+            PortfolioPendingSignal(
+                symbol=pending.symbol,
+                signal_date=pending.signal_date,
+                score=pending.score,
+                atr=pending.atr,
+            )
+            for _, pending in sorted(self._pending.items())
+        )
+
+    def result(self) -> PortfolioBacktestResult:
+        index = pd.DatetimeIndex(self._equity_points.keys())
+        return PortfolioBacktestResult(
+            trades=tuple(self._trades),
+            equity_curve=pd.Series(
+                self._equity_points.values(), index=index, name="equity", dtype="float64"
+            ),
+            exposure_curve=pd.Series(
+                self._exposure_points.values(), index=index, name="exposure", dtype="float64"
+            ),
+            position_count_curve=pd.Series(
+                self._position_count_points.values(),
+                index=index,
+                name="position_count",
+                dtype="int64",
+            ),
+        )
+
+    def process_date(
+        self,
+        date: pd.Timestamp,
+        bars: Mapping[str, PortfolioReplayBar],
+        *,
+        terminal_symbols: set[str] | frozenset[str] | None = None,
+    ) -> None:
+        date = pd.Timestamp(date)
+        if self._last_processed_date is not None and date <= self._last_processed_date:
+            raise ValueError("portfolio replay dates must be strictly increasing")
+        terminal_symbols = set(terminal_symbols or ())
+        replay_bars = dict(bars)
+        if any(bar.symbol != symbol for symbol, bar in replay_bars.items()):
+            raise ValueError("portfolio replay bar keys must match bar symbols")
+        for symbol, bar in replay_bars.items():
+            missing = _REQUIRED_BAR_FIELDS.difference(bar.row.index)
+            if missing:
+                raise ValueError(f"{symbol}: missing replay bar fields {sorted(missing)}")
+
+        current_bars = {symbol: bar.row for symbol, bar in replay_bars.items()}
+
+        for symbol in list(self._positions):
+            row = current_bars.get(symbol)
+            if row is None:
+                continue
+            position = self._positions[symbol]
+            open_price = float(row["Open"])
+            if open_price <= position.stop:
+                self.cash = _close_position(
+                    symbol, date, open_price, "stop_gap", self._positions, self._trades, self.cash
+                )
+
+        candidates: list[_PendingEntry] = []
+        for symbol, pending in list(self._pending.items()):
+            if symbol in current_bars and pending.signal_date < date:
+                candidates.append(self._pending.pop(symbol))
+        candidates.sort(key=lambda item: (-item.score, item.symbol))
+
+        for candidate in candidates:
+            if candidate.symbol in self._positions or len(self._positions) >= self.config.max_positions:
+                continue
+            row = current_bars[candidate.symbol]
+            replay_bar = replay_bars[candidate.symbol]
+            entry_reference = float(row["Open"])
+            cost_model = self.config.cost_model_for(replay_bar.asset_class)
+            if (
+                not isfinite(entry_reference)
+                or entry_reference <= 0
+                or not isfinite(candidate.atr)
+                or candidate.atr <= 0
+            ):
+                continue
+
+            entry = cost_model.buy_fill(entry_reference)
+            stop = initial_stop(entry, candidate.atr, self.config.stop_atr)
+            if stop <= 0:
+                continue
+            risk_per_unit = cost_model.long_risk_per_unit(entry, stop)
+            if risk_per_unit <= 0:
+                continue
+
+            equity = _equity_at_open(self.cash, self._positions, current_bars, self._last_prices)
+            if equity <= 0:
+                continue
+
+            plan = position_plan_for_risk(
+                equity=equity,
+                entry=entry,
+                stop=stop,
+                risk_per_unit=risk_per_unit,
+                risk_fraction=self.config.risk_fraction,
+                max_position_fraction=self.config.max_position_fraction,
+            )
+            remaining_risk = max(
+                0.0,
+                equity * self.config.max_open_risk_fraction - _open_risk(self._positions),
+            )
+            units_by_cash = max(0.0, self.cash / cost_model.buy_cash_per_unit(entry_reference))
+            units_by_remaining_risk = remaining_risk / risk_per_unit
+            units = min(plan.units, units_by_cash, units_by_remaining_risk)
+            if not isfinite(units) or units <= 0:
+                continue
+
+            entry_notional = units * entry
+            entry_fee = cost_model.commission(entry_notional)
+            self.cash -= entry_notional + entry_fee
+            self._positions[candidate.symbol] = _Position(
+                symbol=candidate.symbol,
+                entry_date=date,
+                entry_reference=entry_reference,
+                entry=entry,
+                entry_fee=entry_fee,
+                units=units,
+                initial_stop=stop,
+                stop=stop,
+                highest_close=float(row["Close"]),
+                risk_per_unit=risk_per_unit,
+                signal_score=candidate.score,
+                cost_model=cost_model,
+            )
+
+        for symbol in list(self._positions):
+            row = current_bars.get(symbol)
+            if row is None:
+                continue
+            position = self._positions[symbol]
+            if float(row["Low"]) <= position.stop:
+                self.cash = _close_position(
+                    symbol, date, position.stop, "stop", self._positions, self._trades, self.cash
+                )
+
+        for symbol, position in self._positions.items():
+            row = current_bars.get(symbol)
+            if row is None:
+                continue
+            close = float(row["Close"])
+            atr = float(row["atr14"])
+            position.highest_close = max(position.highest_close, close)
+            if isfinite(atr) and atr > 0:
+                position.stop = trailing_stop(
+                    position.stop, position.highest_close, atr, self.config.trail_atr
+                )
+
+        for symbol, row in current_bars.items():
+            self._last_prices[symbol] = float(row["Close"])
+
+        for symbol in list(self._positions):
+            if symbol not in terminal_symbols:
+                continue
+            self.cash = _close_position(
+                symbol,
+                date,
+                self._last_prices[symbol],
+                "end_of_test",
+                self._positions,
+                self._trades,
+                self.cash,
+            )
+
+        equity = self.cash + sum(
+            position.units * self._last_prices.get(symbol, position.entry)
+            for symbol, position in self._positions.items()
+        )
+        notional = sum(
+            position.units * self._last_prices.get(symbol, position.entry)
+            for symbol, position in self._positions.items()
+        )
+        self._equity_points[date] = equity
+        self._exposure_points[date] = notional / equity if equity > 0 else 0.0
+        self._position_count_points[date] = len(self._positions)
+
+        for symbol, replay_bar in sorted(replay_bars.items()):
+            if symbol in self._positions or symbol in terminal_symbols:
+                continue
+            if not _entry_signal_values(
+                replay_bar.row, replay_bar.score, replay_bar.regime, self.config.min_score
+            ):
+                continue
+            atr = float(replay_bar.row["atr14"])
+            if not isfinite(atr) or atr <= 0:
+                continue
+            self._pending[symbol] = _PendingEntry(
+                symbol=symbol,
+                signal_date=date,
+                score=int(replay_bar.score),
+                atr=atr,
+            )
+
+        self._last_processed_date = date
+
+
 def backtest_portfolio(
     assets: list[PortfolioAsset],
     config: PortfolioBacktestConfig | None = None,
@@ -232,191 +507,24 @@ def backtest_portfolio(
     if not all_dates:
         raise ValueError("asset data cannot be empty")
 
-    cash = float(config.initial_equity)
-    positions: dict[str, _Position] = {}
-    pending: dict[pd.Timestamp, list[_PendingEntry]] = {}
-    trades: list[PortfolioTrade] = []
-    last_prices: dict[str, float] = {}
-    equity_points: dict[pd.Timestamp, float] = {}
-    exposure_points: dict[pd.Timestamp, float] = {}
-    position_count_points: dict[pd.Timestamp, int] = {}
     last_dates = {symbol: asset.data.index[-1] for symbol, asset in prepared.items()}
+    session = PortfolioReplaySession(config)
 
     for date in all_dates:
-        current_bars = {
-            symbol: asset.data.loc[date]
+        bars = {
+            symbol: PortfolioReplayBar(
+                symbol=symbol,
+                row=asset.data.loc[date],
+                score=asset.scores.loc[date],
+                regime=bool(asset.regime.loc[date]),
+                asset_class=asset.asset_class,
+            )
             for symbol, asset in prepared.items()
             if date in asset.data.index
         }
+        terminal_symbols = {
+            symbol for symbol, terminal_date in last_dates.items() if date == terminal_date
+        }
+        session.process_date(date, bars, terminal_symbols=terminal_symbols)
 
-        # Existing stops that are already violated at the open fill from that open reference.
-        for symbol in list(positions):
-            bar = current_bars.get(symbol)
-            if bar is None:
-                continue
-            position = positions[symbol]
-            open_price = float(bar["Open"])
-            if open_price <= position.stop:
-                cash = _close_position(
-                    symbol, date, open_price, "stop_gap", positions, trades, cash
-                )
-
-        # Signals from a previous close may execute only at this asset's next open.
-        candidates = sorted(
-            pending.pop(date, []),
-            key=lambda item: (-item.score, item.symbol),
-        )
-        for candidate in candidates:
-            if candidate.symbol in positions or len(positions) >= config.max_positions:
-                continue
-            bar = current_bars.get(candidate.symbol)
-            if bar is None:
-                continue
-
-            entry_reference = float(bar["Open"])
-            asset = prepared[candidate.symbol]
-            cost_model = config.cost_model_for(asset.asset_class)
-            if (
-                not isfinite(entry_reference)
-                or entry_reference <= 0
-                or not isfinite(candidate.atr)
-                or candidate.atr <= 0
-            ):
-                continue
-
-            entry = cost_model.buy_fill(entry_reference)
-            stop = initial_stop(entry, candidate.atr, config.stop_atr)
-            if stop <= 0:
-                continue
-            risk_per_unit = cost_model.long_risk_per_unit(entry, stop)
-            if risk_per_unit <= 0:
-                continue
-
-            equity = _equity_at_open(cash, positions, current_bars, last_prices)
-            if equity <= 0:
-                continue
-
-            plan = position_plan_for_risk(
-                equity=equity,
-                entry=entry,
-                stop=stop,
-                risk_per_unit=risk_per_unit,
-                risk_fraction=config.risk_fraction,
-                max_position_fraction=config.max_position_fraction,
-            )
-            remaining_risk = max(
-                0.0,
-                equity * config.max_open_risk_fraction - _open_risk(positions),
-            )
-            units_by_cash = max(0.0, cash / cost_model.buy_cash_per_unit(entry_reference))
-            units_by_remaining_risk = remaining_risk / risk_per_unit
-            units = min(plan.units, units_by_cash, units_by_remaining_risk)
-            if not isfinite(units) or units <= 0:
-                continue
-
-            entry_notional = units * entry
-            entry_fee = cost_model.commission(entry_notional)
-            cash -= entry_notional + entry_fee
-            positions[candidate.symbol] = _Position(
-                symbol=candidate.symbol,
-                entry_date=date,
-                entry_reference=entry_reference,
-                entry=entry,
-                entry_fee=entry_fee,
-                units=units,
-                initial_stop=stop,
-                stop=stop,
-                highest_close=float(bar["Close"]),
-                risk_per_unit=risk_per_unit,
-                signal_score=candidate.score,
-                cost_model=cost_model,
-            )
-
-        # Initial and trailing stops are active intraday using the stop known at the open.
-        for symbol in list(positions):
-            bar = current_bars.get(symbol)
-            if bar is None:
-                continue
-            position = positions[symbol]
-            if float(bar["Low"]) <= position.stop:
-                cash = _close_position(
-                    symbol, date, position.stop, "stop", positions, trades, cash
-                )
-
-        # Closing information may only change the stop for the following bar.
-        for symbol, position in positions.items():
-            bar = current_bars.get(symbol)
-            if bar is None:
-                continue
-            close = float(bar["Close"])
-            atr = float(bar["atr14"])
-            position.highest_close = max(position.highest_close, close)
-            if isfinite(atr) and atr > 0:
-                position.stop = trailing_stop(
-                    position.stop,
-                    position.highest_close,
-                    atr,
-                    config.trail_atr,
-                )
-
-        for symbol, bar in current_bars.items():
-            last_prices[symbol] = float(bar["Close"])
-
-        # Each asset is liquidated at its own final available close.
-        for symbol in list(positions):
-            if date != last_dates[symbol]:
-                continue
-            cash = _close_position(
-                symbol,
-                date,
-                last_prices[symbol],
-                "end_of_test",
-                positions,
-                trades,
-                cash,
-            )
-
-        equity = cash + sum(
-            position.units * last_prices.get(symbol, position.entry)
-            for symbol, position in positions.items()
-        )
-        notional = sum(
-            position.units * last_prices.get(symbol, position.entry)
-            for symbol, position in positions.items()
-        )
-        equity_points[date] = equity
-        exposure_points[date] = notional / equity if equity > 0 else 0.0
-        position_count_points[date] = len(positions)
-
-        # Signals are generated last, from the completed close, for the next asset bar only.
-        for symbol, asset in prepared.items():
-            if symbol in positions or date not in asset.data.index:
-                continue
-            if not _entry_signal(asset, date, config.min_score):
-                continue
-            atr = float(asset.data.loc[date, "atr14"])
-            if not isfinite(atr) or atr <= 0:
-                continue
-            location = asset.data.index.get_loc(date)
-            if not isinstance(location, int) or location + 1 >= len(asset.data.index):
-                continue
-            execution_date = asset.data.index[location + 1]
-            pending.setdefault(execution_date, []).append(
-                _PendingEntry(
-                    symbol=symbol,
-                    signal_date=date,
-                    execution_date=execution_date,
-                    score=int(asset.scores.loc[date]),
-                    atr=atr,
-                )
-            )
-
-    index = pd.DatetimeIndex(equity_points.keys())
-    return PortfolioBacktestResult(
-        trades=tuple(trades),
-        equity_curve=pd.Series(equity_points.values(), index=index, name="equity"),
-        exposure_curve=pd.Series(exposure_points.values(), index=index, name="exposure"),
-        position_count_curve=pd.Series(
-            position_count_points.values(), index=index, name="position_count", dtype="int64"
-        ),
-    )
+    return session.result()
