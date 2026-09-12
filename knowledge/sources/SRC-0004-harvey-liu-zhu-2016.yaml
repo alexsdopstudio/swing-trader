@@ -1,0 +1,28 @@
+schema_version: 1
+id: SRC-0004
+title: "... and the Cross-Section of Expected Returns"
+authors:
+  - Campbell R. Harvey
+  - Yan Liu
+  - Heqing Zhu
+year: 2016
+source_type: peer_reviewed_primary
+publisher: Oxford University Press
+publication: The Review of Financial Studies
+doi: 10.1093/rfs/hhv059
+url: https://doi.org/10.1093/rfs/hhv059
+accessed_on: 2026-09-13
+topics:
+  - multiple-testing
+  - factor-research
+  - statistical-significance
+  - backtesting
+redistribution:
+  full_text_committed: false
+project_relevance: >-
+  Shows why conventional significance thresholds become less persuasive after extensive factor and
+  strategy searching, reinforcing the need to record how many hypotheses and parameter variants were
+  considered rather than presenting only the surviving result.
+limitations:
+  - The paper focuses on the cross-section of expected returns and published factor research, not this project's exact event-driven strategy.
+  - Statistical significance controls do not replace execution realism, economic relevance, or prospective validation.

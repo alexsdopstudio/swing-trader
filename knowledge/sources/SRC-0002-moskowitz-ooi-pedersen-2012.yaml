@@ -1,0 +1,28 @@
+schema_version: 1
+id: SRC-0002
+title: Time series momentum
+authors:
+  - Tobias J. Moskowitz
+  - Yao Hua Ooi
+  - Lasse Heje Pedersen
+year: 2012
+source_type: peer_reviewed_primary
+publisher: Elsevier
+publication: Journal of Financial Economics
+doi: 10.1016/j.jfineco.2011.11.003
+url: https://doi.org/10.1016/j.jfineco.2011.11.003
+accessed_on: 2026-09-13
+topics:
+  - momentum
+  - time-series-momentum
+  - trend
+  - multi-asset
+redistribution:
+  full_text_committed: false
+project_relevance: >-
+  Documents return continuation over intermediate horizons across a broad set of liquid futures,
+  supporting time-series trend/momentum as a research concept across asset classes rather than only
+  as an equity cross-sectional effect.
+limitations:
+  - The instruments are futures across equity indices, currencies, commodities, and bonds rather than this project's spot crypto and individual equities.
+  - The paper's signals, portfolio construction, leverage, and horizon differ from Swing Trader v1 and cannot validate its score or thresholds.

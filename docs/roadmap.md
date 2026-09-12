@@ -7,11 +7,11 @@
 - Replay captured evidence only through the read-only information-time evaluator; interim state/trades must not feed v1 tuning.
 - Preserve and verify provenance for every prospective observation and provider revision.
 - Preserve one current-date operational scanner observation without treating it as holdout evidence.
+- Keep external literature, future news observations, curated interpretation, project experiments, and generated indexes in explicit evidence classes.
 
 ## Next
 
-- Build a repo-native knowledge system with authoritative-source metadata, evidence quality, topic indexing, and explicit links from sources to project decisions/experiments.
-- Build a read-only project dashboard derived from canonical repository records and durable operational/prospective artifacts.
+- Build a read-only project dashboard derived from canonical repository records, generated registries, and durable operational/prospective artifacts.
 - If further historical universe work is justified, preregister a point-in-time membership/survivorship methodology rather than selecting additional current survivors.
 
 ## Prospective validation gate
@@ -42,9 +42,11 @@ Interim monitoring is allowed. Interim performance must not be used to tune v1.
 - Read-only prospective evaluator that verifies canonical archives, processes only each newly observable market date, preserves portfolio state across observations, performs zero provider downloads, and stops at the first evidence gap.
 - Deterministic machine-generated experiment/protocol registry with canonical-file digests, normalized existing provenance, prospective protocol-lock validation, and CI stale-state enforcement.
 - Current-date-only daily scanner history with exact captured config/source state, deterministic outputs, archive verification, unique-symbol downloads, and append-only-by-convention yearly release publication.
+- Source-governed knowledge system with nine initial authoritative durable sources, five curated interpretation notes, a validated time-bounded `NEWS-*` observation schema, deterministic source/news/note registry, and dedicated stale-state/schema CI.
+- Explicit agent knowledge evidence classes separating durable references, news observations, curated interpretation, project experiments, operational observations, and generated indexes.
 
 ## Later
 
-- AI catalyst/research agent for earnings, filings, news and crypto-specific events after source/evidence governance is explicit.
+- AI catalyst/research agent for earnings, filings, news and crypto-specific events writing validated `NEWS-*` records rather than an independent ad-hoc store.
 - Paper-trading broker integration after the forward recording/evaluation layer is trustworthy.
-- Semantic retrieval over knowledge/research memory if repository scale warrants it.
+- Semantic/vector retrieval over knowledge/research memory only if repository scale warrants it; retrieval must remain derived from canonical evidence-class-aware records.

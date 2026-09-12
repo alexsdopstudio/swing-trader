@@ -1,0 +1,385 @@
+{
+  "news_observations": [],
+  "notes": [
+    {
+      "id": "KN-0001",
+      "news_ids": [],
+      "path": "knowledge/notes/KN-0001-momentum-and-trend-evidence.md",
+      "sha256": "cc0447c885f58664e3dbeb08c7ec880a1313e57e993b8a1923f67050c6373913",
+      "source_ids": [
+        "SRC-0001",
+        "SRC-0002"
+      ],
+      "status": "curated",
+      "title": "Momentum and trend are research priors, not strategy validation",
+      "topics": [
+        "hypothesis-formation",
+        "momentum",
+        "trend"
+      ]
+    },
+    {
+      "id": "KN-0002",
+      "news_ids": [],
+      "path": "knowledge/notes/KN-0002-backtest-selection-bias.md",
+      "sha256": "2f91692cd819b5b8d71b3399da71b120e607ab7ce974115e9cc19412e9ca1dd5",
+      "source_ids": [
+        "SRC-0003",
+        "SRC-0004",
+        "SRC-0005"
+      ],
+      "status": "curated",
+      "title": "Repeated historical selection weakens inference",
+      "topics": [
+        "backtesting",
+        "data-snooping",
+        "multiple-testing",
+        "overfitting"
+      ]
+    },
+    {
+      "id": "KN-0003",
+      "news_ids": [],
+      "path": "knowledge/notes/KN-0003-performance-statistics.md",
+      "sha256": "af9436e5f8fa79b0b74cfc74aa5847bf9db8fff7abd62b215965c2d2aec9b1c5",
+      "source_ids": [
+        "SRC-0006"
+      ],
+      "status": "curated",
+      "title": "Performance ratios are estimates with assumptions",
+      "topics": [
+        "performance-measurement",
+        "sharpe-ratio",
+        "statistics"
+      ]
+    },
+    {
+      "id": "KN-0004",
+      "news_ids": [],
+      "path": "knowledge/notes/KN-0004-point-in-time-universes.md",
+      "sha256": "4c10156d0cb6199133a80ec0b4dc4a5e49e0f89638654845acaa3bfa5f060f8b",
+      "source_ids": [
+        "SRC-0007",
+        "SRC-0008"
+      ],
+      "status": "curated",
+      "title": "Historical universe tests require point-in-time membership",
+      "topics": [
+        "delistings",
+        "index-membership",
+        "point-in-time-universe",
+        "survivorship-bias"
+      ]
+    },
+    {
+      "id": "KN-0005",
+      "news_ids": [],
+      "path": "knowledge/notes/KN-0005-provenance-for-agent-knowledge.md",
+      "sha256": "906a0d29ef2dbb14a0e3ce57cef99ada46b1360c22db087edaae23d84228c8eb",
+      "source_ids": [
+        "SRC-0009"
+      ],
+      "status": "curated",
+      "title": "Provenance for agent knowledge",
+      "topics": [
+        "ai-agents",
+        "knowledge-management",
+        "provenance"
+      ]
+    }
+  ],
+  "policy": {
+    "path": "knowledge/SOURCE_POLICY.md",
+    "sha256": "c906be3990b13a92a5a3a6521647a2be21c9b15d9c956881fa945bc9d784ec7f"
+  },
+  "schema_version": 1,
+  "sources": [
+    {
+      "accessed_on": "2026-09-13",
+      "authors": [
+        "Narasimhan Jegadeesh",
+        "Sheridan Titman"
+      ],
+      "cited_by_note_ids": [
+        "KN-0001"
+      ],
+      "doi": "10.1111/j.1540-6261.1993.tb04702.x",
+      "full_text_committed": false,
+      "id": "SRC-0001",
+      "limitations": [
+        "The study is cross-sectional and uses winner-minus-loser portfolios, unlike Swing Trader v1's long-only daily score.",
+        "Its historical sample, assets, portfolio construction, and costs do not validate this repository's implementation."
+      ],
+      "path": "knowledge/sources/SRC-0001-jegadeesh-titman-1993.yaml",
+      "project_relevance": "Provides foundational evidence that relative past winners and losers in equities exhibited intermediate-horizon return continuation, making momentum a legitimate research hypothesis rather than a rule invented from this repository's backtest.",
+      "publication": "The Journal of Finance",
+      "publisher": "Wiley",
+      "sha256": "16635dbe9c86744b46ccb5288f16718fbd7c1a5a1f3cdf99f0fcfc8732787c74",
+      "source_type": "peer_reviewed_primary",
+      "title": "Returns to Buying Winners and Selling Losers: Implications for Stock Market Efficiency",
+      "topics": [
+        "cross-sectional-momentum",
+        "equities",
+        "momentum"
+      ],
+      "url": "https://doi.org/10.1111/j.1540-6261.1993.tb04702.x",
+      "year": 1993
+    },
+    {
+      "accessed_on": "2026-09-13",
+      "authors": [
+        "Tobias J. Moskowitz",
+        "Yao Hua Ooi",
+        "Lasse Heje Pedersen"
+      ],
+      "cited_by_note_ids": [
+        "KN-0001"
+      ],
+      "doi": "10.1016/j.jfineco.2011.11.003",
+      "full_text_committed": false,
+      "id": "SRC-0002",
+      "limitations": [
+        "The instruments are futures across equity indices, currencies, commodities, and bonds rather than this project's spot crypto and individual equities.",
+        "The paper's signals, portfolio construction, leverage, and horizon differ from Swing Trader v1 and cannot validate its score or thresholds."
+      ],
+      "path": "knowledge/sources/SRC-0002-moskowitz-ooi-pedersen-2012.yaml",
+      "project_relevance": "Documents return continuation over intermediate horizons across a broad set of liquid futures, supporting time-series trend/momentum as a research concept across asset classes rather than only as an equity cross-sectional effect.",
+      "publication": "Journal of Financial Economics",
+      "publisher": "Elsevier",
+      "sha256": "33461b4876ee90b2981fd1bced542074ddc6491a4f19bd2b8fc03c90f9fb3b2d",
+      "source_type": "peer_reviewed_primary",
+      "title": "Time series momentum",
+      "topics": [
+        "momentum",
+        "multi-asset",
+        "time-series-momentum",
+        "trend"
+      ],
+      "url": "https://doi.org/10.1016/j.jfineco.2011.11.003",
+      "year": 2012
+    },
+    {
+      "accessed_on": "2026-09-13",
+      "authors": [
+        "Halbert White"
+      ],
+      "cited_by_note_ids": [
+        "KN-0002"
+      ],
+      "doi": "10.1111/1468-0262.00152",
+      "full_text_committed": false,
+      "id": "SRC-0003",
+      "limitations": [
+        "The paper provides statistical methodology rather than a guarantee that any particular anti-overfitting workflow is sufficient.",
+        "Applying the general lesson still requires project-specific controls, frozen decisions, and genuinely future evidence."
+      ],
+      "path": "knowledge/sources/SRC-0003-white-2000.yaml",
+      "project_relevance": "Formalizes the inference problem created when the same historical data are reused for model selection and evaluation, directly supporting the repository's separation of exploratory diagnostics from preregistered prospective validation.",
+      "publication": "Econometrica",
+      "publisher": "Wiley",
+      "sha256": "57213a5c03cb4652732d1b7213da2cde6efbdb007b185fe9eb354ed7ef2e8a4e",
+      "source_type": "peer_reviewed_primary",
+      "title": "A Reality Check for Data Snooping",
+      "topics": [
+        "backtesting",
+        "data-snooping",
+        "model-selection",
+        "multiple-testing"
+      ],
+      "url": "https://doi.org/10.1111/1468-0262.00152",
+      "year": 2000
+    },
+    {
+      "accessed_on": "2026-09-13",
+      "authors": [
+        "Campbell R. Harvey",
+        "Yan Liu",
+        "Heqing Zhu"
+      ],
+      "cited_by_note_ids": [
+        "KN-0002"
+      ],
+      "doi": "10.1093/rfs/hhv059",
+      "full_text_committed": false,
+      "id": "SRC-0004",
+      "limitations": [
+        "The paper focuses on the cross-section of expected returns and published factor research, not this project's exact event-driven strategy.",
+        "Statistical significance controls do not replace execution realism, economic relevance, or prospective validation."
+      ],
+      "path": "knowledge/sources/SRC-0004-harvey-liu-zhu-2016.yaml",
+      "project_relevance": "Shows why conventional significance thresholds become less persuasive after extensive factor and strategy searching, reinforcing the need to record how many hypotheses and parameter variants were considered rather than presenting only the surviving result.",
+      "publication": "The Review of Financial Studies",
+      "publisher": "Oxford University Press",
+      "sha256": "fd19d5c51d240a11105707bcbbdbf7bfbb412e5453d407297a23fee81a108d62",
+      "source_type": "peer_reviewed_primary",
+      "title": "... and the Cross-Section of Expected Returns",
+      "topics": [
+        "backtesting",
+        "factor-research",
+        "multiple-testing",
+        "statistical-significance"
+      ],
+      "url": "https://doi.org/10.1093/rfs/hhv059",
+      "year": 2016
+    },
+    {
+      "accessed_on": "2026-09-13",
+      "authors": [
+        "David H. Bailey",
+        "Jonathan M. Borwein",
+        "Marcos López de Prado",
+        "Qiji Jim Zhu"
+      ],
+      "cited_by_note_ids": [
+        "KN-0002"
+      ],
+      "doi": "10.21314/jcf.2016.322",
+      "full_text_committed": false,
+      "id": "SRC-0005",
+      "limitations": [
+        "The proposed probability-of-backtest-overfitting framework is a diagnostic methodology, not proof that a strategy is robust when its estimate is favorable.",
+        "Swing Trader currently emphasizes preregistration, neighborhood tests, and prospective replay rather than implementing the paper's full CSCV procedure."
+      ],
+      "path": "knowledge/sources/SRC-0005-bailey-borwein-lopez-de-prado-zhu-2017.yaml",
+      "project_relevance": "Provides a framework for reasoning about the probability that a selected investment backtest is overfit after comparing alternatives, reinforcing the project's policy of not promoting the best retrospective parameter set and of reserving future data for preregistered evaluation.",
+      "publication": "The Journal of Computational Finance",
+      "publisher": "Risk Journals",
+      "sha256": "f18084ba39d3c6a00bb99958b94d17a402b3dbc6fcfb729188c7f941be21dbfe",
+      "source_type": "peer_reviewed_primary",
+      "title": "The probability of backtest overfitting",
+      "topics": [
+        "backtesting",
+        "cross-validation",
+        "model-selection",
+        "overfitting"
+      ],
+      "url": "https://doi.org/10.21314/jcf.2016.322",
+      "year": 2017
+    },
+    {
+      "accessed_on": "2026-09-13",
+      "authors": [
+        "Andrew W. Lo"
+      ],
+      "cited_by_note_ids": [
+        "KN-0003"
+      ],
+      "doi": "10.2469/faj.v58.n4.2453",
+      "full_text_committed": false,
+      "id": "SRC-0006",
+      "limitations": [
+        "The paper does not define a single universally correct performance metric for all trading strategies.",
+        "It does not validate this repository's returns; it motivates diagnostics around dependence, sample size, and metric uncertainty."
+      ],
+      "path": "knowledge/sources/SRC-0006-lo-2002.yaml",
+      "project_relevance": "Demonstrates that Sharpe-ratio estimates have sampling uncertainty and that simple square-root-time annualization depends on return assumptions, supporting cautious interpretation of backtest Sharpe values rather than treating them as exact strategy properties.",
+      "publication": "Financial Analysts Journal",
+      "publisher": "CFA Institute",
+      "sha256": "c009a921b871803d3432eb363674dd0c9014294a09a22cbdb85c5230fa2d7324",
+      "source_type": "peer_reviewed_primary",
+      "title": "The Statistics of Sharpe Ratios",
+      "topics": [
+        "performance-measurement",
+        "serial-correlation",
+        "sharpe-ratio",
+        "statistics"
+      ],
+      "url": "https://doi.org/10.2469/faj.v58.n4.2453",
+      "year": 2002
+    },
+    {
+      "accessed_on": "2026-09-13",
+      "authors": [
+        "S&P Dow Jones Indices"
+      ],
+      "cited_by_note_ids": [
+        "KN-0004"
+      ],
+      "doi": null,
+      "full_text_committed": false,
+      "id": "SRC-0007",
+      "limitations": [
+        "Current methodology does not by itself reconstruct the exact historical membership state for every past date.",
+        "Swing Trader's configured universe is not currently defined as an S&P index, so this source informs methodology rather than membership selection directly."
+      ],
+      "path": "knowledge/sources/SRC-0007-sp-us-indices-methodology-2026.yaml",
+      "project_relevance": "Documents eligibility, maintenance, additions, and deletions for major U.S. equity indices. The changing constituent process supports using point-in-time membership for historical universe tests instead of applying today's index members to earlier dates.",
+      "publication": "S&P U.S. Indices Methodology",
+      "publisher": "S&P Dow Jones Indices",
+      "sha256": "7b38d53a8117d8e49d125775d7ad8ffd3be73c439a8defd37a0e9b96bd7c40a0",
+      "source_type": "official_methodology",
+      "title": "S&P U.S. Indices Methodology",
+      "topics": [
+        "equities",
+        "index-membership",
+        "point-in-time-universe",
+        "survivorship-bias"
+      ],
+      "url": "https://www.spglobal.com/spdji/en/methodology/article/sp-us-indices-methodology/",
+      "year": 2026
+    },
+    {
+      "accessed_on": "2026-09-13",
+      "authors": [
+        "Center for Research in Security Prices"
+      ],
+      "cited_by_note_ids": [
+        "KN-0004"
+      ],
+      "doi": null,
+      "full_text_committed": false,
+      "id": "SRC-0008",
+      "limitations": [
+        "CRSP is a separate commercial data source and is not the provider currently used by Swing Trader.",
+        "Delisting-return handling addresses only one component of survivorship-free historical universe construction."
+      ],
+      "path": "knowledge/sources/SRC-0008-crsp-delisting-returns-2026.yaml",
+      "project_relevance": "Documents explicit delisting-return fields and treatment after a security stops trading, reinforcing that disappeared securities and post-delisting economic outcomes matter when constructing historical equity evidence.",
+      "publication": "CRSP US Stock & Indexes Databases",
+      "publisher": "Center for Research in Security Prices",
+      "sha256": "61ea3ac9f82d6e93c102b1700f32039172cdee3e9fc243a9a778ffb3c7a5cba8",
+      "source_type": "official_documentation",
+      "title": "CRSP US Stock & Indexes Databases Data Descriptions Guide",
+      "topics": [
+        "data-quality",
+        "delistings",
+        "equities",
+        "survivorship-bias"
+      ],
+      "url": "https://www.crsp.org/crsp_pdf/crsp-us-stock-indexes-databases-data-descriptions-guide-crspaccess/",
+      "year": 2026
+    },
+    {
+      "accessed_on": "2026-09-13",
+      "authors": [
+        "Timothy Lebo",
+        "Satya Sahoo",
+        "Deborah McGuinness"
+      ],
+      "cited_by_note_ids": [
+        "KN-0005"
+      ],
+      "doi": null,
+      "full_text_committed": false,
+      "id": "SRC-0009",
+      "limitations": [
+        "PROV-O is a general Web provenance ontology, not a trading-research or AI-agent knowledge-base specification.",
+        "The repository does not currently serialize its records as RDF/OWL or claim standards conformance."
+      ],
+      "path": "knowledge/sources/SRC-0009-w3c-prov-o-2013.yaml",
+      "project_relevance": "Provides an authoritative provenance model built around entities, activities, agents, derivation, attribution, and time. Swing Trader uses the same design principle to keep sources, observations, generated indexes, and curated interpretation traceable without claiming formal PROV-O conformance.",
+      "publication": "W3C Recommendation",
+      "publisher": "World Wide Web Consortium (W3C)",
+      "sha256": "1119f1ce166aabdcb080d73e70d16bcccf7b2ebba8ad5c3fae41b777752498bb",
+      "source_type": "official_documentation",
+      "title": "PROV-O: The PROV Ontology",
+      "topics": [
+        "ai-agents",
+        "knowledge-management",
+        "provenance"
+      ],
+      "url": "https://www.w3.org/TR/prov-o/",
+      "year": 2013
+    }
+  ]
+}

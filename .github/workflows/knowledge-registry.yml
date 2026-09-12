@@ -1,0 +1,74 @@
+name: Knowledge registry
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "knowledge/**"
+      - "src/swing_trader/knowledge_registry.py"
+      - "src/swing_trader/knowledge_registry_cli.py"
+      - "tests/test_knowledge_registry.py"
+      - "pyproject.toml"
+      - ".github/workflows/knowledge-registry.yml"
+  push:
+    branches: [main]
+    paths:
+      - "knowledge/**"
+      - "src/swing_trader/knowledge_registry.py"
+      - "src/swing_trader/knowledge_registry_cli.py"
+      - "tests/test_knowledge_registry.py"
+      - "pyproject.toml"
+      - ".github/workflows/knowledge-registry.yml"
+  workflow_dispatch:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install project
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev]"
+
+      - name: Run focused schema tests
+        run: pytest -q tests/test_knowledge_registry.py -k "not committed_repository_registry_is_current"
+
+      - name: Generate canonical registry
+        run: swing-knowledge-registry --root .
+
+      - name: Upload generated registry
+        uses: actions/upload-artifact@v4
+        with:
+          name: knowledge-registry
+          path: knowledge/registry.json
+          if-no-files-found: error
+          retention-days: 7
+
+      - name: Reject stale or untracked registry
+        shell: bash
+        run: |
+          set -euo pipefail
+          changes="$(git status --porcelain -- knowledge/registry.json)"
+          if [[ -n "$changes" ]]; then
+            printf '%s\n' "$changes"
+            git diff -- knowledge/registry.json || true
+            echo "knowledge/registry.json is stale; regenerate it with swing-knowledge-registry --root ."
+            exit 1
+          fi
+          swing-knowledge-registry --root . --check
+
+      - name: Verify committed registry through pytest
+        run: pytest -q tests/test_knowledge_registry.py

@@ -37,6 +37,7 @@ See `docs/workflow/agent-session-handoff.md` for the complete cross-agent resume
 - `docs/decisions/`
 - `docs/plans/active/`
 - `docs/solutions/README.md`
+- `knowledge/README.md` and `knowledge/registry.json` when external research, news/catalyst context, provenance, or agent retrieval is relevant
 
 ## Non-negotiable rules
 
@@ -48,6 +49,8 @@ See `docs/workflow/agent-session-handoff.md` for the complete cross-agent resume
 - Do not tune parameters only to improve one historical backtest.
 - Include transaction costs and slippage before treating results as decision-useful.
 - Keep research results reproducible: config, period, universe, code revision and metrics must be recorded.
+- Treat durable external sources, time-bounded news observations, curated interpretation, project experiments, operational observations, and generated indexes as distinct evidence classes. Do not promote literature or news into project validation, and do not treat generated registries as editable sources of truth.
+- External knowledge or news may motivate research or provide context, but must never directly override deterministic strategy, execution, sizing, stop, or portfolio-risk rules.
 - All version-controlled repository content must be written in English, including comments, docstrings, docs, experiment notes, branch names, commit messages, and pull request text.
 - Never develop a feature directly on `main`.
 - Every logical change must use a dedicated branch and pull request as defined in `CONTRIBUTING.md`.

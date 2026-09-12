@@ -1,0 +1,26 @@
+schema_version: 1
+id: SRC-0001
+title: "Returns to Buying Winners and Selling Losers: Implications for Stock Market Efficiency"
+authors:
+  - Narasimhan Jegadeesh
+  - Sheridan Titman
+year: 1993
+source_type: peer_reviewed_primary
+publisher: Wiley
+publication: The Journal of Finance
+doi: 10.1111/j.1540-6261.1993.tb04702.x
+url: https://doi.org/10.1111/j.1540-6261.1993.tb04702.x
+accessed_on: 2026-09-13
+topics:
+  - momentum
+  - cross-sectional-momentum
+  - equities
+redistribution:
+  full_text_committed: false
+project_relevance: >-
+  Provides foundational evidence that relative past winners and losers in equities exhibited
+  intermediate-horizon return continuation, making momentum a legitimate research hypothesis rather
+  than a rule invented from this repository's backtest.
+limitations:
+  - The study is cross-sectional and uses winner-minus-loser portfolios, unlike Swing Trader v1's long-only daily score.
+  - Its historical sample, assets, portfolio construction, and costs do not validate this repository's implementation.
