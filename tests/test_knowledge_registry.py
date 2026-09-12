@@ -34,6 +34,32 @@ limitations:
   - Test limitation.
 """
 
+NEWS_TEMPLATE = """\
+schema_version: 1
+id: {news_id}
+title: Test issuer announcement
+canonical_url: {canonical_url}
+publisher: Test Issuer
+source_type: {source_type}
+published_at: "{published_at}"
+retrieved_at: "{retrieved_at}"
+entities:
+  - TEST
+topics:
+  - earnings
+provenance:
+  retrieval_method: web
+  observed_content_sha256: {content_sha256}
+rights:
+  full_text_committed: {full_text_committed}
+summary: >-
+  Project-authored summary of the observed event.
+claims:
+  - statement: Test issuer reported a test event.
+    attribution: Test Issuer
+status: observed
+"""
+
 NOTE_TEMPLATE = """\
 ---
 schema_version: 1
@@ -65,14 +91,48 @@ It does not validate Swing Trader.
 - `{source_id}` — test source.
 """
 
+NEWS_NOTE_TEMPLATE = """\
+---
+schema_version: 1
+id: KN-0002
+title: Test event note
+topics:
+  - earnings
+news_ids:
+  - {news_id}
+status: curated
+---
+
+# Test event note
+
+## What the evidence says
+
+`{news_id}` records a time-bounded observation.
+
+## Project implication
+
+Treat the observation as catalyst context only.
+
+## What it does not establish
+
+The observation does not validate Swing Trader or change deterministic risk rules.
+
+## Sources
+
+- `{news_id}` — observed event record.
+"""
+
 
 def _write_knowledge_root(root: Path) -> tuple[Path, Path]:
     sources = root / "knowledge" / "sources"
+    news = root / "knowledge" / "news"
     notes = root / "knowledge" / "notes"
     sources.mkdir(parents=True)
+    news.mkdir(parents=True)
     notes.mkdir(parents=True)
     (root / "knowledge" / "README.md").write_text("# Knowledge\n", encoding="utf-8")
     (root / "knowledge" / "SOURCE_POLICY.md").write_text("# Policy\n", encoding="utf-8")
+    (news / "README.md").write_text("# News observations\n", encoding="utf-8")
     source_path = sources / "SRC-0001-test.yaml"
     source_path.write_text(
         SOURCE_TEMPLATE.format(source_id="SRC-0001", full_text_committed="false"),
@@ -88,6 +148,22 @@ def _write_knowledge_root(root: Path) -> tuple[Path, Path]:
         encoding="utf-8",
     )
     return source_path, note_path
+
+
+def _write_news(root: Path, *, news_id: str = "NEWS-20260913-0001", **overrides: str) -> Path:
+    values = {
+        "news_id": news_id,
+        "canonical_url": "https://example.com/news/test",
+        "source_type": "official_company_release",
+        "published_at": "2026-09-13T14:32:00Z",
+        "retrieved_at": "2026-09-13T14:41:17Z",
+        "content_sha256": "0" * 64,
+        "full_text_committed": "false",
+    }
+    values.update(overrides)
+    path = root / "knowledge" / "news" / f"{news_id}-test-event.yaml"
+    path.write_text(NEWS_TEMPLATE.format(**values), encoding="utf-8")
+    return path
 
 
 def test_registry_is_deterministic_and_detects_stale_content(tmp_path: Path) -> None:
@@ -113,7 +189,110 @@ def test_registry_normalizes_yaml_date_and_builds_backlinks(tmp_path: Path) -> N
 
     assert registry["sources"][0]["accessed_on"] == "2026-09-13"
     assert registry["sources"][0]["cited_by_note_ids"] == ["KN-0001"]
+    assert registry["news_observations"] == []
     assert registry["notes"][0]["source_ids"] == ["SRC-0001"]
+    assert registry["notes"][0]["news_ids"] == []
+
+
+def test_news_observation_is_indexed_and_can_backlink_to_note(tmp_path: Path) -> None:
+    _write_knowledge_root(tmp_path)
+    _write_news(tmp_path)
+    note_path = tmp_path / "knowledge" / "notes" / "KN-0002-test-event.md"
+    note_path.write_text(
+        NEWS_NOTE_TEMPLATE.format(news_id="NEWS-20260913-0001"), encoding="utf-8"
+    )
+
+    registry = build_registry(tmp_path)
+    observation = registry["news_observations"][0]
+
+    assert observation["id"] == "NEWS-20260913-0001"
+    assert observation["published_at"] == "2026-09-13T14:32:00Z"
+    assert observation["retrieved_at"] == "2026-09-13T14:41:17Z"
+    assert observation["entities"] == ["TEST"]
+    assert observation["cited_by_note_ids"] == ["KN-0002"]
+    assert observation["evidence_class"] == "time_bounded_context"
+    assert observation["validation_evidence"] is False
+    assert registry["notes"][1]["source_ids"] == []
+    assert registry["notes"][1]["news_ids"] == ["NEWS-20260913-0001"]
+
+
+def test_news_retrieval_cannot_precede_publication(tmp_path: Path) -> None:
+    _write_knowledge_root(tmp_path)
+    _write_news(tmp_path, retrieved_at="2026-09-13T14:31:59Z")
+
+    with pytest.raises(ValueError, match="retrieved_at cannot precede published_at"):
+        build_registry(tmp_path)
+
+
+def test_news_id_date_must_match_publication_date(tmp_path: Path) -> None:
+    _write_knowledge_root(tmp_path)
+    _write_news(tmp_path, published_at="2026-09-12T23:59:59Z")
+
+    with pytest.raises(ValueError, match="news id date must equal published_at UTC date"):
+        build_registry(tmp_path)
+
+
+def test_news_requires_supported_source_type_and_fingerprint(tmp_path: Path) -> None:
+    _write_knowledge_root(tmp_path)
+    news_path = _write_news(tmp_path, source_type="random_blog")
+
+    with pytest.raises(ValueError, match="unsupported news source_type"):
+        build_registry(tmp_path)
+
+    news_path.write_text(
+        NEWS_TEMPLATE.format(
+            news_id="NEWS-20260913-0001",
+            canonical_url="https://example.com/news/test",
+            source_type="primary_news",
+            published_at="2026-09-13T14:32:00Z",
+            retrieved_at="2026-09-13T14:41:17Z",
+            content_sha256="not-a-digest",
+            full_text_committed="false",
+        ),
+        encoding="utf-8",
+    )
+    with pytest.raises(ValueError, match="observed_content_sha256"):
+        build_registry(tmp_path)
+
+
+def test_duplicate_news_ids_are_rejected(tmp_path: Path) -> None:
+    _write_knowledge_root(tmp_path)
+    _write_news(tmp_path)
+    duplicate = tmp_path / "knowledge" / "news" / "NEWS-20260913-0001-duplicate-event.yaml"
+    duplicate.write_text(
+        NEWS_TEMPLATE.format(
+            news_id="NEWS-20260913-0001",
+            canonical_url="https://example.com/news/duplicate",
+            source_type="primary_news",
+            published_at="2026-09-13T15:00:00Z",
+            retrieved_at="2026-09-13T15:01:00Z",
+            content_sha256="1" * 64,
+            full_text_committed="false",
+        ),
+        encoding="utf-8",
+    )
+
+    with pytest.raises(ValueError, match="duplicate knowledge news ids"):
+        build_registry(tmp_path)
+
+
+def test_unknown_news_reference_is_rejected(tmp_path: Path) -> None:
+    _write_knowledge_root(tmp_path)
+    note_path = tmp_path / "knowledge" / "notes" / "KN-0002-test-event.md"
+    note_path.write_text(
+        NEWS_NOTE_TEMPLATE.format(news_id="NEWS-20260913-9999"), encoding="utf-8"
+    )
+
+    with pytest.raises(ValueError, match="unknown news ids: NEWS-20260913-9999"):
+        build_registry(tmp_path)
+
+
+def test_news_full_text_commit_is_rejected(tmp_path: Path) -> None:
+    _write_knowledge_root(tmp_path)
+    _write_news(tmp_path, full_text_committed="true")
+
+    with pytest.raises(ValueError, match="rights.full_text_committed=false"):
+        build_registry(tmp_path)
 
 
 def test_duplicate_source_ids_are_rejected(tmp_path: Path) -> None:
