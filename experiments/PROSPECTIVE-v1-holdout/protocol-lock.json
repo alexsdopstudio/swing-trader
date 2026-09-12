@@ -1,0 +1,7 @@
+{
+  "schema_version": 1,
+  "protocol_id": "PROSPECTIVE-v1-holdout",
+  "protocol_sha256": "aabbf9c8ed47024a537f569265f4e80ee57db46a2edbadd733e2a94e567b4df8",
+  "frozen_source_commit": "dbb45a8a3910298e3565a02758b835975308e88c",
+  "warmup_start": "2020-01-01"
+}
