@@ -1,0 +1,25 @@
+schema_version: 1
+id: SRC-0007
+title: S&P U.S. Indices Methodology
+authors:
+  - S&P Dow Jones Indices
+year: 2026
+source_type: official_methodology
+publisher: S&P Dow Jones Indices
+publication: S&P U.S. Indices Methodology
+url: https://www.spglobal.com/spdji/en/methodology/article/sp-us-indices-methodology/
+accessed_on: 2026-09-13
+topics:
+  - point-in-time-universe
+  - index-membership
+  - equities
+  - survivorship-bias
+redistribution:
+  full_text_committed: false
+project_relevance: >-
+  Documents eligibility, maintenance, additions, and deletions for major U.S. equity indices. The
+  changing constituent process supports using point-in-time membership for historical universe tests
+  instead of applying today's index members to earlier dates.
+limitations:
+  - Current methodology does not by itself reconstruct the exact historical membership state for every past date.
+  - Swing Trader's configured universe is not currently defined as an S&P index, so this source informs methodology rather than membership selection directly.
