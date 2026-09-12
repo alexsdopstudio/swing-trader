@@ -1,0 +1,40 @@
+experiment:
+  id: EXP-0006
+  name: configured-universe-breadth
+  research_stage: retrospective-universe-breadth
+  base_experiment_config: experiments/EXP-0001-baseline/config.yaml
+  reference_results: experiments/EXP-0001-baseline/results.json
+  universe_config: config/universe.yaml
+
+control_symbols:
+  - BTC-USD
+  - SOL-USD
+  - META
+  - NVDA
+
+expanded_symbols:
+  - BTC-USD
+  - ETH-USD
+  - SOL-USD
+  - META
+  - NVDA
+  - MSFT
+  - AAPL
+  - AMZN
+  - GOOGL
+  - AVGO
+  - TSLA
+
+breadth_criteria:
+  minimum_positive_symbol_contributors: 4
+  minimum_positive_added_symbol_contributors: 2
+  maximum_largest_positive_contributor_share: 0.60
+  require_positive_added_symbols_aggregate_pnl: true
+  require_positive_equity_contributor: true
+  require_positive_crypto_contributor: true
+  control_reference_tolerances:
+    total_return: 0.01
+    cagr: 0.0025
+    max_drawdown: 0.005
+    expectancy_r: 0.10
+    trade_count: 2

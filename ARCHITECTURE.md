@@ -40,6 +40,7 @@ The scanner uses the same indicator and scoring concepts for the latest bar, whi
 - `reference_baselines.py`: deterministic cost-aware passive buy-and-hold references.
 - `reference_comparison.py`: controlled active-vs-passive experiment orchestration on one shared snapshot.
 - `parameter_neighborhood.py`: preregistered local score/stop/trail robustness diagnostics with full-path reruns on shared inputs and no winner selection.
+- `universe_breadth.py`: controlled same-snapshot subset-vs-configured-universe full-path comparison with realized symbol/asset-class contribution and concentration diagnostics.
 - `prospective_recorder.py`: byte-locked, current-date-only forward provider-state capture with exclusive cutoffs, complete source snapshots, and deterministic archive verification.
 - `context_builder.py`: builds a compact AI working-context snapshot from repository memory.
 
@@ -62,6 +63,8 @@ The technical stop remains a market-reference trigger. Execution cost changes th
 Passive references deliberately do not inherit v1 sizing/stops: they answer an opportunity-cost question. They must still share evaluation dates, provider snapshot, and execution-cost conventions with the active strategy so the comparison is controlled.
 
 Parameter-neighborhood scenarios rerun the full portfolio path because score thresholds and ATR stop/trail distances can alter entries, sizing, exits, cash, open risk, and later opportunities. The diagnostic evaluates a preregistered surface and never promotes the historical winner into frozen v1.
+
+Universe-breadth paths also rerun the full shared-account portfolio because added assets compete for cash, open-risk budget, and position slots. A broader-universe conclusion is evaluated through realized symbol/asset-class contribution and concentration, not headline return alone. Using a fixed pre-existing current-survivor universe reduces dependence on a narrow subset but is not equivalent to point-in-time membership data.
 
 ## Prospective evidence boundary
 
@@ -95,4 +98,4 @@ Retrospective diagnostics and passive references can challenge the frozen strate
 
 ## Current architectural milestone
 
-The research engine now has reproducible retrospective baseline, cost-sensitivity, temporal-stability, passive/reference, and parameter-neighborhood workflows plus a provenance-preserving prospective capture path. The next retrospective diagnostic is broader-universe testing to reduce selection/survivorship bias. The next prospective infrastructure step is read-only replay/evaluation from captured evidence after the recorder begins, before paper execution is considered.
+The research engine now has reproducible retrospective baseline, cost-sensitivity, temporal-stability, passive/reference, parameter-neighborhood, and configured-universe breadth workflows plus a provenance-preserving prospective capture path. The next prospective infrastructure step is read-only replay/evaluation from captured evidence after the recorder begins, before paper execution is considered. Any stronger historical survivorship study should use preregistered point-in-time universe membership rather than adding further present-day survivors.
