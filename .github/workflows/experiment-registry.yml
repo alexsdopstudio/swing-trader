@@ -49,4 +49,13 @@ jobs:
           retention-days: 7
 
       - name: Require committed registry to be current
-        run: git diff --exit-code -- experiments/registry.json
+        shell: bash
+        run: |
+          set -euo pipefail
+          status="$(git status --porcelain -- experiments/registry.json)"
+          if [[ -n "$status" ]]; then
+            echo "$status"
+            git diff -- experiments/registry.json || true
+            echo "experiments/registry.json is missing or stale; regenerate it with swing-experiment-registry --root ."
+            exit 1
+          fi
