@@ -129,13 +129,21 @@ swing-parameter-neighborhood \
   --output-dir .artifacts/EXP-0005
 ```
 
+Run the configured-universe breadth diagnostic with:
+
+```bash
+swing-universe-breadth \
+  --config experiments/EXP-0006-configured-universe-breadth/config.yaml \
+  --output-dir .artifacts/EXP-0006
+```
+
 GitHub Actions runs the same real-data experiments and retains detailed trade/equity artifacts for review.
 
 ### EXP-0001 baseline
 
 The first exploratory cost-aware baseline used BTC-USD, SOL-USD, META, and NVDA from 2021-01-01 through 2026-08-31, with warm-up history beginning in 2020.
 
-Headline result: 65 trades, +1.05R expectancy, 3.18 profit factor, 6.01% CAGR and -4.25% maximum drawdown. The result is explicitly **not considered validated** because the sample is small, profits are concentrated in a few assets/trades, 2025–2026 is negative, and no true prospective holdout or broader-universe test has matured.
+Headline result: 65 trades, +1.05R expectancy, 3.18 profit factor, 6.01% CAGR and -4.25% maximum drawdown. The result is explicitly **not considered validated** because the sample is small, profits are concentrated in a few assets/trades, 2025–2026 is negative, and no true prospective holdout has matured.
 
 ### EXP-0002 execution-cost sensitivity
 
@@ -166,6 +174,14 @@ EXP-0005 keeps v1 frozen and evaluates exactly 27 preregistered combinations of 
 All 27 scenarios and all six immediate axial neighbors were joint-positive, median expectancy was +0.92R versus a preregistered +0.50R threshold, and the exact v1 center reproduced EXP-0001 within every preregistered tolerance. This supports local retrospective parameter robustness.
 
 The magnitude is still parameter-sensitive: expectancy ranges from roughly +0.43R to +1.73R across the tested surface. No historical winner is selected or promoted, and frozen v1 remains 70 / 2.0 / 2.5. EXP-0005 does not repair EXP-0003's temporal instability or create out-of-sample evidence.
+
+### EXP-0006 configured-universe breadth
+
+EXP-0006 keeps v1 frozen and reruns the original four-symbol research subset plus the complete 11-asset list that was already present in `config/universe.yaml`, using one shared provider snapshot. Added assets compete for the same cash, four position slots, and 2% open-risk budget rather than being tested independently.
+
+All preregistered breadth criteria passed. The expanded path produced +39.98% total return, 6.12% CAGR, +0.49R expectancy, a 2.04 profit factor and -5.13% maximum drawdown across 141 trades. Five of the seven added symbols and 8 of 11 symbols overall were positive net-PnL contributors; added symbols contributed +514.76 in aggregate, both equities and crypto contributed positively, and the largest positive symbol contribution (SOL-USD) was 30.58% of summed positive symbol PnL versus a 60% ceiling.
+
+This supports broader retrospective contribution but not superiority of the expanded portfolio: compared with the four-symbol control, expectancy/profit factor fell and exposure/drawdown rose. It also does not eliminate survivorship bias because the configured universe contains current/high-profile survivors rather than point-in-time membership data.
 
 ### Prospective v1 holdout
 
@@ -233,10 +249,10 @@ experiments/             reproducible research history and prospective protocols
 ## Roadmap
 
 1. Keep v1 frozen and record the prospective holdout from 2026-09-14 onward without interim tuning.
-2. Build a provenance-preserving forward observation / holdout store.
-3. Test a broader universe to reduce survivor/selection bias.
-4. Add a persistent daily scan history on the forward-data foundation.
-5. Add an AI research layer for catalysts, filings, earnings and crypto-specific events.
+2. Preserve complete provider states with the provenance-preserving forward recorder; never backfill missed prospective dates.
+3. Build a read-only prospective evaluator/trade-state replay over captured evidence.
+4. If more historical universe research is warranted, use preregistered point-in-time membership rather than adding current survivors.
+5. Add persistent daily scan history and later an AI research layer for catalysts, filings, earnings and crypto-specific events.
 6. Add broker/exchange execution only after paper-trading infrastructure and prospective evidence are trustworthy.
 
 ## Risk model for the initial €5k account
