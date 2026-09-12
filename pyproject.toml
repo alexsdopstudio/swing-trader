@@ -22,6 +22,7 @@ dev = ["pytest>=8.0", "ruff>=0.6"]
 swing-trader = "swing_trader.cli:main"
 swing-backtest = "swing_trader.backtest_cli:main"
 swing-experiment = "swing_trader.experiment_cli:main"
+swing-cost-sensitivity = "swing_trader.cost_sensitivity_cli:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
