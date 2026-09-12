@@ -103,12 +103,22 @@ def _market_frame(symbol: str, end: str, *, revise_prior: bool = False) -> pd.Da
     return frame
 
 
-def _record(archive_dir: Path, observation_date: str, *, revise_prior: bool = False) -> Path:
+def _record(
+    archive_dir: Path,
+    observation_date: str,
+    *,
+    revise_prior: bool = False,
+    omit_market_date_for: str | None = None,
+) -> Path:
     recorded_at = datetime.fromisoformat(f"{observation_date}T01:00:00+00:00")
+    market_date = pd.Timestamp(observation_date) - pd.Timedelta(days=1)
 
     def downloader(symbol: str, start: str, end: str | None) -> pd.DataFrame:
         assert end is not None
-        return _market_frame(symbol, end, revise_prior=revise_prior)
+        frame = _market_frame(symbol, end, revise_prior=revise_prior)
+        if symbol == omit_market_date_for:
+            frame = frame.drop(market_date, errors="ignore")
+        return frame
 
     result = capture_snapshot(
         archive_dir,
@@ -162,6 +172,22 @@ def test_evaluator_stops_at_first_missing_canonical_observation(tmp_path: Path) 
     assert result["evidence"]["evidence_complete_through_available_range"] is False
     assert result["evidence"]["unprocessed_archives_after_gap"] == ["2026-09-17"]
     assert result["state"]["processed_through_market_date"] == "2026-09-14"
+
+
+def test_evaluator_rejects_incomplete_new_crypto_market_date(tmp_path: Path) -> None:
+    archives = tmp_path / "archives"
+    _record(archives, "2026-09-15", omit_market_date_for="BTC-USD")
+
+    with pytest.raises(RuntimeError, match="missing newly observable crypto bar"):
+        evaluate_holdout_archives(archives, tmp_path / "out")
+
+
+def test_evaluator_rejects_incomplete_equity_session(tmp_path: Path) -> None:
+    archives = tmp_path / "archives"
+    _record(archives, "2026-09-15", omit_market_date_for="META")
+
+    with pytest.raises(RuntimeError, match="benchmark session but missing equity bar"):
+        evaluate_holdout_archives(archives, tmp_path / "out")
 
 
 def test_evaluator_rejects_duplicate_observation_dates(tmp_path: Path) -> None:
