@@ -43,6 +43,7 @@ The scanner uses the same indicator and scoring concepts for the latest bar, whi
 - `universe_breadth.py`: controlled same-snapshot subset-vs-configured-universe full-path comparison with realized symbol/asset-class contribution and concentration diagnostics.
 - `prospective_recorder.py`: byte-locked, current-date-only forward provider-state capture with exclusive cutoffs, complete source snapshots, and deterministic archive verification.
 - `prospective_evaluator.py`: read-only information-time replay of the frozen holdout from verified canonical archives, with state continuity and fail-closed gap handling.
+- `experiment_registry.py`: deterministic derived index and integrity validation for durable historical experiment records and prospective protocol locks.
 - `context_builder.py`: builds a compact AI working-context snapshot from repository memory.
 
 ## Execution and risk boundary
@@ -68,6 +69,14 @@ Passive references deliberately do not inherit v1 sizing/stops: they answer an o
 Parameter-neighborhood scenarios rerun the full portfolio path because score thresholds and ATR stop/trail distances can alter entries, sizing, exits, cash, open risk, and later opportunities. The diagnostic evaluates a preregistered surface and never promotes the historical winner into frozen v1.
 
 Universe-breadth paths also rerun the full shared-account portfolio because added assets compete for cash, open-risk budget, and position slots. A broader-universe conclusion is evaluated through realized symbol/asset-class contribution and concentration, not headline return alone. Using a fixed pre-existing current-survivor universe reduces dependence on a narrow subset but is not equivalent to point-in-time membership data.
+
+## Research-memory integrity boundary
+
+`experiments/README.md`, each experiment's reviewed `notes.md`/`results.json`, and prospective protocol files remain the canonical durable research sources. `experiments/registry.json` is deliberately derived from them; it contains only mechanically recoverable identity, content digests, provenance, and protocol-lock facts.
+
+`experiment_registry.py` validates directory/config/result identity, required durable files, normalized existing provenance, README coverage, and prospective protocol byte locks before rendering deterministic JSON. It adds no generation timestamp and does not infer research conclusions that are absent from canonical result files.
+
+The generated registry is versioned for review and fast discovery, but it is not a second editable research schema. CI regenerates it and fails when the committed bytes differ, so changes to canonical experiment/protocol memory must update the derived index in the same PR.
 
 ## Prospective evidence boundary
 
@@ -103,4 +112,4 @@ Retrospective diagnostics and passive references can challenge the frozen strate
 
 ## Current architectural milestone
 
-The research engine now has reproducible retrospective baseline, cost-sensitivity, temporal-stability, passive/reference, parameter-neighborhood, and configured-universe breadth workflows plus provenance-preserving prospective capture and read-only replay infrastructure. The immediate operational milestone is the first active 2026-09-15 recorder observation and continued gap-free evidence capture. Any stronger historical survivorship study should use preregistered point-in-time universe membership rather than adding further present-day survivors.
+The research engine now has reproducible retrospective baseline, cost-sensitivity, temporal-stability, passive/reference, parameter-neighborhood, and configured-universe breadth workflows plus provenance-preserving prospective capture, read-only replay infrastructure, and a deterministic derived experiment/protocol registry. The immediate operational milestone is the first active 2026-09-15 recorder observation and continued gap-free evidence capture. Any stronger historical survivorship study should use preregistered point-in-time universe membership rather than adding further present-day survivors.

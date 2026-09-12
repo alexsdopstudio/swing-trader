@@ -89,6 +89,15 @@ The technical stop remains a market-reference trigger. Execution costs affect th
 
 Versioned research lives under `experiments/`. Experiment configs separate indicator warm-up history from the actual evaluation window and record code revision, data coverage, source-data digests, portfolio parameters, execution assumptions, metrics, and reviewed conclusions.
 
+`experiments/registry.json` is a deterministic machine-generated integrity/provenance index derived from the canonical experiment and protocol files. Regenerate it after changing durable research records, or verify that it is current with:
+
+```bash
+swing-experiment-registry --root .
+swing-experiment-registry --root . --check
+```
+
+The registry does not replace the human research index or reviewed interpretation; CI rejects stale or internally inconsistent registry state.
+
 Run the baseline experiment locally with:
 
 ```bash

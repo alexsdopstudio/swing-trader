@@ -28,6 +28,7 @@ Last updated: 2026-09-12
 - scheduled/manual GitHub Release publication path with yearly durable evidence releases, duplicate-date skip, and no overwrite/backfill semantics
 - read-only prospective holdout evaluator replaying one newly observable market date per verified canonical archive with no provider fallback
 - deterministic prospective derived state/trade outputs with fail-closed handling of missing or duplicate observation dates
+- deterministic machine-generated experiment/protocol registry with content digests, normalized provenance, protocol-lock validation, and stale-state CI enforcement
 - CI workflows capable of running real-data experiments and validating prospective recorder/evaluator infrastructure
 - experiment index and durable reviewed experiment memory
 - CI with pytest and Ruff
@@ -40,6 +41,8 @@ Last updated: 2026-09-12
 ## Validation status
 
 - unit test suite is passing in CI
+- experiment registry tests cover deterministic bytes, stale detection, identity/file mismatch rejection, duplicate ids, README coverage, normalized legacy/top-level provenance, and prospective protocol-lock mismatch
+- dedicated registry CI regenerates `experiments/registry.json` and rejects modified or newly generated/untracked registry state
 - portfolio execution/risk semantics are covered by synthetic tests
 - stateful replay preserves next-asset-bar, stop ordering, terminal-liquidation separation, and pending-state continuity
 - all real-data EXP-0001 through EXP-0006 workflows remain green after the portfolio event-loop refactor
@@ -89,6 +92,7 @@ Last updated: 2026-09-12
 - GitHub Release append-only behavior is enforced by workflow convention and digests, not by an administrator-proof storage primitive
 - evaluator outputs are derived/reproducible monitoring state rather than a second durable evidence store
 - evaluator infrastructure has only synthetic evidence so far because the first real active archive is not expected until 2026-09-15
+- the generated experiment registry validates structural/provenance integrity but deliberately does not replace human interpretation or prove research conclusions correct
 - no point-in-time universe membership/survivorship study
 - no semantic retrieval for solution memory
 - no persistent daily scan history
@@ -96,4 +100,4 @@ Last updated: 2026-09-12
 
 ## Current milestone
 
-Keep v1 frozen. Let the forward recorder produce the first active UTC observation on 2026-09-15 and treat any missed scheduled day as a gap rather than backfill it. Replay captured evidence only through the read-only information-time evaluator and never feed interim state/trades into tuning. If historical universe work continues, preregister point-in-time membership rather than adding more current survivors; otherwise the next infrastructure candidates are persistent experiment/index automation and daily scan persistence.
+Keep v1 frozen. Let the forward recorder produce the first active UTC observation on 2026-09-15 and treat any missed scheduled day as a gap rather than backfill it. Replay captured evidence only through the read-only information-time evaluator and never feed interim state/trades into tuning. The experiment/protocol registry is now automated and should remain a derived integrity index rather than a second research source of truth. If historical universe work continues, preregister point-in-time membership rather than adding more current survivors; otherwise the next infrastructure candidate is persistent daily scan history.
