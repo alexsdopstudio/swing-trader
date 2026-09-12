@@ -1,0 +1,26 @@
+schema_version: 1
+id: SRC-0003
+title: A Reality Check for Data Snooping
+authors:
+  - Halbert White
+year: 2000
+source_type: peer_reviewed_primary
+publisher: Wiley
+publication: Econometrica
+doi: 10.1111/1468-0262.00152
+url: https://doi.org/10.1111/1468-0262.00152
+accessed_on: 2026-09-13
+topics:
+  - backtesting
+  - data-snooping
+  - multiple-testing
+  - model-selection
+redistribution:
+  full_text_committed: false
+project_relevance: >-
+  Formalizes the inference problem created when the same historical data are reused for model
+  selection and evaluation, directly supporting the repository's separation of exploratory
+  diagnostics from preregistered prospective validation.
+limitations:
+  - The paper provides statistical methodology rather than a guarantee that any particular anti-overfitting workflow is sufficient.
+  - Applying the general lesson still requires project-specific controls, frozen decisions, and genuinely future evidence.
