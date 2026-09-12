@@ -85,6 +85,28 @@ A long buy pays half the configured spread plus slippage above the market refere
 
 The technical stop remains a market-reference trigger. Execution costs affect the realized exit fill and are included in position sizing, aggregate open-risk accounting, shared cash, and realized R multiples.
 
+## Reproducible experiments
+
+Versioned research lives under `experiments/`. Experiment configs separate indicator warm-up history from the actual evaluation window and record the code revision, data coverage, portfolio parameters, execution costs, metrics, and reviewed conclusion.
+
+Run an experiment locally with:
+
+```bash
+swing-experiment \
+  --config experiments/EXP-0001-baseline/config.yaml \
+  --output-dir .artifacts/EXP-0001
+```
+
+The runner generates strict `results.json`, `trades.csv`, `equity.csv`, `resolved-config.yaml`, and a factual generated summary. GitHub Actions can run the same experiment against real market data and upload the generated directory as a review artifact.
+
+### EXP-0001 baseline
+
+The first exploratory cost-aware baseline used BTC-USD, SOL-USD, META, and NVDA from 2021-01-01 through 2026-08-31, with warm-up history beginning in 2020.
+
+Headline result: 65 trades, +1.05R expectancy, 3.18 profit factor, 6.01% CAGR and -4.25% maximum drawdown. The result is explicitly **not considered validated** because the sample is small, profits are concentrated in a few assets/trades, 2025–2026 is negative, and no held-out, cost-sensitivity, parameter-robustness, or broader-universe test has been completed.
+
+See `experiments/EXP-0001-baseline/notes.md` for the reviewed interpretation.
+
 ## Development workflow
 
 Development uses dedicated branches and pull requests. Do not implement features directly on `main`.
@@ -132,17 +154,18 @@ tests/                  unit tests
 docs/                   strategy, domain, decisions, plans, solutions, roadmap
 experiments/             reproducible research history
 .ai/                     current state and task/context helpers
-.github/workflows/      CI and PR convention checks
+.github/workflows/      CI, PR convention checks, and experiment runs
 ```
 
 ## Roadmap
 
-1. Run and record the first cost-aware portfolio experiments on BTC, SOL, META, and NVDA.
-2. Add walk-forward / out-of-sample evaluation.
-3. Add parameter robustness sweeps, including execution-cost sensitivity.
-4. Add a persistent daily scan database.
-5. Add an AI research layer for catalysts, filings, earnings and crypto-specific events.
-6. Add broker/exchange execution only after paper-trading validation.
+1. Run execution-cost sensitivity on the frozen v1 / EXP-0001 setup.
+2. Add walk-forward / held-out evaluation.
+3. Add parameter robustness sweeps.
+4. Test a broader universe and explicit passive/reference baselines.
+5. Add a persistent daily scan database.
+6. Add an AI research layer for catalysts, filings, earnings and crypto-specific events.
+7. Add broker/exchange execution only after paper-trading validation.
 
 ## Risk model for the initial €5k account
 
