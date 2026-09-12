@@ -83,11 +83,11 @@ def _market_frame(symbol: str, end: str, *, revise_prior: bool = False) -> pd.Da
     else:
         index = pd.date_range(start, end_ts - pd.Timedelta(days=1), freq="D")
     steps = np.arange(len(index), dtype=float)
-    close = 100.0 + steps * 0.12
+    close = 100.0 * np.power(1.005, steps)
     frame = pd.DataFrame({
-        "Open": close - 0.15,
-        "High": close + 0.20,
-        "Low": close - 0.30,
+        "Open": close * 0.999,
+        "High": close * 1.002,
+        "Low": close * 0.997,
         "Close": close,
         "Volume": np.full(len(index), 1_000.0),
     }, index=index)
@@ -148,6 +148,7 @@ def test_evaluator_is_read_only_deterministic_and_uses_canonical_daily_chain(
     daily = pd.read_csv(tmp_path / "out-a" / "daily-state.csv")
     assert daily["market_date"].tolist() == ["2026-09-14", "2026-09-15"]
     assert int(daily.iloc[0]["pending_signal_count"]) >= 1
+    assert int(daily.iloc[1]["open_position_count"]) >= 1
 
 
 def test_evaluator_stops_at_first_missing_canonical_observation(tmp_path: Path) -> None:
