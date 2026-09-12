@@ -1,0 +1,26 @@
+schema_version: 1
+id: SRC-0009
+title: "PROV-O: The PROV Ontology"
+authors:
+  - Timothy Lebo
+  - Satya Sahoo
+  - Deborah McGuinness
+year: 2013
+source_type: official_documentation
+publisher: World Wide Web Consortium (W3C)
+publication: W3C Recommendation
+url: https://www.w3.org/TR/prov-o/
+accessed_on: 2026-09-13
+topics:
+  - ai-agents
+  - knowledge-management
+  - provenance
+redistribution:
+  full_text_committed: false
+project_relevance: >-
+  Provides an authoritative provenance model built around entities, activities, agents, derivation,
+  attribution, and time. Swing Trader uses the same design principle to keep sources, observations,
+  generated indexes, and curated interpretation traceable without claiming formal PROV-O conformance.
+limitations:
+  - PROV-O is a general Web provenance ontology, not a trading-research or AI-agent knowledge-base specification.
+  - The repository does not currently serialize its records as RDF/OWL or claim standards conformance.
