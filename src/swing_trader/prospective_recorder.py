@@ -65,23 +65,32 @@ def _package_version(name: str) -> str:
         return "unknown"
 
 
+def _load_protocol_lock(path: str | Path) -> dict[str, Any]:
+    lock = json.loads(Path(path).read_text(encoding="utf-8"))
+    if not isinstance(lock, dict):
+        raise ValueError("holdout protocol lock must be a mapping")
+    if lock.get("schema_version") != SCHEMA_VERSION:
+        raise ValueError("unsupported holdout protocol lock schema")
+    for key in ("protocol_id", "protocol_sha256", "frozen_source_commit", "warmup_start"):
+        if not isinstance(lock.get(key), str) or not lock[key]:
+            raise ValueError(f"holdout protocol lock is missing {key}")
+    return lock
+
+
 def load_locked_protocol(
     protocol_path: str | Path = DEFAULT_PROTOCOL_PATH,
     lock_path: str | Path = DEFAULT_LOCK_PATH,
 ) -> tuple[dict[str, Any], dict[str, Any], str]:
     """Load the registered holdout protocol and verify its immutable byte fingerprint."""
     protocol_path = Path(protocol_path)
-    lock_path = Path(lock_path)
     protocol_bytes = protocol_path.read_bytes()
     protocol_sha256 = _sha256_bytes(protocol_bytes)
     protocol = yaml.safe_load(protocol_bytes) or {}
-    lock = json.loads(lock_path.read_text(encoding="utf-8"))
+    lock = _load_protocol_lock(lock_path)
 
-    if not isinstance(protocol, dict) or not isinstance(lock, dict):
-        raise ValueError("holdout protocol and lock must be mappings")
-    if lock.get("schema_version") != SCHEMA_VERSION:
-        raise ValueError("unsupported holdout protocol lock schema")
-    if protocol_sha256 != lock.get("protocol_sha256"):
+    if not isinstance(protocol, dict):
+        raise ValueError("holdout protocol must be a mapping")
+    if protocol_sha256 != lock["protocol_sha256"]:
         raise RuntimeError("registered holdout protocol bytes do not match protocol lock")
 
     metadata = protocol.get("protocol")
@@ -90,9 +99,9 @@ def load_locked_protocol(
     integrity = protocol.get("research_integrity")
     if not all(isinstance(item, dict) for item in (metadata, holdout, universe, integrity)):
         raise ValueError("holdout protocol is missing required mappings")
-    if metadata.get("id") != lock.get("protocol_id"):
+    if metadata.get("id") != lock["protocol_id"]:
         raise RuntimeError("protocol id does not match protocol lock")
-    if metadata.get("frozen_source_commit") != lock.get("frozen_source_commit"):
+    if metadata.get("frozen_source_commit") != lock["frozen_source_commit"]:
         raise RuntimeError("frozen source commit does not match protocol lock")
     if metadata.get("status") != "preregistered":
         raise RuntimeError("holdout protocol must remain preregistered")
@@ -107,7 +116,7 @@ def load_locked_protocol(
 
     try:
         date.fromisoformat(str(holdout["evaluation_start"]))
-        date.fromisoformat(str(lock["warmup_start"]))
+        date.fromisoformat(lock["warmup_start"])
     except (KeyError, ValueError) as exc:
         raise ValueError("holdout dates are malformed") from exc
 
@@ -236,9 +245,10 @@ def capture_snapshot(
     source_dir.mkdir(parents=True, exist_ok=False)
 
     source_records: dict[str, dict[str, Any]] = {}
-    warmup_start = str(lock["warmup_start"])
+    warmup_start = lock["warmup_start"]
     cutoff = observation_date.isoformat()
-    for symbol in required_symbols(protocol):
+    symbols = required_symbols(protocol)
+    for symbol in symbols:
         raw = downloader(symbol, warmup_start, cutoff)
         frame = _prepare_source_frame(symbol, raw, observation_date)
         filename = _safe_symbol_filename(symbol)
@@ -282,7 +292,7 @@ def capture_snapshot(
             "run_id": os.environ.get("GITHUB_RUN_ID"),
             "run_attempt": os.environ.get("GITHUB_RUN_ATTEMPT"),
         },
-        "required_symbols": required_symbols(protocol),
+        "required_symbols": symbols,
         "source": source_records,
         "research_integrity": {
             "interim_parameter_tuning_allowed": False,
@@ -291,14 +301,12 @@ def capture_snapshot(
             "strategy_evaluation_included": False,
         },
     }
-    manifest_path = snapshot_dir / "manifest.json"
-    manifest_path.write_text(
+    (snapshot_dir / "manifest.json").write_text(
         json.dumps(manifest, indent=2, sort_keys=True, allow_nan=False) + "\n",
         encoding="utf-8",
     )
 
     temporary_archive = output_dir / f"{_ARCHIVE_ID}-{observation_date}.zip.tmp"
-    output_dir.mkdir(parents=True, exist_ok=True)
     _write_deterministic_zip(snapshot_dir, temporary_archive)
     archive_sha256 = _file_sha256(temporary_archive)
     archive_path = output_dir / f"{_ARCHIVE_ID}-{observation_date}-{archive_sha256}.zip"
@@ -316,17 +324,21 @@ def capture_snapshot(
     )
 
 
-def verify_snapshot_archive(path: str | Path) -> dict[str, Any]:
-    """Verify archive-name digest, manifest, source digests, and exclusive cutoff."""
+def verify_snapshot_archive(
+    path: str | Path,
+    *,
+    lock_path: str | Path = DEFAULT_LOCK_PATH,
+) -> dict[str, Any]:
+    """Verify archive bytes, registered protocol binding, source digests, and cutoff."""
     path = Path(path)
     match = _ARCHIVE_RE.match(path.name)
     if match is None:
         raise ValueError("holdout archive filename does not match the required digest format")
     filename_date, filename_sha = match.groups()
-    actual_sha = _file_sha256(path)
-    if actual_sha != filename_sha:
+    if _file_sha256(path) != filename_sha:
         raise RuntimeError("holdout archive SHA-256 does not match its filename")
 
+    lock = _load_protocol_lock(lock_path)
     with zipfile.ZipFile(path, "r") as archive:
         names = set(archive.namelist())
         if "manifest.json" not in names:
@@ -334,6 +346,17 @@ def verify_snapshot_archive(path: str | Path) -> dict[str, Any]:
         manifest = json.loads(archive.read("manifest.json"))
         if manifest.get("schema_version") != SCHEMA_VERSION:
             raise RuntimeError("unsupported holdout snapshot schema")
+
+        protocol = manifest.get("protocol")
+        if not isinstance(protocol, dict):
+            raise RuntimeError("holdout manifest has no protocol record")
+        if (
+            protocol.get("id") != lock["protocol_id"]
+            or protocol.get("protocol_sha256") != lock["protocol_sha256"]
+            or protocol.get("frozen_source_commit") != lock["frozen_source_commit"]
+        ):
+            raise RuntimeError("holdout archive does not match the registered protocol lock")
+
         observation_date = manifest.get("capture", {}).get("observation_date")
         if observation_date != filename_date:
             raise RuntimeError("manifest observation date does not match archive filename")
@@ -342,8 +365,14 @@ def verify_snapshot_archive(path: str | Path) -> dict[str, Any]:
         cutoff = pd.Timestamp(observation_date)
 
         source = manifest.get("source")
+        required = manifest.get("required_symbols")
         if not isinstance(source, dict) or not source:
             raise RuntimeError("holdout manifest has no source records")
+        if not isinstance(required, list) or len(required) != len(set(required)):
+            raise RuntimeError("holdout manifest required-symbol set is invalid")
+        if set(source) != set(required):
+            raise RuntimeError("holdout manifest source set differs from required symbols")
+
         for symbol, record in source.items():
             relative = record.get("path")
             if relative not in names:
@@ -352,9 +381,15 @@ def verify_snapshot_archive(path: str | Path) -> dict[str, Any]:
             if _sha256_bytes(payload) != record.get("sha256"):
                 raise RuntimeError(f"source SHA-256 mismatch for {symbol}")
             frame = pd.read_csv(BytesIO(payload), parse_dates=["Date"], index_col="Date")
+            if list(frame.columns) != REQUIRED_COLUMNS:
+                raise RuntimeError(f"source schema mismatch for {symbol}")
             if frame.empty or pd.Timestamp(frame.index.max()) >= cutoff:
                 raise RuntimeError(f"source cutoff violation for {symbol}")
             if len(frame) != int(record.get("rows", -1)):
                 raise RuntimeError(f"source row-count mismatch for {symbol}")
+            if frame.index[0].date().isoformat() != record.get("first_observation"):
+                raise RuntimeError(f"source first-observation mismatch for {symbol}")
+            if frame.index[-1].date().isoformat() != record.get("last_observation"):
+                raise RuntimeError(f"source last-observation mismatch for {symbol}")
 
     return manifest
