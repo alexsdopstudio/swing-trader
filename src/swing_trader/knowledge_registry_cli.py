@@ -13,7 +13,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--check",
         action="store_true",
-        help="Verify that knowledge/registry.json exactly matches canonical source/note records.",
+        help="Verify that knowledge/registry.json exactly matches canonical source/news/note records.",
     )
     return parser
 
