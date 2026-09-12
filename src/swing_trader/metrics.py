@@ -36,7 +36,7 @@ def _safe_mean(values: list[float]) -> float:
 
 def calculate_metrics(
     result: PortfolioBacktestResult,
-    periods_per_year: float = 365.25,
+    periods_per_year: float | None = None,
 ) -> BacktestMetrics:
     """Calculate deterministic summary metrics for a portfolio backtest result."""
     equity = result.equity_curve.dropna().astype(float)
@@ -58,14 +58,19 @@ def calculate_metrics(
     max_drawdown = float(drawdown.min())
 
     returns = equity.pct_change().dropna()
-    if len(returns) >= 2 and float(returns.std(ddof=1)) > 0:
-        sharpe = float(returns.mean() / returns.std(ddof=1) * sqrt(periods_per_year))
+    annualization = periods_per_year
+    if annualization is None:
+        annualization = len(returns) / years if years > 0 and len(returns) > 0 else 365.25
+
+    return_std = float(returns.std(ddof=1)) if len(returns) >= 2 else 0.0
+    if return_std > 0:
+        sharpe = float(returns.mean() / return_std * sqrt(annualization))
     else:
         sharpe = float("nan")
 
-    downside = returns[returns < 0]
-    if len(downside) >= 2 and float(downside.std(ddof=1)) > 0:
-        sortino = float(returns.mean() / downside.std(ddof=1) * sqrt(periods_per_year))
+    downside_deviation = float(np.sqrt(np.mean(np.square(np.minimum(returns, 0.0)))))
+    if len(returns) > 0 and downside_deviation > 0:
+        sortino = float(returns.mean() / downside_deviation * sqrt(annualization))
     else:
         sortino = float("nan")
 
