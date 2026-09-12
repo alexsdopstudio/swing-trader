@@ -16,3 +16,10 @@ jobs:
       - run: pip install -e ".[dev]"
       - run: pytest -q
       - run: ruff check src tests
+      - name: Smoke test autonomous agent bootstrap
+        env:
+          SWING_TRADER_OFFLINE: "1"
+        run: |
+          python scripts/agent_bootstrap.py
+          test -s .ai/context.md
+          test -s .ai/handoff.md
