@@ -1,0 +1,28 @@
+experiment:
+  id: EXP-0005
+  name: parameter-neighborhood
+  research_stage: retrospective-parameter-neighborhood
+  base_experiment_config: experiments/EXP-0001-baseline/config.yaml
+  reference_results: experiments/EXP-0001-baseline/results.json
+
+parameters:
+  min_score: [65, 70, 75]
+  stop_atr: [1.5, 2.0, 2.5]
+  trail_atr: [2.0, 2.5, 3.0]
+
+center:
+  min_score: 70
+  stop_atr: 2.0
+  trail_atr: 2.5
+
+robustness_criteria:
+  minimum_joint_positive_scenarios: 18
+  minimum_joint_positive_axial_neighbors: 5
+  minimum_median_expectancy_r: 0.5
+  missing_expectancy_r_for_median: 0.0
+  center_reference_tolerances:
+    total_return: 0.01
+    cagr: 0.0025
+    max_drawdown: 0.005
+    expectancy_r: 0.10
+    trade_count: 2

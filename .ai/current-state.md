@@ -20,6 +20,7 @@ Last updated: 2026-09-12
 - execution-cost sensitivity runner with shared market-data snapshots across scenarios
 - temporal-stability runner with independent calendar folds and one shared provider snapshot
 - passive/reference comparison runner with cost-aware per-symbol and initial equal-weight buy-and-hold baselines
+- parameter-neighborhood runner with a preregistered 27-scenario local grid, shared inputs, full-path reruns, and no winner selection
 - preregistered prospective-v1 holdout protocol
 - CI workflows capable of running real-data experiments and uploading artifacts
 - experiment index and durable reviewed experiment memory
@@ -48,6 +49,10 @@ Last updated: 2026-09-12
 - EXP-0004 initial equal-weight buy-and-hold: +2,139.01% total return, 73.16% CAGR, -95.19% max drawdown, 1.06 Sharpe, 99.89% average exposure
 - EXP-0004 frozen v1: +39.17% total return, 6.01% CAGR, -4.25% max drawdown, 1.27 Sharpe, 6.04% average exposure
 - EXP-0004 shows much higher passive absolute return but radically different drawdown/exposure; it is retrospective and does not validate v1
+- EXP-0005 parameter-neighborhood diagnostic completed across exactly 27 preregistered score/stop/trail scenarios on one shared provider snapshot
+- EXP-0005 joint-positive scenarios: 27 of 27; joint-positive immediate axial neighbors: 6 of 6; median expectancy: +0.92R versus preregistered +0.50R threshold
+- EXP-0005 exact frozen-v1 center reproduced EXP-0001 within every preregistered provider-revision tolerance
+- EXP-0005 supports local retrospective parameter robustness but does not select a replacement parameter set; expectancy still spans roughly +0.43R to +1.73R across the grid
 - `PROSPECTIVE-v1-holdout` is preregistered to start 2026-09-14 with no interim v1 tuning
 - no validated portfolio-level trading edge yet
 - no live or paper execution yet
@@ -56,20 +61,21 @@ Last updated: 2026-09-12
 
 - execution costs use linear basis-point assumptions rather than order-book or nonlinear market-impact models
 - baseline cost assumptions and sensitivity multipliers are research inputs, not broker/exchange quotes
-- EXP-0001/EXP-0002/EXP-0003/EXP-0004 use the same narrow, survivor/high-profile universe
+- EXP-0001/EXP-0002/EXP-0003/EXP-0004/EXP-0005 use the same narrow, survivor/high-profile universe
 - profit contribution is concentrated in a small number of large winners and favorable calendar regimes
 - passive-reference returns are strongly influenced by exceptional SOL and NVDA paths and do not remove selection/survivorship bias
 - passive references are nearly fully invested while v1 averages about 6% exposure; no volatility/leverage normalization has been preregistered or tested
 - the aggregate historical edge is not temporally uniform: 2025 and 2026-YTD are negative and 2022 is inactive
-- EXP-0003 and EXP-0004 are retrospective diagnostics, not true out-of-sample validation
+- EXP-0005 supports local sign/quality robustness but parameter choice still materially affects historical magnitude
+- EXP-0003, EXP-0004, and EXP-0005 are retrospective diagnostics, not true out-of-sample validation
 - the prospective holdout cannot support validation claims before both 2028-09-14 and 30 closed trades
 - yfinance adjusted equity/QQQ history has changed across repeated runs; exact provider replay is not guaranteed without immutable snapshots
-- no parameter-neighborhood robustness analysis yet
 - no broader-universe survivorship/selection-bias study
+- no provenance-preserving forward holdout observation store
 - no semantic retrieval for solution memory
 - no persistent daily scan history
 - no catalyst/news agent
 
 ## Current milestone
 
-Keep v1 frozen for the prospective holdout. Run parameter-neighborhood robustness next without selecting a new v1 parameter set from retrospective results, then broaden the universe. Build forward holdout recording independently so future observations remain provenance-preserving and cannot feed interim v1 tuning.
+Keep v1 frozen for the prospective holdout. Build provenance-preserving forward holdout recording for observations beginning 2026-09-14, and run broader-universe testing next to reduce selection/survivorship bias. Do not further mine the completed EXP-0005 surface for replacement v1 parameters.

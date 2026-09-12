@@ -34,6 +34,7 @@ Do not delete failed experiments merely because they performed poorly. Negative 
 | [`EXP-0002-cost-sensitivity`](EXP-0002-cost-sensitivity/) | Reviewed sensitivity experiment | Does the EXP-0001 result survive materially higher execution-cost assumptions? | Cost robustness supported in-sample; continue research; do not deploy |
 | [`EXP-0003-temporal-stability`](EXP-0003-temporal-stability/) | Reviewed retrospective temporal diagnostic | Is the historical v1 result stable across calendar regimes? | Predeclared stability thresholds not met; continue research; do not deploy |
 | [`EXP-0004-reference-baselines`](EXP-0004-reference-baselines/) | Reviewed retrospective reference comparison | How does frozen v1 compare with passive ownership of the same selected assets? | Passive return is much higher but with near-full exposure and extreme drawdown; keep v1 frozen; continue research; do not deploy |
+| [`EXP-0005-parameter-neighborhood`](EXP-0005-parameter-neighborhood/) | Reviewed retrospective parameter-neighborhood diagnostic | Does frozen v1 remain economically positive under a preregistered local score/stop/trail neighborhood? | All preregistered local-robustness criteria passed; keep v1 frozen; do not select a historical winner; continue research; do not deploy |
 
 ## Prospective protocols
 

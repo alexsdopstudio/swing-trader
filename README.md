@@ -121,13 +121,21 @@ swing-reference-comparison \
   --output-dir .artifacts/EXP-0004
 ```
 
+Run the preregistered local parameter-neighborhood diagnostic with:
+
+```bash
+swing-parameter-neighborhood \
+  --config experiments/EXP-0005-parameter-neighborhood/config.yaml \
+  --output-dir .artifacts/EXP-0005
+```
+
 GitHub Actions runs the same real-data experiments and retains detailed trade/equity artifacts for review.
 
 ### EXP-0001 baseline
 
 The first exploratory cost-aware baseline used BTC-USD, SOL-USD, META, and NVDA from 2021-01-01 through 2026-08-31, with warm-up history beginning in 2020.
 
-Headline result: 65 trades, +1.05R expectancy, 3.18 profit factor, 6.01% CAGR and -4.25% maximum drawdown. The result is explicitly **not considered validated** because the sample is small, profits are concentrated in a few assets/trades, 2025–2026 is negative, and no true prospective holdout, parameter-robustness, or broader-universe test has matured.
+Headline result: 65 trades, +1.05R expectancy, 3.18 profit factor, 6.01% CAGR and -4.25% maximum drawdown. The result is explicitly **not considered validated** because the sample is small, profits are concentrated in a few assets/trades, 2025–2026 is negative, and no true prospective holdout or broader-universe test has matured.
 
 ### EXP-0002 execution-cost sensitivity
 
@@ -150,6 +158,14 @@ EXP-0004 keeps v1 frozen and compares it with cost-aware buy-and-hold of each se
 The passive basket produced +2,139.01% total return and 73.16% CAGR versus v1's +39.17% and 6.01%, but the passive path was essentially fully invested and suffered a -95.19% maximum drawdown. v1 averaged only about 6.04% exposure, had a -4.25% maximum drawdown, and recorded higher Sharpe/Sortino than every passive reference in this selected sample.
 
 This does not establish economic superiority for either approach. The comparison exposes a large return-versus-capital-at-risk trade-off, is strongly influenced by exceptional SOL and NVDA histories, and remains retrospective rather than out-of-sample evidence.
+
+### EXP-0005 parameter neighborhood
+
+EXP-0005 keeps v1 frozen and evaluates exactly 27 preregistered combinations of `min_score` 65/70/75, `stop_atr` 1.5/2.0/2.5, and `trail_atr` 2.0/2.5/3.0 on one shared provider snapshot.
+
+All 27 scenarios and all six immediate axial neighbors were joint-positive, median expectancy was +0.92R versus a preregistered +0.50R threshold, and the exact v1 center reproduced EXP-0001 within every preregistered tolerance. This supports local retrospective parameter robustness.
+
+The magnitude is still parameter-sensitive: expectancy ranges from roughly +0.43R to +1.73R across the tested surface. No historical winner is selected or promoted, and frozen v1 remains 70 / 2.0 / 2.5. EXP-0005 does not repair EXP-0003's temporal instability or create out-of-sample evidence.
 
 ### Prospective v1 holdout
 
@@ -217,9 +233,9 @@ experiments/             reproducible research history and prospective protocols
 ## Roadmap
 
 1. Keep v1 frozen and record the prospective holdout from 2026-09-14 onward without interim tuning.
-2. Run parameter-neighborhood robustness diagnostics without modifying or reselecting the frozen v1 specification.
+2. Build a provenance-preserving forward observation / holdout store.
 3. Test a broader universe to reduce survivor/selection bias.
-4. Add a persistent daily scan / prospective observation store.
+4. Add a persistent daily scan history on the forward-data foundation.
 5. Add an AI research layer for catalysts, filings, earnings and crypto-specific events.
 6. Add broker/exchange execution only after paper-trading infrastructure and prospective evidence are trustworthy.
 

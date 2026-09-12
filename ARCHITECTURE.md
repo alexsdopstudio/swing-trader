@@ -39,6 +39,7 @@ The scanner uses the same indicator and scoring concepts for the latest bar, whi
 - `backtest_cli.py`: cost-aware historical portfolio research entry point.
 - `reference_baselines.py`: deterministic cost-aware passive buy-and-hold references.
 - `reference_comparison.py`: controlled active-vs-passive experiment orchestration on one shared snapshot.
+- `parameter_neighborhood.py`: preregistered local score/stop/trail robustness diagnostics with full-path reruns on shared inputs and no winner selection.
 - `context_builder.py`: builds a compact AI working-context snapshot from repository memory.
 
 ## Execution and risk boundary
@@ -58,6 +59,8 @@ For long trades:
 The technical stop remains a market-reference trigger. Execution cost changes the realized fill, cash flow and risk, not the chronological information available to the strategy.
 
 Passive references deliberately do not inherit v1 sizing/stops: they answer an opportunity-cost question. They must still share evaluation dates, provider snapshot, and execution-cost conventions with the active strategy so the comparison is controlled.
+
+Parameter-neighborhood scenarios rerun the full portfolio path because score thresholds and ATR stop/trail distances can alter entries, sizing, exits, cash, open risk, and later opportunities. The diagnostic evaluates a preregistered surface and never promotes the historical winner into frozen v1.
 
 ## AI boundary
 
@@ -81,4 +84,4 @@ Retrospective diagnostics and passive references can challenge the frozen strate
 
 ## Current architectural milestone
 
-The cost-aware portfolio research engine now has reproducible baseline, execution-cost sensitivity, temporal-stability, and passive/reference comparison workflows. The next retrospective diagnostic is parameter-neighborhood robustness without changing frozen v1, followed by broader-universe testing. In parallel, the prospective holdout needs a provenance-preserving forward recording layer before paper execution is considered.
+The cost-aware portfolio research engine now has reproducible baseline, execution-cost sensitivity, temporal-stability, passive/reference comparison, and parameter-neighborhood workflows. The next retrospective diagnostic is broader-universe testing to reduce selection/survivorship bias. In parallel, the prospective holdout needs a provenance-preserving forward recording layer before paper execution is considered.

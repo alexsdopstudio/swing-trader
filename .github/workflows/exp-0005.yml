@@ -1,0 +1,161 @@
+name: EXP-0005
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "src/swing_trader/parameter_neighborhood.py"
+      - "src/swing_trader/parameter_neighborhood_cli.py"
+      - "src/swing_trader/experiment.py"
+      - "src/swing_trader/data.py"
+      - "src/swing_trader/indicators.py"
+      - "src/swing_trader/scoring.py"
+      - "src/swing_trader/historical.py"
+      - "src/swing_trader/portfolio.py"
+      - "src/swing_trader/risk.py"
+      - "src/swing_trader/metrics.py"
+      - "src/swing_trader/execution.py"
+      - "config/universe.yaml"
+      - "config/execution-costs.yaml"
+      - "experiments/EXP-0001-baseline/config.yaml"
+      - "experiments/EXP-0001-baseline/results.json"
+      - "experiments/EXP-0005-parameter-neighborhood/config.yaml"
+      - ".github/workflows/exp-0005.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  run-experiment:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout PR head
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install project
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev]"
+
+      - name: Run EXP-0005
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf .artifacts/EXP-0005
+          for attempt in 1 2 3; do
+            if swing-parameter-neighborhood \
+              --config experiments/EXP-0005-parameter-neighborhood/config.yaml \
+              --output-dir .artifacts/EXP-0005; then
+              break
+            fi
+            if [ "$attempt" -eq 3 ]; then
+              echo "EXP-0005 failed after 3 attempts" >&2
+              exit 1
+            fi
+            echo "EXP-0005 attempt $attempt failed; retrying after 10 seconds..." >&2
+            sleep 10
+          done
+
+      - name: Validate generated artifact
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          root = Path('.artifacts/EXP-0005')
+          required = ['results.json', 'scenario-comparison.csv', 'resolved-config.yaml', 'notes.md']
+          missing = [name for name in required if not (root / name).exists()]
+          if missing:
+              raise SystemExit(f'Missing EXP-0005 artifacts: {missing}')
+
+          results = json.loads((root / 'results.json').read_text(encoding='utf-8'))
+          experiment = results['experiment']
+          if experiment['id'] != 'EXP-0005':
+              raise SystemExit('Unexpected experiment id')
+          if experiment['true_out_of_sample_claim']:
+              raise SystemExit('EXP-0005 must not claim true out-of-sample evidence')
+          if not experiment['historical_data_already_observed']:
+              raise SystemExit('EXP-0005 must declare that the history was already observed')
+
+          expected_parameters = {
+              'min_score': [65, 70, 75],
+              'stop_atr': [1.5, 2.0, 2.5],
+              'trail_atr': [2.0, 2.5, 3.0],
+          }
+          if results['preregistered_parameters'] != expected_parameters:
+              raise SystemExit('Preregistered parameter grid changed unexpectedly')
+          if results['center'] != {'min_score': 70, 'stop_atr': 2.0, 'trail_atr': 2.5}:
+              raise SystemExit('Frozen v1 center changed unexpectedly')
+
+          scenarios = results['scenarios']
+          if len(scenarios) != 27:
+              raise SystemExit(f'Expected 27 scenarios, observed {len(scenarios)}')
+          if sum(bool(item['is_center']) for item in scenarios) != 1:
+              raise SystemExit('Expected exactly one center scenario')
+          if sum(bool(item['is_axial_neighbor']) for item in scenarios) != 6:
+              raise SystemExit('Expected exactly six axial neighbors')
+          if 'selected_parameter_set' in results:
+              raise SystemExit('EXP-0005 must not select a replacement parameter set')
+
+          consistency = results['data_consistency']
+          if consistency['shared_provider_download_count'] != 5:
+              raise SystemExit('EXP-0005 should download the four assets plus QQQ once each')
+          if not consistency['identical_source_digests_across_scenarios']:
+              raise SystemExit('All parameter scenarios must reuse one provider snapshot')
+
+          criteria = results['preregistered_criteria']
+          if criteria['minimum_joint_positive_scenarios'] != 18:
+              raise SystemExit('Joint-positive scenario threshold changed')
+          if criteria['minimum_joint_positive_axial_neighbors'] != 5:
+              raise SystemExit('Axial-neighbor threshold changed')
+          if criteria['minimum_median_expectancy_r'] != 0.5:
+              raise SystemExit('Median expectancy threshold changed')
+          if criteria['missing_expectancy_r_for_median'] != 0.0:
+              raise SystemExit('Missing-expectancy convention changed')
+          if criteria['center_reference_tolerances'] != {
+              'total_return': 0.01,
+              'cagr': 0.0025,
+              'max_drawdown': 0.005,
+              'expectancy_r': 0.1,
+              'trade_count': 2,
+          }:
+              raise SystemExit('Center reproduction tolerances changed')
+
+          robustness = results['robustness']
+          if robustness['scenario_count'] != 27 or robustness['axial_neighbor_count'] != 6:
+              raise SystemExit('Unexpected robustness scenario counts')
+          if set(robustness['criteria']) != {
+              'joint_positive_scenarios',
+              'joint_positive_axial_neighbors',
+              'median_expectancy_r',
+              'center_reproduction',
+          }:
+              raise SystemExit('Unexpected preregistered criteria set')
+
+          scenario_root = root / 'scenarios'
+          scenario_dirs = [path for path in scenario_root.iterdir() if path.is_dir()]
+          if len(scenario_dirs) != 27:
+              raise SystemExit(f'Expected 27 detailed scenario directories, observed {len(scenario_dirs)}')
+          for scenario_dir in scenario_dirs:
+              for name in ['results.json', 'trades.csv', 'equity.csv', 'resolved-config.yaml']:
+                  if not (scenario_dir / name).exists():
+                      raise SystemExit(f'Missing {scenario_dir.name}/{name}')
+          PY
+
+      - name: Upload EXP-0005 artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: EXP-0005-parameter-neighborhood
+          path: .artifacts/EXP-0005
+          if-no-files-found: error
+          retention-days: 30
