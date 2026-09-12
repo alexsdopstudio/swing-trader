@@ -41,3 +41,4 @@ _No reusable engineering solution notes recorded yet._
 ### Trading research
 
 - [`order-events-by-information-time.md`](trading-research/order-events-by-information-time.md) — preserve realistic open/intraday/close ordering, next-asset-bar execution, and stop semantics in bar-based multi-asset backtests.
+- [`include-costs-in-risk-accounting.md`](trading-research/include-costs-in-risk-accounting.md) — include commissions, spread, and slippage in sizing, cash constraints, aggregate risk, and R-multiple accounting rather than treating them only as final PnL adjustments.
