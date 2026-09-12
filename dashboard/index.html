@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <meta name="description" content="Read-only Swing Trader research and validation dashboard.">
+  <title>Swing Trader — Research Cockpit</title>
+  <link rel="stylesheet" href="./styles.css">
+  <script src="./app.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+
+  <header class="hero">
+    <div class="hero__bar shell">
+      <a class="brand" id="repository-link" href="#" aria-label="Open Swing Trader repository">
+        <span class="brand__mark" aria-hidden="true">ST</span>
+        <span>
+          <strong>Swing Trader</strong>
+          <small>Research cockpit</small>
+        </span>
+      </a>
+      <div class="hero__live" aria-live="polite">
+        <span class="pulse" id="live-pulse" aria-hidden="true"></span>
+        <span id="live-summary">Loading repository status…</span>
+      </div>
+    </div>
+
+    <div class="hero__content shell">
+      <div class="hero__copy">
+        <p class="eyebrow">Rule-based · research-first · evidence-aware</p>
+        <h1>One view of what the project knows — and what it does not.</h1>
+        <p class="hero__lede">
+          Canonical research state comes from the repository. Live GitHub data only enriches this
+          view; it never changes the validation verdict.
+        </p>
+      </div>
+      <aside class="validation-card" aria-labelledby="validation-card-title">
+        <span class="validation-card__label" id="validation-card-title">Validation status</span>
+        <strong class="validation-card__verdict" id="validation-label">NOT VALIDATED</strong>
+        <div class="validation-card__meta">
+          <span>Strategy <b id="strategy-version">—</b></span>
+          <span id="strategy-status">—</span>
+          <span id="deployment-status">—</span>
+        </div>
+      </aside>
+    </div>
+  </header>
+
+  <main id="main-content" class="shell page-grid">
+    <section class="section section--wide" id="validation" aria-labelledby="validation-title">
+      <div class="section__heading">
+        <div>
+          <p class="eyebrow">Prospective evidence</p>
+          <h2 id="validation-title">Validation gate</h2>
+        </div>
+        <span class="section__status" id="holdout-status">—</span>
+      </div>
+
+      <div class="gate-grid">
+        <article class="metric-card">
+          <span class="metric-card__label">Evaluation start</span>
+          <strong id="holdout-start">—</strong>
+          <small>Frozen before forward evidence</small>
+        </article>
+        <article class="metric-card">
+          <span class="metric-card__label">Minimum observation end</span>
+          <strong id="holdout-end">—</strong>
+          <small>Time gate</small>
+        </article>
+        <article class="metric-card">
+          <span class="metric-card__label">Minimum closed trades</span>
+          <strong><span id="minimum-trades">—</span></strong>
+          <small>Trade-count gate</small>
+        </article>
+        <article class="metric-card metric-card--live">
+          <span class="metric-card__label">Latest canonical archive</span>
+          <strong id="holdout-latest">Checking…</strong>
+          <small id="holdout-archive-count">Live GitHub release lookup</small>
+        </article>
+      </div>
+
+      <div class="callout callout--warning">
+        <strong>Both gates must be satisfied.</strong>
+        <span>Interim monitoring is allowed. Interim results cannot be used to tune frozen v1.</span>
+      </div>
+    </section>
+
+    <section class="section" id="operations" aria-labelledby="operations-title">
+      <div class="section__heading">
+        <div>
+          <p class="eyebrow">Repository operations</p>
+          <h2 id="operations-title">Live status</h2>
+        </div>
+        <span class="section__status section__status--live">Best effort</span>
+      </div>
+
+      <dl class="status-list">
+        <div>
+          <dt>Open pull requests</dt>
+          <dd id="open-prs">Checking…</dd>
+        </div>
+        <div>
+          <dt>Main branch checks</dt>
+          <dd id="workflow-status">Checking…</dd>
+        </div>
+        <div>
+          <dt>Daily scan archive</dt>
+          <dd id="scan-latest">Checking…</dd>
+        </div>
+        <div>
+          <dt>Daily scan observations</dt>
+          <dd id="scan-archive-count">Checking…</dd>
+        </div>
+      </dl>
+
+      <p class="section__note">
+        Operational scanner history is an audit trail of what the scanner observed. It is not
+        prospective validation evidence.
+      </p>
+    </section>
+
+    <section class="section" id="knowledge" aria-labelledby="knowledge-title">
+      <div class="section__heading">
+        <div>
+          <p class="eyebrow">Agent knowledge</p>
+          <h2 id="knowledge-title">Curated knowledge</h2>
+        </div>
+      </div>
+
+      <div class="knowledge-stats" aria-label="Knowledge record counts">
+        <div><strong id="source-count">—</strong><span>authoritative sources</span></div>
+        <div><strong id="note-count">—</strong><span>curated notes</span></div>
+        <div><strong id="news-count">—</strong><span>news observations</span></div>
+      </div>
+      <div class="topic-cloud" id="topic-cloud" aria-label="Knowledge topics"></div>
+      <p class="section__note">
+        Sources, news observations and project experiments are separate evidence classes. More
+        records do not imply stronger evidence.
+      </p>
+    </section>
+
+    <section class="section section--wide" id="research" aria-labelledby="research-title">
+      <div class="section__heading">
+        <div>
+          <p class="eyebrow">Historical research</p>
+          <h2 id="research-title">Experiment record</h2>
+        </div>
+        <span class="section__status"><span id="experiment-count">—</span> experiments</span>
+      </div>
+      <div class="experiment-grid" id="experiment-grid" aria-live="polite"></div>
+    </section>
+
+    <section class="section" id="universe" aria-labelledby="universe-title">
+      <div class="section__heading">
+        <div>
+          <p class="eyebrow">Configured coverage</p>
+          <h2 id="universe-title">Universe</h2>
+        </div>
+        <span class="section__status"><span id="asset-count">—</span> assets</span>
+      </div>
+      <div class="benchmark-row">
+        <span>Equities benchmark <b id="benchmark-equities">—</b></span>
+        <span>Crypto benchmark <b id="benchmark-crypto">—</b></span>
+      </div>
+      <div class="asset-grid" id="asset-grid"></div>
+    </section>
+
+    <section class="section" id="boundaries" aria-labelledby="boundaries-title">
+      <div class="section__heading">
+        <div>
+          <p class="eyebrow">Guardrails</p>
+          <h2 id="boundaries-title">Evidence boundaries</h2>
+        </div>
+      </div>
+      <ul class="boundary-list" id="boundary-list"></ul>
+    </section>
+  </main>
+
+  <footer class="footer shell">
+    <p>
+      Read-only derived view. Canonical state lives in the
+      <a id="footer-repository-link" href="#">GitHub repository</a>.
+    </p>
+    <p id="live-detail">Live enrichment has not completed yet.</p>
+  </footer>
+
+  <template id="experiment-template">
+    <article class="experiment-card">
+      <div class="experiment-card__top">
+        <strong class="experiment-card__id"></strong>
+        <span class="experiment-card__stage"></span>
+      </div>
+      <h3 class="experiment-card__name"></h3>
+      <p class="experiment-card__decision"></p>
+      <a class="experiment-card__link" href="#">Open experiment ↗</a>
+    </article>
+  </template>
+
+  <template id="asset-template">
+    <div class="asset-chip">
+      <strong class="asset-chip__symbol"></strong>
+      <span class="asset-chip__class"></span>
+    </div>
+  </template>
+
+  <noscript>
+    <div class="noscript">JavaScript is required to render the generated project snapshot.</div>
+  </noscript>
+</body>
+</html>
