@@ -1,0 +1,127 @@
+{
+  "data_coverage": {
+    "evaluation": {
+      "BTC-USD": {
+        "first_observation": "2021-01-01",
+        "last_observation": "2026-08-31",
+        "rows": 2069
+      },
+      "META": {
+        "first_observation": "2021-01-04",
+        "last_observation": "2026-08-31",
+        "rows": 1421
+      },
+      "NVDA": {
+        "first_observation": "2021-01-04",
+        "last_observation": "2026-08-31",
+        "rows": 1421
+      },
+      "SOL-USD": {
+        "first_observation": "2021-01-01",
+        "last_observation": "2026-08-31",
+        "rows": 2069
+      }
+    },
+    "source": {
+      "BTC-USD": {
+        "first_observation": "2020-01-01",
+        "last_observation": "2026-08-31",
+        "rows": 2435
+      },
+      "META": {
+        "first_observation": "2020-01-02",
+        "last_observation": "2026-08-31",
+        "rows": 1674
+      },
+      "NVDA": {
+        "first_observation": "2020-01-02",
+        "last_observation": "2026-08-31",
+        "rows": 1674
+      },
+      "QQQ": {
+        "first_observation": "2020-01-02",
+        "last_observation": "2026-08-31",
+        "rows": 1674
+      },
+      "SOL-USD": {
+        "first_observation": "2020-04-10",
+        "last_observation": "2026-08-31",
+        "rows": 2335
+      }
+    }
+  },
+  "diagnostics": {
+    "exit_reason_counts": {
+      "end_of_test": 1,
+      "stop": 59,
+      "stop_gap": 5
+    },
+    "total_execution_cost": 86.11164563229204,
+    "total_fees": 24.322729983821276,
+    "trade_count": 65
+  },
+  "experiment": {
+    "code_commit_sha": "926ce69b6214b237866fbcff97e0de7a16ddff3d",
+    "data_provider": "yfinance",
+    "evaluation_end_exclusive": "2026-09-01",
+    "evaluation_start": "2021-01-01",
+    "id": "EXP-0001",
+    "name": "cost-aware-baseline",
+    "research_stage": "exploratory",
+    "strategy_version": "v1",
+    "symbols": [
+      "BTC-USD",
+      "SOL-USD",
+      "META",
+      "NVDA"
+    ],
+    "warmup_start": "2020-01-01"
+  },
+  "metrics": {
+    "average_exposure": 0.060371938140371485,
+    "average_holding_days": 23.16923076923077,
+    "average_loser_r": -0.7948148857883225,
+    "average_winner_r": 3.1949432903998884,
+    "best_r": 12.107227474406447,
+    "cagr": 0.06011557593518124,
+    "end_equity": 6958.51795559906,
+    "expectancy_r": 1.0466119647600822,
+    "max_drawdown": -0.04249152131761369,
+    "profit_factor": 3.1834272589489525,
+    "sharpe": 1.2700267542572405,
+    "sortino": 2.1568356126100974,
+    "start_equity": 5000.0,
+    "top5_profit_share": 0.47984236136151065,
+    "total_return": 0.3917035911198119,
+    "trade_count": 65,
+    "win_rate": 0.46153846153846156,
+    "worst_r": -1.0000000000000022
+  },
+  "portfolio": {
+    "execution_costs": {
+      "crypto": {
+        "commission_bps": 10.0,
+        "slippage_bps": 10.0,
+        "spread_bps": 10.0
+      },
+      "default": {
+        "commission_bps": 0.0,
+        "slippage_bps": 0.0,
+        "spread_bps": 0.0
+      },
+      "equity": {
+        "commission_bps": 1.0,
+        "slippage_bps": 5.0,
+        "spread_bps": 5.0
+      }
+    },
+    "initial_equity": 5000.0,
+    "max_open_risk_fraction": 0.02,
+    "max_position_fraction": 0.25,
+    "max_positions": 4,
+    "min_score": 70,
+    "risk_fraction": 0.005,
+    "stop_atr": 2.0,
+    "trail_atr": 2.5
+  }
+}
