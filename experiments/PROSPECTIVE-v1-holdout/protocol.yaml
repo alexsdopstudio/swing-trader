@@ -1,0 +1,48 @@
+protocol:
+  id: PROSPECTIVE-v1-holdout
+  status: preregistered
+  registered_on: 2026-09-12
+  strategy_version: v1
+  frozen_source_commit: dbb45a8a3910298e3565a02758b835975308e88c
+  base_experiment_config: experiments/EXP-0001-baseline/config.yaml
+  execution_cost_config: config/execution-costs.yaml
+
+universe:
+  symbols:
+    - BTC-USD
+    - SOL-USD
+    - META
+    - NVDA
+  benchmark_equities: QQQ
+  benchmark_crypto: BTC-USD
+
+portfolio:
+  initial_equity: 5000.0
+  risk_fraction: 0.005
+  max_open_risk_fraction: 0.02
+  max_positions: 4
+  max_position_fraction: 0.25
+  min_score: 70
+  stop_atr: 2.0
+  trail_atr: 2.5
+
+execution:
+  signal_timeframe: daily
+  signal_at: completed_close
+  entry_at: next_asset_open
+  direction: long_only
+  costs: baseline
+
+holdout:
+  evaluation_start: 2026-09-14
+  minimum_observation_end: 2028-09-14
+  minimum_closed_trades: 30
+  gate: both_time_and_trade_count
+
+research_integrity:
+  interim_monitoring_allowed: true
+  interim_parameter_tuning_allowed: false
+  interim_validation_claims_allowed: false
+  strategy_or_risk_change_requires_new_protocol: true
+  provider_revisions_must_be_recorded: true
+  execution_model_changes_require_parallel_reporting_or_new_protocol: true

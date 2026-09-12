@@ -105,19 +105,46 @@ swing-cost-sensitivity \
   --output-dir .artifacts/EXP-0002
 ```
 
+Run historical temporal-stability diagnostics with:
+
+```bash
+swing-temporal-stability \
+  --config experiments/EXP-0003-temporal-stability/config.yaml \
+  --output-dir .artifacts/EXP-0003
+```
+
 GitHub Actions runs the same real-data experiments and retains detailed trade/equity artifacts for review.
 
 ### EXP-0001 baseline
 
 The first exploratory cost-aware baseline used BTC-USD, SOL-USD, META, and NVDA from 2021-01-01 through 2026-08-31, with warm-up history beginning in 2020.
 
-Headline result: 65 trades, +1.05R expectancy, 3.18 profit factor, 6.01% CAGR and -4.25% maximum drawdown. The result is explicitly **not considered validated** because the sample is small, profits are concentrated in a few assets/trades, 2025–2026 is negative, and no held-out, parameter-robustness, or broader-universe test has been completed.
+Headline result: 65 trades, +1.05R expectancy, 3.18 profit factor, 6.01% CAGR and -4.25% maximum drawdown. The result is explicitly **not considered validated** because the sample is small, profits are concentrated in a few assets/trades, 2025–2026 is negative, and no true prospective holdout, parameter-robustness, or broader-universe test has matured.
 
 ### EXP-0002 execution-cost sensitivity
 
 EXP-0002 freezes the EXP-0001 strategy and tests 0.5x, 1.0x, 2.0x and 4.0x execution-cost assumptions on one shared market-data snapshot.
 
 The 2.0x scenario retains +0.99R expectancy and a 3.03 profit factor. The 4.0x stress scenario retains +0.82R expectancy and a 2.62 profit factor. This supports execution-cost robustness **inside the same historical sample**, but it is not held-out validation and does not justify deployment.
+
+### EXP-0003 temporal stability
+
+EXP-0003 decomposes the already-observed 2021–2026 history into six independent calendar folds, resetting the portfolio to 5,000 for each fold while keeping v1 frozen.
+
+Only 3 of 6 folds had positive expectancy, positive return, and profit factor above 1. The preregistered 4-of-6 stability thresholds therefore failed. 2022 produced no trades, while 2025 and 2026-YTD were negative.
+
+This is a retrospective temporal diagnostic, **not** an out-of-sample claim. It shows that the positive aggregate result is concentrated in favorable regimes rather than being temporally uniform.
+
+### Prospective v1 holdout
+
+`experiments/PROSPECTIVE-v1-holdout/protocol.yaml` preregisters the first genuinely future v1 holdout. It starts on 2026-09-14 and freezes the v1 strategy/risk/execution specification from before the holdout begins.
+
+Validation claims are blocked until both gates are satisfied:
+
+- minimum observation end: 2028-09-14;
+- minimum closed trades: 30.
+
+Interim monitoring is allowed, but interim results must not be used to tune v1. Any strategy or risk change requires a new prospective protocol/version.
 
 See `experiments/README.md` and each experiment's `notes.md` for reviewed interpretation and limitations.
 
@@ -166,20 +193,20 @@ config/                 universe and execution-cost configuration
 src/swing_trader/       production code
 tests/                  unit tests
 docs/                   strategy, domain, decisions, plans, solutions, roadmap
-experiments/             reproducible research history
+experiments/             reproducible research history and prospective protocols
 .ai/                     current state and task/context helpers
 .github/workflows/      CI, PR convention checks, and experiment runs
 ```
 
 ## Roadmap
 
-1. Run held-out / walk-forward evaluation with v1 frozen.
-2. Add simple passive/reference baselines.
-3. Run parameter-neighborhood robustness sweeps only after held-out evidence is recorded.
+1. Add passive/reference baselines to make opportunity cost visible.
+2. Keep v1 frozen and record the prospective holdout from 2026-09-14 onward without interim tuning.
+3. Run parameter-neighborhood robustness diagnostics without modifying the frozen v1 specification.
 4. Test a broader universe to reduce survivor/selection bias.
-5. Add a persistent daily scan database.
+5. Add a persistent daily scan / prospective observation store.
 6. Add an AI research layer for catalysts, filings, earnings and crypto-specific events.
-7. Add broker/exchange execution only after paper-trading validation.
+7. Add broker/exchange execution only after paper-trading infrastructure and prospective evidence are trustworthy.
 
 ## Risk model for the initial €5k account
 

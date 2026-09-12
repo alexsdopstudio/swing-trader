@@ -32,3 +32,10 @@ Do not delete failed experiments merely because they performed poorly. Negative 
 |---|---|---|---|
 | [`EXP-0001-baseline`](EXP-0001-baseline/) | Reviewed exploratory baseline | Does v1 show a positive cost-aware baseline on BTC, SOL, META, and NVDA? | Continue research; do not deploy |
 | [`EXP-0002-cost-sensitivity`](EXP-0002-cost-sensitivity/) | Reviewed sensitivity experiment | Does the EXP-0001 result survive materially higher execution-cost assumptions? | Cost robustness supported in-sample; continue research; do not deploy |
+| [`EXP-0003-temporal-stability`](EXP-0003-temporal-stability/) | Reviewed retrospective temporal diagnostic | Is the historical v1 result stable across calendar regimes? | Predeclared stability thresholds not met; continue research; do not deploy |
+
+## Prospective protocols
+
+| Protocol | Status | Start | Validation gate |
+|---|---|---|---|
+| [`PROSPECTIVE-v1-holdout`](PROSPECTIVE-v1-holdout/protocol.yaml) | Preregistered | 2026-09-14 | At least 24 months and at least 30 closed trades; no interim v1 tuning |

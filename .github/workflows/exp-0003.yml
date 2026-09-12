@@ -1,0 +1,112 @@
+name: EXP-0003
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "src/swing_trader/temporal_stability.py"
+      - "src/swing_trader/temporal_stability_cli.py"
+      - "src/swing_trader/experiment.py"
+      - "src/swing_trader/data.py"
+      - "src/swing_trader/indicators.py"
+      - "src/swing_trader/historical.py"
+      - "src/swing_trader/portfolio.py"
+      - "src/swing_trader/metrics.py"
+      - "src/swing_trader/execution.py"
+      - "config/universe.yaml"
+      - "config/execution-costs.yaml"
+      - "experiments/EXP-0001-baseline/config.yaml"
+      - "experiments/EXP-0001-baseline/results.json"
+      - "experiments/EXP-0003-temporal-stability/config.yaml"
+      - "experiments/PROSPECTIVE-v1-holdout/protocol.yaml"
+      - ".github/workflows/exp-0003.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  run-experiment:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout PR head
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install project
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev]"
+
+      - name: Run EXP-0003
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf .artifacts/EXP-0003
+          for attempt in 1 2 3; do
+            if swing-temporal-stability \
+              --config experiments/EXP-0003-temporal-stability/config.yaml \
+              --output-dir .artifacts/EXP-0003; then
+              break
+            fi
+            if [ "$attempt" -eq 3 ]; then
+              echo "EXP-0003 failed after 3 attempts" >&2
+              exit 1
+            fi
+            echo "EXP-0003 attempt $attempt failed; retrying after 10 seconds..." >&2
+            sleep 10
+          done
+
+      - name: Validate generated artifact
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          root = Path('.artifacts/EXP-0003')
+          required = ['results.json', 'fold-comparison.csv', 'resolved-config.yaml', 'notes.md']
+          missing = [name for name in required if not (root / name).exists()]
+          if missing:
+              raise SystemExit(f'Missing EXP-0003 artifacts: {missing}')
+
+          results = json.loads((root / 'results.json').read_text(encoding='utf-8'))
+          if results['experiment']['id'] != 'EXP-0003':
+              raise SystemExit('Unexpected experiment id')
+          if results['experiment']['true_out_of_sample_claim']:
+              raise SystemExit('EXP-0003 must not claim historical folds are true out-of-sample data')
+
+          expected = {'2021', '2022', '2023', '2024', '2025', '2026-ytd'}
+          observed = {fold['name'] for fold in results['folds']}
+          if observed != expected:
+              raise SystemExit(f'Unexpected fold set: {observed}')
+          if results['diagnostics']['fold_count'] != 6:
+              raise SystemExit('EXP-0003 must contain six historical folds')
+          if results['data_snapshot']['provider_download_count'] != 5:
+              raise SystemExit('EXP-0003 should download the four assets plus QQQ once each')
+
+          source = results['data_snapshot']['source']
+          if not source or any('sha256' not in record for record in source.values()):
+              raise SystemExit('Snapshot source-data digests are missing')
+
+          for fold in expected:
+              fold_root = root / 'folds' / fold
+              for name in ['results.json', 'trades.csv', 'equity.csv', 'resolved-config.yaml']:
+                  if not (fold_root / name).exists():
+                      raise SystemExit(f'Missing {fold}/{name}')
+          PY
+
+      - name: Upload EXP-0003 artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: EXP-0003-temporal-stability
+          path: .artifacts/EXP-0003
+          if-no-files-found: error
+          retention-days: 30
