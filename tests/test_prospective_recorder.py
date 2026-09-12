@@ -157,8 +157,8 @@ def test_recorder_workflow_is_append_only_and_has_no_backfill_input() -> None:
         encoding="utf-8"
     )
 
-    assert "workflow_dispatch:" in workflow
-    assert "observation_date:" not in workflow
+    assert "  workflow_dispatch:\n" in workflow
+    assert "  workflow_dispatch:\n    inputs:" not in workflow
     assert "--clobber" not in workflow
     assert "gh release upload" in workflow
     assert "prospective-v1-holdout-data-" in workflow
