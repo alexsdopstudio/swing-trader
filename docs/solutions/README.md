@@ -41,6 +41,7 @@ This README is the lightweight solution-memory index consumed by the AI context 
 - [`separate-operational-observations-from-validation-evidence.md`](engineering/separate-operational-observations-from-validation-evidence.md) — use separate namespaces, consumers, and explicit eligibility flags for operational audit history versus preregistered validation evidence even when both use the same provenance techniques.
 - [`separate-agent-knowledge-by-evidence-class.md`](engineering/separate-agent-knowledge-by-evidence-class.md) — separate durable references, time-bounded news observations, curated interpretation, project experiments, and generated indexes so agent retrieval cannot collapse provenance or validation boundaries.
 - [`separate-canonical-state-from-live-dashboard-enrichment.md`](engineering/separate-canonical-state-from-live-dashboard-enrichment.md) — generate an authoritative static snapshot from repository records, then treat live operational API data as a failure-tolerant presentation layer that cannot revise research status.
+- [`separate-paper-planning-from-recorded-fills.md`](engineering/separate-paper-planning-from-recorded-fills.md) — keep close-based planning, human approval, later paper fills, and first-observed trailing-stop marks separate so next-open timing and deterministic risk controls remain enforceable.
 
 ### Trading research
 

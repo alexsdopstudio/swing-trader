@@ -1,0 +1,10 @@
+schema_version: 1
+mode: paper
+approval_required: true
+
+account:
+  starting_equity: 5000.0
+  currency: USD
+
+# This is a deterministic research input, not a broker quote or connection.
+execution_costs_path: execution-costs.yaml

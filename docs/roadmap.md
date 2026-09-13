@@ -8,7 +8,7 @@
 - Preserve and verify provenance for every prospective observation and provider revision.
 - Preserve one current-date operational scanner observation without treating it as holdout evidence.
 - Keep external literature, future news observations, curated interpretation, project experiments, and generated indexes in explicit evidence classes.
-- Build the approval-only personal paper-operations layer: daily brief, human decision records, deterministic ticket sizing/stops, and append-only operational ledger.
+- Operate the approval-only personal paper-operations layer from verified daily scanner archives without treating its records as validation evidence.
 
 ## Next
 
@@ -47,6 +47,7 @@ Interim monitoring is allowed. Interim performance must not be used to tune v1.
 - Source-governed knowledge system with nine initial authoritative durable sources, five curated interpretation notes, a validated time-bounded `NEWS-*` observation schema, deterministic source/news/note registry, and dedicated stale-state/schema CI.
 - Explicit agent knowledge evidence classes separating durable references, news observations, curated interpretation, project experiments, operational observations, and generated indexes.
 - Read-only static project dashboard with a deterministic canonical snapshot, offline-safe research status, optional public GitHub operational enrichment, PR build artifacts, and GitHub Pages deployment workflow.
+- Approval-only personal paper-operations CLI with verified scanner-archive provenance, deterministic long tickets/sizing/stops, explicit human decisions, paper-only fill records, ledger-derived trailing stops, and append-only ledger validation.
 
 ## Later
 

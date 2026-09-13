@@ -8,9 +8,56 @@ The v1 system is deliberately simple: daily bars, long-only, trend + momentum + 
 
 ## Personal trade operations
 
-The next product layer is an approval-only paper-trading workflow. It will turn daily scanner observations into human-reviewable long candidates, proposed quantities derived from configured capital and deterministic risk limits, explicit initial/trailing-stop exit rules, and an append-only decision and execution journal.
+The approval-only paper-trading workflow turns a verified daily scanner observation into human-reviewable long candidates, proposed quantities derived from configured capital and deterministic risk limits, explicit initial/trailing-stop exit rules, and an append-only local decision and paper-fill journal.
 
-It will not send broker orders, hold broker credentials, guarantee fills, or treat paper records as proof that v1 is validated. The owner remains responsible for every live decision and for verifying broker-specific order semantics.
+It will not send broker orders, hold broker credentials, guarantee fills, or treat paper records as proof that v1 is validated. The owner remains responsible for verifying any venue-specific calendar or order semantics outside this tool.
+
+### Run the paper-only workflow
+
+Create a verified daily scanner archive first, then use the same archive to render the brief:
+
+```bash
+swing-scan-record \
+  --config config/universe.yaml \
+  --output-dir data/paper-operations/scans
+
+swing-paper-ops brief \
+  --operations-config config/paper-operations.yaml \
+  --ledger data/paper-operations/paper-ledger.jsonl \
+  --archive data/paper-operations/scans/daily-scan-history-<date>-<sha>.zip \
+  --archive-dir data/paper-operations/scans
+```
+
+The brief uses the completed-bar close only as a planning reference. It labels every ticket as eligible no earlier than the next available open after its signal date; it never presents that reference as an executed fill. The `data/paper-operations/` directory is intentionally ignored so personal decisions and paper records stay local.
+
+After reviewing a ticket, append one human decision. Only an approved ticket can receive a paper entry record. The command computes the paper fill, fee, quantity, stop, and initial loss from the supplied next-open market reference and the existing deterministic cost/risk model; it does not submit an order.
+
+```bash
+swing-paper-ops decide \
+  --operations-config config/paper-operations.yaml \
+  --ledger data/paper-operations/paper-ledger.jsonl \
+  --archive data/paper-operations/scans/daily-scan-history-<date>-<sha>.zip \
+  --archive-dir data/paper-operations/scans \
+  --ticket-id PT-<ticket-id> \
+  --decision approved
+
+swing-paper-ops record-entry \
+  --operations-config config/paper-operations.yaml \
+  --ledger data/paper-operations/paper-ledger.jsonl \
+  --ticket-id PT-<ticket-id> \
+  --execution-date 2026-09-16 \
+  --entry-reference 123.45
+
+swing-paper-ops record-exit \
+  --operations-config config/paper-operations.yaml \
+  --ledger data/paper-operations/paper-ledger.jsonl \
+  --ticket-id PT-<ticket-id> \
+  --execution-date 2026-09-20 \
+  --exit-reference 118.00 \
+  --reason trailing_stop
+```
+
+The JSONL ledger is append-only: it rejects duplicate ticket decisions, duplicate fills, out-of-order events, mismatched config provenance, same-day-or-earlier entries, and deterministic cash/risk-cap violations. An open position's stop is reconstructed from the first observed completed scanner marks in the supplied archive history, so later provider revisions cannot revise an earlier trailing-stop update.
 
 ## Strategy v1
 
@@ -288,7 +335,7 @@ This writes `.ai/context.md`, which is intentionally ignored by Git because it i
 ## Repository layout
 
 ```text
-config/                 universe and execution-cost configuration
+config/                 universe, execution-cost, and paper-operations configuration
 dashboard/              static dashboard templates and browser enrichment layer
 src/swing_trader/       production code
 tests/                  unit tests

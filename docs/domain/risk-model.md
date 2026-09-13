@@ -66,3 +66,5 @@ The aggregate open-risk cap is enforced before each new entry. When remaining ri
 - Any strategy conclusion must be tested for execution-cost sensitivity.
 - A human may approve or decline an operational ticket, but cannot override deterministic sizing, stop, or portfolio-cap calculations inside that ticket.
 - A proposed stop is a risk trigger, not a guaranteed exit fill. Paper and manually reported execution records must preserve the difference between proposed, reference, and actual prices when known.
+- A paper entry is re-priced from its next-open market reference after approval. Its quantity is recalculated from the existing cost model and a conservative ledger-derived account value, so an earlier planning ticket cannot bypass available-cash, position-count, notional, or aggregate-risk limits.
+- Trailing stops use only completed scanner marks observed after entry, update monotonically, and become actionable only after the close that produced them; a later provider revision cannot rewrite the first observed paper-operation mark.

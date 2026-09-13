@@ -19,3 +19,9 @@ Add a personal trade-operations layer with these boundaries:
 ## Consequences
 
 The owner can use a daily brief and ticket workflow before prospective validation matures, but the product must state that candidate status, stop levels, and expected fills are not guarantees. Any future broker integration requires a separate reviewed decision covering authorization, credentials, venue-specific order behavior, failure controls, and regulatory scope.
+
+## Implementation boundary
+
+The first implementation accepts only verified `daily-scan-history` archives, a narrow paper-only account configuration, and a local append-only JSONL ledger. A planning ticket uses the completed-bar close solely as a deterministic planning reference and is eligible no earlier than the next available open after its signal date. A human approval precedes a separate paper-entry record, which re-prices from the supplied market reference and recomputes deterministic sizing/caps without accepting a manual quantity or fill override.
+
+Open-position trailing stops are derived from the first observed completed scanner marks in the supplied archive history. The ledger and brief have no broker adapter, credential field, or network order path.
