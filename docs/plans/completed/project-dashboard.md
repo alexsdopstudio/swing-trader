@@ -118,7 +118,7 @@ GitHub requires Pages to be configured to use GitHub Actions. If that repository
 - builder rejects repository/template output paths and unrelated output entries rather than overwriting them;
 - `pytest -q` passes with 129 tests;
 - `ruff check src tests` passes;
-- the PR workflow builds the site without deployment and all current PR checks pass;
+- the initial PR workflow build passed without deployment; final-head checks remain required before merge;
 - final diff-based review and merge remain required.
 
 ## Simplify
