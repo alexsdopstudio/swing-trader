@@ -89,6 +89,7 @@ Last updated: 2026-09-13
 - dashboard focused tests cover deterministic canonical projection, safe output-directory boundaries, static dependency hygiene, and non-mutating live enrichment boundaries
 - no validated portfolio-level trading edge yet
 - no live or paper execution yet
+- personal paper-operations product layer is planned but not implemented; the current scanner does not yet create user-specific tickets, decision records, or position-management views
 
 ## Known limitations
 
@@ -118,4 +119,4 @@ Last updated: 2026-09-13
 
 ## Current milestone
 
-Keep v1 frozen. Let the forward recorder produce the first active UTC observation on 2026-09-15 and treat any missed scheduled day as a gap rather than backfill it. Replay captured evidence only through the read-only information-time evaluator and never feed interim state/trades into tuning. Preserve daily scanner history as a separate operational audit trail rather than validation evidence. The source-governed knowledge layer is the canonical home for durable external references, future time-bounded news observations, and curated interpretation; generated registries and the project dashboard remain derived views. Publish the dashboard through GitHub Pages when the repository is configured for GitHub Actions, without treating live presentation metadata as research evidence. If historical universe work continues, preregister point-in-time membership rather than adding more current survivors.
+Keep v1 frozen. Let the forward recorder produce the first active UTC observation on 2026-09-15 and treat any missed scheduled day as a gap rather than backfill it. Replay captured evidence only through the read-only information-time evaluator and never feed interim state/trades into tuning. Build a separate approval-only paper-operations layer that makes deterministic scanner, risk, and exit information usable by one human owner while keeping its ledger distinct from validation evidence. Preserve daily scanner history as a separate operational audit trail rather than validation evidence. The source-governed knowledge layer is the canonical home for durable external references, future time-bounded news observations, and curated interpretation; generated registries and the project dashboard remain derived views. Publish the dashboard through GitHub Pages when the repository is configured for GitHub Actions, without treating live presentation metadata as research evidence. If historical universe work continues, preregister point-in-time membership rather than adding more current survivors.
