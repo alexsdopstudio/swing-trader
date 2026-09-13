@@ -8,6 +8,7 @@ venv/
 .DS_Store
 data/*.csv
 data/*.parquet
+data/paper-operations/
 .ai/context.md
 .ai/handoff.md
 .ai/handoff.json

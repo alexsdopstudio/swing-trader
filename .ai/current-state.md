@@ -10,6 +10,10 @@ Last updated: 2026-09-13
 - scanner with one provider read per unique configured asset/benchmark and reusable scoring from captured frames
 - provenance-preserving current-date-only daily scan history with exact captured universe config, normalized source snapshots, deterministic JSON/CSV results, archive digests, and verification
 - scheduled/manual yearly GitHub Release publication for operational scan history with duplicate-date skip and no historical backfill
+- approval-only personal paper-operations CLI consuming verified daily scanner archives
+- deterministic close-based planning tickets for long `BUY` candidates with existing cost-aware sizing, initial stops, and trailing-stop rules
+- append-only local JSONL decision and paper-fill ledger with ticket/config/archive provenance, duplicate/order validation, and no broker path
+- ledger-derived open-paper-position and trailing-stop view using first-observed completed scanner marks only
 - deterministic position sizing
 - ATR initial/trailing stops
 - single-asset backtester
@@ -88,7 +92,8 @@ Last updated: 2026-09-13
 - first active prospective capture is expected on 2026-09-15 after the completed 2026-09-14 bar is available; no prospective observation exists yet
 - dashboard focused tests cover deterministic canonical projection, safe output-directory boundaries, static dependency hygiene, and non-mutating live enrichment boundaries
 - no validated portfolio-level trading edge yet
-- no live or paper execution yet
+- paper operations can record deterministic local paper fills after explicit approval; no live order transmission, broker credential storage, or broker integration exists
+- paper-operation tests cover deterministic tickets, explicit decisions, same-day-entry refusal, provenance mismatch, append-only ordering, risk-cap enforcement, trailing-stop reconstruction, and CLI output
 
 ## Known limitations
 
@@ -115,7 +120,9 @@ Last updated: 2026-09-13
 - no point-in-time universe membership/survivorship study
 - live dashboard enrichment uses GitHub's unauthenticated public API and can be rate-limited or unavailable; the committed canonical snapshot remains available
 - no live catalyst/news agent
+- paper ticket planning uses the completed-bar close as a reference only; the owner must provide a real next-open market reference for a paper entry, and the tool cannot verify venue calendars or broker-specific order behavior
+- the local paper ledger is an operational journal, not an administrator-proof write-once store or validation evidence
 
 ## Current milestone
 
-Keep v1 frozen. Let the forward recorder produce the first active UTC observation on 2026-09-15 and treat any missed scheduled day as a gap rather than backfill it. Replay captured evidence only through the read-only information-time evaluator and never feed interim state/trades into tuning. Preserve daily scanner history as a separate operational audit trail rather than validation evidence. The source-governed knowledge layer is the canonical home for durable external references, future time-bounded news observations, and curated interpretation; generated registries and the project dashboard remain derived views. Publish the dashboard through GitHub Pages when the repository is configured for GitHub Actions, without treating live presentation metadata as research evidence. If historical universe work continues, preregister point-in-time membership rather than adding more current survivors.
+Keep v1 frozen. Let the forward recorder produce the first active UTC observation on 2026-09-15 and treat any missed scheduled day as a gap rather than backfill it. Replay captured evidence only through the read-only information-time evaluator and never feed interim state/trades into tuning. Use the separate approval-only paper-operations layer only with verified daily scanner archives and its local append-only ledger; it can support disciplined paper decisions but cannot tune v1 or become validation evidence. Preserve daily scanner history as a separate operational audit trail rather than validation evidence. The source-governed knowledge layer is the canonical home for durable external references, future time-bounded news observations, and curated interpretation; generated registries and the project dashboard remain derived views. Publish the dashboard through GitHub Pages when the repository is configured for GitHub Actions, without treating live presentation metadata as research evidence. If historical universe work continues, preregister point-in-time membership rather than adding more current survivors.

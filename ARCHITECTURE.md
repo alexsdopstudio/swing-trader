@@ -2,7 +2,7 @@
 
 ## Goal
 
-Swing Trader is a research-first system for identifying and validating medium-term momentum/trend opportunities in crypto and US equities.
+Swing Trader is a personal decision-support system for identifying, planning, and reviewing medium-term momentum/trend opportunities in crypto and US equities. Its research engine validates assumptions; its product layer must turn those assumptions into reviewable human decisions without promising profitability.
 
 ## Current flow
 
@@ -32,6 +32,8 @@ The scanner uses the same indicator and scoring concepts for the latest bar, whi
 - `historical.py`: historical score and market-regime series without future data.
 - `scanner.py`: universe scan and ranking, including scoring from already-captured frames.
 - `daily_scan_recorder.py`: current-date-only operational scanner capture with exact universe config, complete normalized source snapshots, deterministic scan outputs, and archive verification.
+- `paper_operations.py`: verified scanner-observation loader, deterministic paper-ticket planning, append-only decision/fill ledger validation, and ledger-derived paper-position state.
+- `paper_operations_cli.py`: approval-only daily brief and local paper-ledger commands; it has no broker adapter, credential input, or order-transmission path.
 - `risk.py`: deterministic position sizing, initial stop and trailing stop helpers.
 - `execution.py`: immutable commission, spread and slippage assumptions plus cost-config loading.
 - `backtest.py`: legacy/minimal single-asset event-driven backtest.
@@ -65,6 +67,18 @@ For long trades:
 7. the trade ledger records gross and net results plus execution costs.
 
 The technical stop remains a market-reference trigger. Execution cost changes the realized fill, cash flow and risk, not the chronological information available to the strategy.
+
+## Personal trade-operations boundary
+
+The paper-operations layer consumes a verified completed daily scanner observation and the deterministic portfolio/risk rules to create human-reviewable candidates, proposed quantities, and exit rules. It is not a second strategy engine: it must not alter scores, thresholds, stops, sizing, or execution chronology.
+
+The initial product mode is paper-only and approval-only. A close-derived planning ticket is eligible only at the next available open after its completed signal date; an explicit approval is required before a separate deterministic paper-fill record can be appended. The entry record re-prices against the supplied market reference, applies the existing cost model, and rechecks cash, position, notional, and aggregate-risk limits without accepting a user-specified quantity or fill.
+
+The local JSONL ledger is append-only. It preserves the immutable ticket/provenance snapshot, human decision, paper reference/fill/fee, and later paper exit. It rejects duplicate decisions or fills, invalid ordering, config provenance mismatch, and same-day-or-earlier entry records. Current trailing stops are reconstructed from the first observed completed scanner marks in supplied daily-scan archives, so a later provider revision cannot retroactively change a prior stop update.
+
+The layer never sends broker orders, stores broker credentials, or claims that an order will fill at a proposed price. A later manual-live journal may record user-reported executions without becoming a broker adapter.
+
+Personal operating records are distinct from the `PROSPECTIVE-v1-holdout`: they can improve usability and expose operational defects, but cannot tune frozen v1 or establish a validation claim.
 
 The same stateful daily portfolio session is used by finite historical backtests and prospective replay. Historical backtests explicitly mark each asset's final bar for terminal liquidation. Prospective replay does not: open positions, pending signals, stops, cash, and last prices carry forward to later canonical observations.
 
@@ -145,4 +159,4 @@ Retrospective diagnostics and passive references can challenge the frozen strate
 
 ## Current architectural milestone
 
-The research engine now has reproducible retrospective diagnostics, provenance-preserving prospective capture, read-only replay, deterministic experiment/protocol indexing, provenance-preserving daily operational scanner history, a source-governed knowledge layer, and a static project dashboard derived from those canonical records. The dashboard may enrich its presentation with live public GitHub metadata, but its canonical snapshot remains deterministic and its validation state cannot be changed by browser data. The immediate evidence milestone remains the first active 2026-09-15 holdout recorder observation and continued gap-free capture.
+The research engine now has reproducible retrospective diagnostics, provenance-preserving prospective capture, read-only replay, deterministic experiment/protocol indexing, provenance-preserving daily operational scanner history, an approval-only paper-operations layer, a source-governed knowledge layer, and a static project dashboard derived from canonical records. The dashboard may enrich its presentation with live public GitHub metadata, but its canonical snapshot remains deterministic and its validation state cannot be changed by browser data. The immediate evidence milestone remains the first active 2026-09-15 holdout recorder observation and continued gap-free capture.

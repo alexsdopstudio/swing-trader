@@ -8,10 +8,10 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO_ROOT / "src"))
 
-from swing_trader.handoff import write_handoff
-
 
 def main() -> None:
+    from swing_trader.handoff import write_handoff
+
     parser = argparse.ArgumentParser(description="Generate cross-agent handoff artifacts.")
     parser.add_argument("--root", default=None, help="Repository root. Defaults to script parent repo.")
     parser.add_argument("--metadata-file", default=None, help="JSON file containing `pr` and `checks`.")

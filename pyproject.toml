@@ -33,6 +33,7 @@ swing-holdout-record = "swing_trader.prospective_recorder_cli:main"
 swing-holdout-evaluate = "swing_trader.prospective_evaluator_cli:main"
 swing-universe-breadth = "swing_trader.universe_breadth_cli:main"
 swing-scan-record = "swing_trader.daily_scan_recorder_cli:main"
+swing-paper-ops = "swing_trader.paper_operations_cli:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]

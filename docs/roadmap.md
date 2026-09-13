@@ -8,10 +8,12 @@
 - Preserve and verify provenance for every prospective observation and provider revision.
 - Preserve one current-date operational scanner observation without treating it as holdout evidence.
 - Keep external literature, future news observations, curated interpretation, project experiments, and generated indexes in explicit evidence classes.
+- Operate the approval-only personal paper-operations layer from verified daily scanner archives without treating its records as validation evidence.
 
 ## Next
 
 - Publish and monitor the read-only project dashboard through GitHub Pages once the repository is configured to use GitHub Actions for Pages.
+- After paper-operations integrity is demonstrated, add a manual-live journal that records user-reported fills without transmitting broker orders or changing frozen v1.
 - If further historical universe work is justified, preregister a point-in-time membership/survivorship methodology rather than selecting additional current survivors.
 
 ## Prospective validation gate
@@ -45,9 +47,10 @@ Interim monitoring is allowed. Interim performance must not be used to tune v1.
 - Source-governed knowledge system with nine initial authoritative durable sources, five curated interpretation notes, a validated time-bounded `NEWS-*` observation schema, deterministic source/news/note registry, and dedicated stale-state/schema CI.
 - Explicit agent knowledge evidence classes separating durable references, news observations, curated interpretation, project experiments, operational observations, and generated indexes.
 - Read-only static project dashboard with a deterministic canonical snapshot, offline-safe research status, optional public GitHub operational enrichment, PR build artifacts, and GitHub Pages deployment workflow.
+- Approval-only personal paper-operations CLI with verified scanner-archive provenance, deterministic long tickets/sizing/stops, explicit human decisions, paper-only fill records, ledger-derived trailing stops, and append-only ledger validation.
 
 ## Later
 
 - AI catalyst/research agent for earnings, filings, news and crypto-specific events writing validated `NEWS-*` records rather than an independent ad-hoc store.
-- Paper-trading broker integration after the forward recording/evaluation layer is trustworthy.
+- Broker connectivity only after a separately reviewed design establishes user authorization, broker-specific order semantics, risk thresholds, credential handling, and failure controls.
 - Semantic/vector retrieval over knowledge/research memory only if repository scale warrants it; retrieval must remain derived from canonical evidence-class-aware records.
