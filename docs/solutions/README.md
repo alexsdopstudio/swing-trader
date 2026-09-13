@@ -40,6 +40,7 @@ This README is the lightweight solution-memory index consumed by the AI context 
 - [`keep-derived-repository-indexes-regenerable.md`](engineering/keep-derived-repository-indexes-regenerable.md) — keep generated repository indexes deterministic and mechanically derived from canonical records, and make CI stale checks include untracked first-generation output.
 - [`separate-operational-observations-from-validation-evidence.md`](engineering/separate-operational-observations-from-validation-evidence.md) — use separate namespaces, consumers, and explicit eligibility flags for operational audit history versus preregistered validation evidence even when both use the same provenance techniques.
 - [`separate-agent-knowledge-by-evidence-class.md`](engineering/separate-agent-knowledge-by-evidence-class.md) — separate durable references, time-bounded news observations, curated interpretation, project experiments, and generated indexes so agent retrieval cannot collapse provenance or validation boundaries.
+- [`separate-canonical-state-from-live-dashboard-enrichment.md`](engineering/separate-canonical-state-from-live-dashboard-enrichment.md) — generate an authoritative static snapshot from repository records, then treat live operational API data as a failure-tolerant presentation layer that cannot revise research status.
 
 ### Trading research
 

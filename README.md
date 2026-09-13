@@ -66,6 +66,20 @@ swing-scan-record \
 
 Each archive contains the exact universe config, normalized source CSVs, deterministic JSON/CSV scan results, and an integrity manifest. Daily scan history is operational evidence only; it must never replace the preregistered prospective holdout for validation.
 
+## Project dashboard
+
+Build the read-only static dashboard from the canonical experiment registry, knowledge registry, and configured universe:
+
+```bash
+swing-dashboard-build \
+  --root . \
+  --output-dir .artifacts/project-dashboard/site
+```
+
+The builder writes only `index.html`, `styles.css`, `app.js`, and deterministic `project.json`. It refuses the repository root, the template directory, or an output directory containing unrelated files, so generated assets cannot accidentally overwrite source content.
+
+The browser can enrich the presentation with public GitHub pull-request, workflow-run, and Release metadata. That data is best effort and cannot change the frozen v1, research-only, or **NOT VALIDATED** canonical status. The GitHub Pages workflow builds review artifacts for pull requests and deploys only from `main`, scheduled, or manual runs after Pages is configured to use GitHub Actions.
+
 ## Run the portfolio backtester
 
 The portfolio backtester shares one cash balance and one risk budget across all selected assets. It models execution costs at trade time: adverse spread/slippage changes fill prices, commissions reduce cash, and position sizing includes expected friction to the initial stop.
@@ -269,6 +283,7 @@ This writes `.ai/context.md`, which is intentionally ignored by Git because it i
 
 ```text
 config/                 universe and execution-cost configuration
+dashboard/              static dashboard templates and browser enrichment layer
 src/swing_trader/       production code
 tests/                  unit tests
 docs/                   strategy, domain, decisions, plans, solutions, roadmap
@@ -284,7 +299,7 @@ experiments/             reproducible research history and prospective protocols
 3. Replay those captured observations through the read-only information-time evaluator without feeding interim results into tuning.
 4. Preserve contemporaneous daily scanner history as operational evidence without treating it as holdout validation.
 5. Build a repo-native authoritative knowledge system with traceable sources and evidence-to-decision links.
-6. Publish a read-only project dashboard derived from repository state and durable artifacts.
+6. Publish and monitor the read-only project dashboard derived from repository state and durable artifacts.
 7. If more historical universe research is warranted, use preregistered point-in-time membership rather than adding current survivors.
 8. Add an AI research layer for catalysts, filings, earnings and crypto-specific events only after the knowledge/evidence boundaries are explicit.
 9. Add broker/exchange execution only after paper-trading infrastructure and prospective evidence are trustworthy.

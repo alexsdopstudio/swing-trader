@@ -1,6 +1,6 @@
 # Design Plan — Read-Only Project Dashboard
 
-Status: Active
+Status: Completed — pending final review and merge
 
 ## Problem
 
@@ -115,21 +115,23 @@ GitHub requires Pages to be configured to use GitHub Actions. If that repository
 - universe symbols/benchmarks match `config/universe.yaml`;
 - generated site contains no external script/style dependencies;
 - JavaScript live layer has explicit loading/unavailable states and does not overwrite canonical validation labels;
-- full `pytest -q` and `ruff check src tests`;
-- workflow builds site on PR without deployment;
-- formal final-diff review and green CI before merge.
+- builder rejects repository/template output paths and unrelated output entries rather than overwriting them;
+- `pytest -q` passes with 129 tests;
+- `ruff check src tests` passes;
+- the PR workflow builds the site without deployment and all current PR checks pass;
+- final diff-based review and merge remain required.
 
 ## Simplify
 
-Prefer plain HTML/CSS/vanilla JavaScript and a small Python snapshot builder over React/Next/Vite, a server, a database, or a dashboard SaaS. Keep live GitHub status outside the canonical project JSON so time-varying operational data does not make committed research records nondeterministic.
+The implementation uses plain HTML/CSS/vanilla JavaScript and a small Python snapshot builder rather than a frontend framework, server, database, or dashboard SaaS. Live GitHub status remains outside canonical `project.json`; the build also fails safely when an output path could overwrite source/template content or contains unrelated files.
 
 ## Compound
 
-Capture a reusable lesson if the implementation reveals a general pattern for separating authoritative project state from live presentation-layer enrichment.
+Captured `docs/solutions/engineering/separate-canonical-state-from-live-dashboard-enrichment.md`: derive authoritative state first, then treat live operational data as a failure-tolerant presentation enhancement that cannot revise research status.
 
 ## Rollout
 
-1. Build and validate the static site on the feature branch.
-2. Merge after PASS review and green CI.
-3. Let the main-branch Pages workflow attempt deployment.
+1. Build and validate the static site on the feature branch. Completed.
+2. Merge after PASS review and green CI. Pending.
+3. Let the main-branch Pages workflow attempt deployment. Pending merge.
 4. If Pages is not yet configured for GitHub Actions, leave the build artifact green and document the single repository-level enablement dependency rather than changing the architecture.

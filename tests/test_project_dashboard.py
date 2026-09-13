@@ -74,6 +74,7 @@ def test_project_snapshot_bytes_are_deterministic() -> None:
 
 def test_dashboard_build_copies_only_local_static_assets(tmp_path: Path) -> None:
     output = build_dashboard(tmp_path / "site", root=ROOT)
+    build_dashboard(output, root=ROOT)
 
     assert output == (tmp_path / "site").resolve()
     assert sorted(path.name for path in output.iterdir()) == [
@@ -94,6 +95,19 @@ def test_dashboard_build_copies_only_local_static_assets(tmp_path: Path) -> None
     styles = (output / "styles.css").read_text(encoding="utf-8")
     assert "@import" not in styles
     assert "url(http" not in styles
+
+
+def test_dashboard_build_refuses_unsafe_or_dirty_output_directories(tmp_path: Path) -> None:
+    with pytest.raises(ValueError, match="distinct from the repository root"):
+        build_dashboard(ROOT, root=ROOT)
+    with pytest.raises(ValueError, match="distinct from the repository root"):
+        build_dashboard(ROOT / "dashboard", root=ROOT)
+
+    output = tmp_path / "site"
+    output.mkdir()
+    (output / "unexpected.txt").write_text("not a dashboard asset\n", encoding="utf-8")
+    with pytest.raises(ValueError, match="unexpected entries: unexpected.txt"):
+        build_dashboard(output, root=ROOT)
 
 
 def test_live_javascript_cannot_replace_canonical_validation_from_github() -> None:

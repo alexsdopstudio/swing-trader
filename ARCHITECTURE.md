@@ -46,6 +46,8 @@ The scanner uses the same indicator and scoring concepts for the latest bar, whi
 - `prospective_evaluator.py`: read-only information-time replay of the frozen holdout from verified canonical archives, with state continuity and fail-closed gap handling.
 - `experiment_registry.py`: deterministic derived index and integrity validation for durable historical experiment records and prospective protocol locks.
 - `knowledge_registry.py`: deterministic validation/indexing for durable external sources, time-bounded news observations, and curated project-authored knowledge notes.
+- `project_dashboard.py`: deterministic static dashboard projection from canonical experiment, knowledge, and universe records.
+- `project_dashboard_cli.py`: read-only static-site build entry point for the project dashboard.
 - `context_builder.py`: builds a compact AI working-context snapshot from repository memory.
 
 ## Execution and risk boundary
@@ -143,4 +145,4 @@ Retrospective diagnostics and passive references can challenge the frozen strate
 
 ## Current architectural milestone
 
-The research engine now has reproducible retrospective diagnostics, provenance-preserving prospective capture, read-only replay, deterministic experiment/protocol indexing, provenance-preserving daily operational scanner history, and a source-governed knowledge layer for durable references, news observations, and curated interpretation. The immediate evidence milestone remains the first active 2026-09-15 holdout recorder observation and continued gap-free capture. The next repository-infrastructure milestone is a read-only project dashboard derived from canonical repository/evidence state.
+The research engine now has reproducible retrospective diagnostics, provenance-preserving prospective capture, read-only replay, deterministic experiment/protocol indexing, provenance-preserving daily operational scanner history, a source-governed knowledge layer, and a static project dashboard derived from those canonical records. The dashboard may enrich its presentation with live public GitHub metadata, but its canonical snapshot remains deterministic and its validation state cannot be changed by browser data. The immediate evidence milestone remains the first active 2026-09-15 holdout recorder observation and continued gap-free capture.

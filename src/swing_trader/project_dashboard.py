@@ -14,6 +14,7 @@ SCHEMA_VERSION = 1
 DEFAULT_REPOSITORY = "alexsdopstudio/swing-trader"
 DEFAULT_TEMPLATE_DIR = Path("dashboard")
 _TEMPLATE_FILES = ("index.html", "styles.css", "app.js")
+_OUTPUT_FILES = (*_TEMPLATE_FILES, "project.json")
 _REPOSITORY_RE = re.compile(r"^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$")
 
 
@@ -208,7 +209,17 @@ def build_dashboard(
     if missing:
         raise FileNotFoundError(f"dashboard template is missing: {', '.join(missing)}")
 
+    if output_dir == root or output_dir == source_dir or source_dir in output_dir.parents:
+        raise ValueError(
+            "dashboard output directory must be distinct from the repository root and template directory"
+        )
+
     output_dir.mkdir(parents=True, exist_ok=True)
+    unexpected = sorted(path.name for path in output_dir.iterdir() if path.name not in _OUTPUT_FILES)
+    if unexpected:
+        raise ValueError(
+            f"dashboard output directory contains unexpected entries: {', '.join(unexpected)}"
+        )
     for name in _TEMPLATE_FILES:
         shutil.copyfile(source_dir / name, output_dir / name)
     (output_dir / "project.json").write_bytes(project_snapshot_bytes(root, repository=repository))
