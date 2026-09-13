@@ -8,10 +8,12 @@
 - Preserve and verify provenance for every prospective observation and provider revision.
 - Preserve one current-date operational scanner observation without treating it as holdout evidence.
 - Keep external literature, future news observations, curated interpretation, project experiments, and generated indexes in explicit evidence classes.
+- Build the approval-only personal paper-operations layer: daily brief, human decision records, deterministic ticket sizing/stops, and append-only operational ledger.
 
 ## Next
 
 - Publish and monitor the read-only project dashboard through GitHub Pages once the repository is configured to use GitHub Actions for Pages.
+- After paper-operations integrity is demonstrated, add a manual-live journal that records user-reported fills without transmitting broker orders or changing frozen v1.
 - If further historical universe work is justified, preregister a point-in-time membership/survivorship methodology rather than selecting additional current survivors.
 
 ## Prospective validation gate
@@ -49,5 +51,5 @@ Interim monitoring is allowed. Interim performance must not be used to tune v1.
 ## Later
 
 - AI catalyst/research agent for earnings, filings, news and crypto-specific events writing validated `NEWS-*` records rather than an independent ad-hoc store.
-- Paper-trading broker integration after the forward recording/evaluation layer is trustworthy.
+- Broker connectivity only after a separately reviewed design establishes user authorization, broker-specific order semantics, risk thresholds, credential handling, and failure controls.
 - Semantic/vector retrieval over knowledge/research memory only if repository scale warrants it; retrieval must remain derived from canonical evidence-class-aware records.
