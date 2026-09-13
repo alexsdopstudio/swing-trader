@@ -2,7 +2,7 @@
 
 ## Goal
 
-Swing Trader is a research-first system for identifying and validating medium-term momentum/trend opportunities in crypto and US equities.
+Swing Trader is a personal decision-support system for identifying, planning, and reviewing medium-term momentum/trend opportunities in crypto and US equities. Its research engine validates assumptions; its product layer must turn those assumptions into reviewable human decisions without promising profitability.
 
 ## Current flow
 
@@ -65,6 +65,14 @@ For long trades:
 7. the trade ledger records gross and net results plus execution costs.
 
 The technical stop remains a market-reference trigger. Execution cost changes the realized fill, cash flow and risk, not the chronological information available to the strategy.
+
+## Personal trade-operations boundary
+
+The paper-operations layer consumes a completed daily scanner observation and the deterministic portfolio/risk rules to create human-reviewable candidates, proposed quantities, and exit rules. It is not a second strategy engine: it must not alter scores, thresholds, stops, sizing, or execution chronology.
+
+The initial product mode is paper-only and approval-only. It records a human decision and later paper or manually reported fill as append-only operational evidence. It never sends broker orders, stores broker credentials, or claims that an order will fill at a proposed price. A later manual-live journal may record user-reported executions without becoming a broker adapter.
+
+Personal operating records are distinct from the `PROSPECTIVE-v1-holdout`: they can improve usability and expose operational defects, but cannot tune frozen v1 or establish a validation claim.
 
 The same stateful daily portfolio session is used by finite historical backtests and prospective replay. Historical backtests explicitly mark each asset's final bar for terminal liquidation. Prospective replay does not: open positions, pending signals, stops, cash, and last prices carry forward to later canonical observations.
 
