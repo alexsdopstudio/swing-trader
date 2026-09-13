@@ -2,7 +2,9 @@
 
 ## Mission
 
-Build a robust, testable swing-trading research system. The objective is not to maximize historical returns; it is to find strategies that remain credible out-of-sample and under realistic execution assumptions.
+Build a robust, testable personal swing-trading decision-support system for crypto and US equities. Its product purpose is to help its owner pursue measurable net returns through repeatable decisions, deterministic risk controls, and honest performance records.
+
+Historical return remains a research diagnostic, not a product promise. The system must preserve out-of-sample credibility, realistic execution assumptions, and human control rather than optimizing a backtest or an AI recommendation for headline profit.
 
 ## Session bootstrap and resume
 
