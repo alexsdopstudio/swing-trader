@@ -1,10 +1,16 @@
 # Swing Trader
 
-A rule-based swing trading research project for equities and crypto.
+A rule-based personal swing-trading decision-support project for equities and crypto.
 
-The v1 system is deliberately simple: daily bars, long-only, trend + momentum + relative strength + breakout + volume scoring, ATR-based risk, and next-session execution assumptions. The goal is to test whether the strategy has a robust historical edge before adding AI agents or live execution.
+The v1 system is deliberately simple: daily bars, long-only, trend + momentum + relative strength + breakout + volume scoring, ATR-based risk, and next-session execution assumptions. The product goal is to help one owner pursue measurable net returns through repeatable, risk-bounded decisions while separately testing whether the strategy has a robust edge.
 
 > Research software only. This repository is not financial advice and is not designed to guarantee profits.
+
+## Personal trade operations
+
+The next product layer is an approval-only paper-trading workflow. It will turn daily scanner observations into human-reviewable long candidates, proposed quantities derived from configured capital and deterministic risk limits, explicit initial/trailing-stop exit rules, and an append-only decision and execution journal.
+
+It will not send broker orders, hold broker credentials, guarantee fills, or treat paper records as proof that v1 is validated. The owner remains responsible for every live decision and for verifying broker-specific order semantics.
 
 ## Strategy v1
 
