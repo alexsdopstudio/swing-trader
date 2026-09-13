@@ -64,3 +64,5 @@ The aggregate open-risk cap is enforced before each new entry. When remaining ri
 - Equity and crypto use configurable execution-cost assumptions rather than one universal friction model.
 - Baseline commission/spread/slippage settings are research inputs, not broker or exchange quotes.
 - Any strategy conclusion must be tested for execution-cost sensitivity.
+- A human may approve or decline an operational ticket, but cannot override deterministic sizing, stop, or portfolio-cap calculations inside that ticket.
+- A proposed stop is a risk trigger, not a guaranteed exit fill. Paper and manually reported execution records must preserve the difference between proposed, reference, and actual prices when known.
