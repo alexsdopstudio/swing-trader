@@ -1,6 +1,6 @@
 # Paper trading operations
 
-Status: Completed pending final review and merge
+Status: Completed on merge
 
 ## Problem
 
@@ -73,7 +73,8 @@ Updated README, architecture, risk model, roadmap, current state, this plan, ADR
 3. [x] Implement ledger validation and derived position state.
 4. [x] Add a CLI daily brief and fixture-driven tests.
 5. [x] Defer dashboard projection until the CLI/ledger path is proven.
-6. [ ] Simplify, validate, capture compound learning, finalize memory, review, and merge.
+6. [x] Simplify, validate, capture compound learning, and finalize memory.
+7. [ ] Complete formal review, final CI, and merge.
 
 ## Review checklist
 
