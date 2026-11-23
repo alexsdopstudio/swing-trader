@@ -8,7 +8,9 @@ Last updated: 2026-11-23
 - First data expansion priority: integrations that are free to access and legally reusable, beginning with official government/regulator/company sources, public macro datasets, reputable news/RSS, and permitted public social/community APIs.
 - Data quality is more important than source count. Require source provenance, information-time timestamps, deduplication, independent corroboration, reliability/automation/manipulation checks, licensing review, and evidence of incremental value.
 - Existing strategy v1 remains frozen. Catalyst discovery is a separate research path and cannot alter v1 risk, sizing, signal, execution, or prospective holdout semantics.
-- No new data-source integration has been implemented by this goal-setting change.
+- Implemented free official public-data clients in src/swing_trader/public_data.py: SEC EDGAR submissions and XBRL Company Facts (no key, identifying User-Agent required), Treasury Fiscal Data (no token, explicit one-page pagination), and BLS Public Data API v1 (no key, maximum 25 series/request). Offline mocked tests are in tests/test_public_data.py.
+- Canonical free-source inventory: docs/data-sources/free-public-data.md. It distinguishes implemented clients from candidate sources and records access, key, quota, licensing, and point-in-time caveats.
+- Provider clients currently return structured source payloads only; no scheduler, persistence, event classifier, news/social ingestion, or trading signals have been added. FRED/ALFRED, BEA, and EIA require free API-key registration and are next priorities.
 
 ## Working
 

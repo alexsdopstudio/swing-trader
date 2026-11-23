@@ -14,8 +14,8 @@
 
 ## Next
 
-- Design and inventory free data integrations across official government/regulator APIs, company disclosures, macroeconomic datasets, reputable news/RSS, public social/community APIs, and alternative public indicators; document access, licensing, quotas, latency, history, and provenance before implementation.
-- Build a source-adapter and event-observation foundation that preserves publication/observation/retrieval timestamps, raw-response fingerprints, attribution, deduplication, and source-quality metadata.
+- Extend the free public-data clients incrementally: FRED/ALFRED, BEA, EIA, FDA/openFDA, ClinicalTrials.gov, USAspending, Federal Register, and permitted public social/news interfaces. Maintain provider-specific access, licensing, quota, latency, historical-depth, and provenance records.
+- Build canonical source observations and news ingestion on the existing provider clients, preserving publication/first-seen/retrieval timestamps, source attribution, content fingerprints, revisions, deduplication, corroboration, and source-quality metadata.
 - Publish and monitor the read-only project dashboard through GitHub Pages once the repository is configured to use GitHub Actions for Pages.
 - After paper-operations integrity is demonstrated, add a manual-live journal that records user-reported fills without transmitting broker orders or changing frozen v1.
 - If further historical universe work is justified, preregister a point-in-time membership/survivorship methodology rather than selecting additional current survivors.
