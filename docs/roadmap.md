@@ -2,6 +2,8 @@
 
 ## Now
 
+- Establish the product direction as a high-quality market-intelligence and catalyst-discovery system for US equities and crypto, prioritizing free, legally accessible data sources and strict source-quality controls.
+- Keep existing strategy v1 frozen; develop catalyst-driven discovery as a separate research path with independent validation.
 - Keep v1 frozen for `PROSPECTIVE-v1-holdout`, which begins 2026-09-14.
 - Let the provenance-preserving forward recorder begin with the first active 2026-09-15 UTC capture; do not backfill missed prospective dates.
 - Replay captured evidence only through the read-only information-time evaluator; interim state/trades must not feed v1 tuning.
@@ -12,6 +14,8 @@
 
 ## Next
 
+- Design and inventory free data integrations across official government/regulator APIs, company disclosures, macroeconomic datasets, reputable news/RSS, public social/community APIs, and alternative public indicators; document access, licensing, quotas, latency, history, and provenance before implementation.
+- Build a source-adapter and event-observation foundation that preserves publication/observation/retrieval timestamps, raw-response fingerprints, attribution, deduplication, and source-quality metadata.
 - Publish and monitor the read-only project dashboard through GitHub Pages once the repository is configured to use GitHub Actions for Pages.
 - After paper-operations integrity is demonstrated, add a manual-live journal that records user-reported fills without transmitting broker orders or changing frozen v1.
 - If further historical universe work is justified, preregister a point-in-time membership/survivorship methodology rather than selecting additional current survivors.
@@ -51,6 +55,6 @@ Interim monitoring is allowed. Interim performance must not be used to tune v1.
 
 ## Later
 
-- AI catalyst/research agent for earnings, filings, news and crypto-specific events writing validated `NEWS-*` records rather than an independent ad-hoc store.
+- Catalyst intelligence and ranking across official disclosures, news, macro, sector and permitted social/community data, writing validated time-bounded observations rather than an independent ad-hoc store. Social attention is corroborating context, never standalone trade evidence.
 - Broker connectivity only after a separately reviewed design establishes user authorization, broker-specific order semantics, risk thresholds, credential handling, and failure controls.
 - Semantic/vector retrieval over knowledge/research memory only if repository scale warrants it; retrieval must remain derived from canonical evidence-class-aware records.

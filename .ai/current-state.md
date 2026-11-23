@@ -1,6 +1,14 @@
 # Current State
 
-Last updated: 2026-09-13
+Last updated: 2026-11-23
+
+## Product direction
+
+- New goal: discover, verify, rank, and evaluate actionable swing-trading catalysts by combining high-quality public information and market behavior for US equities and crypto.
+- First data expansion priority: integrations that are free to access and legally reusable, beginning with official government/regulator/company sources, public macro datasets, reputable news/RSS, and permitted public social/community APIs.
+- Data quality is more important than source count. Require source provenance, information-time timestamps, deduplication, independent corroboration, reliability/automation/manipulation checks, licensing review, and evidence of incremental value.
+- Existing strategy v1 remains frozen. Catalyst discovery is a separate research path and cannot alter v1 risk, sizing, signal, execution, or prospective holdout semantics.
+- No new data-source integration has been implemented by this goal-setting change.
 
 ## Working
 
@@ -124,5 +132,7 @@ Last updated: 2026-09-13
 - the local paper ledger is an operational journal, not an administrator-proof write-once store or validation evidence
 
 ## Current milestone
+
+Set the product direction toward high-quality, broad-coverage market intelligence and catalyst discovery using free, legally accessible public data first. The next task is a source-by-source integration inventory and architecture, with explicit cost, API access, licensing, quota, latency, historical depth, reliability, and incremental-value assessment. Do not start indiscriminate scraping or treat social volume/sentiment as a trade signal. Keep strategy v1 and its prospective holdout frozen and separate from any catalyst strategy.
 
 Keep v1 frozen. Let the forward recorder produce the first active UTC observation on 2026-09-15 and treat any missed scheduled day as a gap rather than backfill it. Replay captured evidence only through the read-only information-time evaluator and never feed interim state/trades into tuning. Use the separate approval-only paper-operations layer only with verified daily scanner archives and its local append-only ledger; it can support disciplined paper decisions but cannot tune v1 or become validation evidence. Preserve daily scanner history as a separate operational audit trail rather than validation evidence. The source-governed knowledge layer is the canonical home for durable external references, future time-bounded news observations, and curated interpretation; generated registries and the project dashboard remain derived views. Publish the dashboard through GitHub Pages when the repository is configured for GitHub Actions, without treating live presentation metadata as research evidence. If historical universe work continues, preregister point-in-time membership rather than adding more current survivors.

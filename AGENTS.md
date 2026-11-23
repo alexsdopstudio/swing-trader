@@ -2,9 +2,9 @@
 
 ## Mission
 
-Build a robust, testable personal swing-trading decision-support system for crypto and US equities. Its product purpose is to help its owner pursue measurable net returns through repeatable decisions, deterministic risk controls, and honest performance records.
+Build a robust, testable market-intelligence and swing-trading decision-support system for US equities and crypto. Its goal is to discover, verify, rank, and evaluate actionable market catalysts by combining broad, high-quality public information with market behavior and deterministic risk controls. Prefer free, official, public, and legally reusable data sources; maximize useful coverage, not raw source count or message volume.
 
-Historical return remains a research diagnostic, not a product promise. The system must preserve out-of-sample credibility, realistic execution assumptions, and human control rather than optimizing a backtest or an AI recommendation for headline profit.
+Historical return remains a research diagnostic, not a product promise. The system must preserve out-of-sample credibility, realistic execution assumptions, source/data provenance, information-time correctness, and human control rather than optimizing a backtest or an AI recommendation for headline profit. Existing strategy v1 remains frozen; catalyst-driven research must be separately specified and validated.
 
 ## Session bootstrap and resume
 
