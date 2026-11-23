@@ -2,7 +2,9 @@
 
 ## Goal
 
-Swing Trader is a personal decision-support system for identifying, planning, and reviewing medium-term momentum/trend opportunities in crypto and US equities. Its research engine validates assumptions; its product layer must turn those assumptions into reviewable human decisions without promising profitability.
+Swing Trader is a personal market-intelligence and swing-trading decision-support system for US equities and crypto. It aims to discover, verify, rank, and evaluate actionable market catalysts by combining high-quality public information with market behavior and deterministic risk controls. Data coverage should be broad and extensible, prioritizing free official APIs, public datasets, public company disclosures, reputable news, RSS/Atom feeds, and permitted public social/community interfaces. Source count is not a quality target: reliability, provenance, information time, licensing, independence, and incremental information value govern inclusion.
+
+The existing strategy v1 remains frozen. Catalyst discovery is a separate research layer until its hypotheses, timing, execution assumptions, and risk rules are independently specified and validated. The product layer turns evidence into reviewable human decisions without promising profitability.
 
 ## Current flow
 

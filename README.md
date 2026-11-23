@@ -1,8 +1,10 @@
 # Swing Trader
 
-A rule-based personal swing-trading decision-support project for equities and crypto.
+A personal market-intelligence and swing-trading decision-support system for US equities and crypto. Its goal is to discover, verify, rank, and evaluate actionable market catalysts by combining high-quality public information with market behavior and deterministic risk controls.
 
-The v1 system is deliberately simple: daily bars, long-only, trend + momentum + relative strength + breakout + volume scoring, ATR-based risk, and next-session execution assumptions. The product goal is to help one owner pursue measurable net returns through repeatable, risk-bounded decisions while separately testing whether the strategy has a robust edge.
+The long-term product direction is broad coverage of useful, legally accessible data sources, prioritizing free official APIs, public datasets, RSS/Atom feeds, and permitted public social/community interfaces. Coverage is not a quality target: sources must be assessed for reliability, provenance, timeliness, independence, licensing, and incremental information value. Noisy, manipulative, duplicated, inaccessible, or unlicensed data must not be treated as signal.
+
+The existing v1 strategy remains frozen: daily bars, long-only, trend + momentum + relative strength + breakout + volume scoring, ATR-based risk, and next-session execution assumptions. Catalyst discovery is a separate research and decision-support layer until independently specified and validated. The product helps its owner pursue measurable net returns through repeatable, risk-bounded decisions; it does not promise profitability.
 
 > Research software only. This repository is not financial advice and is not designed to guarantee profits.
 
